@@ -26,3 +26,10 @@
 *.exe
 *.out
 *.app
+
+# Misc.
+*~
+
+# Output
+truthOut/
+truthOut/*
