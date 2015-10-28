@@ -3,6 +3,9 @@
 
 #include <EventLoop/Algorithm.h>
 
+// reclustering forward declaration
+class JetReclusteringTool;
+
 namespace xAOD{ 
   class TEvent;
 }

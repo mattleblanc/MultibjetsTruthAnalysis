@@ -24,6 +24,8 @@
 #include "xAODBase/IParticleHelpers.h"
 #include "AthContainers/ConstDataVector.h"
 
+#include <xAODJetReclustering/JetReclusteringTool.h>
+
 #include "TRandom3.h"
 
 /// Helper macro for checking xAOD::TReturnCode return values
