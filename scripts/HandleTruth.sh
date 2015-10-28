@@ -23,7 +23,7 @@
 
 python MultibjetsTruthAnalysis/scripts/Run.py \
     --submitDir=/home/mleblanc/susyGtt/MultibjetsTruthAnalysis/truthOut/ \
-    --inputDS="mc15_13TeV:mc15_13TeV.410082.MadGraphPythia8EvtGen_A14NNPDF23LO_ttgamma_noallhad.merge.DAOD_TRUTH3.e4404_p2425/" \
+    --inputDS="mc15_13TeV:mc15_13TeV.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad.merge.DAOD_TRUTH1.e3698_p2375/" \
     --driver=direct \
     --nevents=1000 \
     --doRcJets=1 \
