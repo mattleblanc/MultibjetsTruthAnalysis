@@ -118,6 +118,20 @@ EL::StatusCode TruthAnalysis :: initialize ()
   // input events.
 
   m_event = wk()->xaodEvent(); // you should have already added this as described before
+  /*
+  if(TruthJets->empty()){
+    Error("initialize()", "Cannot do reclustering if the input jet container is empty");
+    return EL::StatusCode::FAILURE;
+  }
+  */
+  // reclustering jets
+  m_reclusteringTool = new JetReclusteringTool("MBJTruth_JetReclusteringTool");
+  m_reclusteringTool->setProperty("InputJetContainer",  "AntiKt4TruthJets");
+  m_reclusteringTool->setProperty("OutputJetContainer", "RC10TruthJets");
+  m_reclusteringTool->setProperty("ReclusterRadius",    1.0);
+  m_reclusteringTool->setProperty("InputJetPtMin",      10.0);
+  m_reclusteringTool->setProperty("RCJetPtFrac",        0.05);
+  m_reclusteringTool->initialize();
 
   return EL::StatusCode::SUCCESS;
 }
@@ -190,52 +204,30 @@ EL::StatusCode TruthAnalysis :: execute ()
   }
 
   //std::cout << " Measured " << SelectedBJets->size() << " truth number " << TruthBNum << std::endl;
-
-  /*
-  const xAOD::JetContainer* TruthLargeJets = 0;
-  EL_RETURN_CHECK("Get jets", m_event->retrieve( TruthLargeJets, "TrimmedAntiKt10TruthJets" ) ); 
-  ConstDataVector<xAOD::JetContainer> * SelectedLargeJets   =  new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
-  ConstDataVector<xAOD::JetContainer> * TaggedLargeJets     =  new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
-
-  for(const auto jet : *TruthLargeJets){
-    if(fabs(jet->eta()) < 1.6 && jet->pt() / MEV > 300.){
-      SelectedLargeJets->push_back(jet);
-
-      float Tau32 = Tau3(*jet) / Tau2(*jet);
-      bool TopTagged = false;
-
-      //now tag
-      if(jet->pt() / MEV < 500.){
-        if(Tau32 < 0.77 && jet->m() / MEV > 75.){
-          TopTagged = true;
-        }
-      }
-      else{ // high pt region
-        if(Tau32 < 0.69 && jet->m() / MEV > 71.){
-          TopTagged = true;
-        }
-      }
-
-      if(TopTagged){
-        TaggedLargeJets->push_back(jet);
-      }
+  
+  // Jet Reclustering!
+  m_reclusteringTool->execute();
+  const xAOD::JetContainer* RC10TruthJets = 0;
+  m_event->retrieve( RC10TruthJets, "RC10TruthJets");
+  for(const auto jet : *RC10TruthJets)
+    {
+      // What do we want to do per-RC-jet?
     }
-  }
-  */
-    // else if (taggingShortCut == "FixedCut_LowPt_50") {
-    //   return configSubstTagger(tagname, std::vector<std::string>{ "102000<m" , "Tau32_wta<0.64" } );
-    // }                                   
-    // else if (taggingShortCut == "FixedCut_LowPt_80") {
-    //   return configSubstTagger(tagname, std::vector<std::string>{ "75000<m" , "Tau32_wta<0.77" } );
+  
+  // else if (taggingShortCut == "FixedCut_LowPt_50") {
+  //   return configSubstTagger(tagname, std::vector<std::string>{ "102000<m" , "Tau32_wta<0.64" } );
+  // }                                   
+  // else if (taggingShortCut == "FixedCut_LowPt_80") {
+  //   return configSubstTagger(tagname, std::vector<std::string>{ "75000<m" , "Tau32_wta<0.77" } );
       
-    // }                                   
-    // else if (taggingShortCut == "FixedCut_HighPt_50") {
-    //   return configSubstTagger(tagname, std::vector<std::string>{ "120000<m" , "Tau32_wta<0.57" } );
-    // }                                   
-    // else if (taggingShortCut == "FixedCut_HighPt_80") {
-    //   return configSubstTagger(tagname, std::vector<std::string>{ "71000<m" , "Tau32_wta<0.69" } );      
-    // }    
-
+  // }                                   
+  // else if (taggingShortCut == "FixedCut_HighPt_50") {
+  //   return configSubstTagger(tagname, std::vector<std::string>{ "120000<m" , "Tau32_wta<0.57" } );
+  // }                                   
+  // else if (taggingShortCut == "FixedCut_HighPt_80") {
+  //   return configSubstTagger(tagname, std::vector<std::string>{ "71000<m" , "Tau32_wta<0.69" } );      
+  // }    
+  
   const xAOD::TruthParticleContainer* TruthElectrons = 0;
   EL_RETURN_CHECK("Get electrons", m_event->retrieve( TruthElectrons, "TruthElectrons" ) );
   

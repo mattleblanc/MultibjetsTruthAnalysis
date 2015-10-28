@@ -26,7 +26,6 @@ public:
   // Tree *myTree; //!
   // TH1 *myHist; //!
 
-
   xAOD::TEvent*  m_event; //!
 
   // this is a standard constructor
@@ -45,6 +44,9 @@ public:
 
   // this is needed to distribute the algorithm to the workers
   ClassDef(TruthAnalysis, 1);
+
+ private:
+  JetReclusteringTool* m_reclusteringTool = nullptr; //!
 };
 
 #endif
