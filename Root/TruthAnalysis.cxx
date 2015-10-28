@@ -131,6 +131,8 @@ EL::StatusCode TruthAnalysis :: execute ()
   // histograms and trees.  This is where most of your actual analysis
   // code will go.
 
+  //std::cout << "TruthAnalysis::execute()" << std::endl;
+
   // TODO: Seed this properly
   TRandom3* myRand = new TRandom3();
 
@@ -153,9 +155,8 @@ EL::StatusCode TruthAnalysis :: execute ()
       SelectedJets->push_back(jet);
     }
 
-
     // handle b-jets now
-
+    
     if(fabs(jet->eta()) > 2.5 || jet->pt() / MEV < 20.){
       continue;
     }
@@ -188,8 +189,9 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   }
 
-  // std::cout << " Measured " << SelectedBJets->size() << " truth number " << TruthBNum << std::endl;
+  //std::cout << " Measured " << SelectedBJets->size() << " truth number " << TruthBNum << std::endl;
 
+  /*
   const xAOD::JetContainer* TruthLargeJets = 0;
   EL_RETURN_CHECK("Get jets", m_event->retrieve( TruthLargeJets, "TrimmedAntiKt10TruthJets" ) ); 
   ConstDataVector<xAOD::JetContainer> * SelectedLargeJets   =  new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
@@ -219,7 +221,7 @@ EL::StatusCode TruthAnalysis :: execute ()
       }
     }
   }
-
+  */
     // else if (taggingShortCut == "FixedCut_LowPt_50") {
     //   return configSubstTagger(tagname, std::vector<std::string>{ "102000<m" , "Tau32_wta<0.64" } );
     // }                                   
@@ -234,23 +236,24 @@ EL::StatusCode TruthAnalysis :: execute ()
     //   return configSubstTagger(tagname, std::vector<std::string>{ "71000<m" , "Tau32_wta<0.69" } );      
     // }    
 
-
   const xAOD::TruthParticleContainer* TruthElectrons = 0;
   EL_RETURN_CHECK("Get electrons", m_event->retrieve( TruthElectrons, "TruthElectrons" ) );
-
   
   // check pt cut on leptons; susytools defaults to 10.
   ConstDataVector<xAOD::TruthParticleContainer> * SignalElectrons    =  new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
   ConstDataVector<xAOD::TruthParticleContainer> * BaselineElectrons  =  new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
-  for(const auto electron : *TruthElectrons){
-    if(fabs(electron->eta()) < 2.47 && electron->pt() / MEV > 20.){
-      SignalElectrons->push_back(electron);
+ 
+  for(const auto electron : *TruthElectrons)
+    { 
+     if(fabs(electron->eta()) < 2.47 && electron->pt() / MEV > 20.)
+	{
+	  SignalElectrons->push_back(electron);
+	}
+      if(fabs(electron->eta()) < 2.47 && electron->pt() / MEV > 10.)
+	{
+	  BaselineElectrons->push_back(electron);
+	}
     }
-    if(fabs(electron->eta()) < 2.47 && electron->pt() / MEV > 10.){
-      BaselineElectrons->push_back(electron);
-    }
-  }
-
 
   const xAOD::TruthParticleContainer* TruthMuons = 0;
   EL_RETURN_CHECK("Get muons", m_event->retrieve( TruthMuons, "TruthMuons" ) );
@@ -267,10 +270,9 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   }
 
-
   const xAOD::MissingETContainer* TruthMET = 0;
   EL_RETURN_CHECK("Get MET", m_event->retrieve( TruthMET, "MET_Truth" ) );
-
+ 
   xAOD::MissingETContainer::const_iterator TruthMET_it = TruthMET->find("NonInt");
   if (TruthMET_it == TruthMET->end()) std::cout << "No NonINT inside MET container" << std::endl;
   xAOD::MissingET* TruthMET_NonInt = *TruthMET_it;
@@ -285,21 +287,19 @@ EL::StatusCode TruthAnalysis :: execute ()
   int NBaseLeptons     = NBaseElectrons + NBaseMuons;
 
 
-
-
+  std::cout << "Applying signal region criteria." << std::endl;
+  
   // 1 lepton region
-  if(NSignalLeptons == 1){
-
-  }
-
+  if(NSignalLeptons == 1)
+    {
+      std::cout << "One-lepton region." << std::endl;
+    }
 
   // 0 lepton region
-  if(NBaseLeptons == 0){
-
-  }
-
-
-
+  if(NBaseLeptons == 0)
+    {
+      std::cout    << "Zero-lepton region."    << std::endl;
+    }
   
   return EL::StatusCode::SUCCESS;
 }
