@@ -125,7 +125,7 @@ EL::StatusCode TruthAnalysis :: initialize ()
 
   // set the m_event output to this file
   TFile *file_xAOD = wk()->getOutputFile ("output_xAOD");
-  RETURN_CHECK("initialize()", m_event->writeTo(file_xAOD), "Could not set output to file");
+  EL_RETURN_CHECK("initialize()", m_event->writeTo(file_xAOD));//, "Could not set output to file");
 
   /*
   if(TruthJets->empty()){
@@ -642,7 +642,7 @@ EL::StatusCode TruthAnalysis :: finalize ()
 
   // output xAOD
   TFile *file_xAOD = wk()->getOutputFile ("output_xAOD");
-  RETURN_CHECK("finalize()", m_event->finishWritingTo( file_xAOD ), "Could not finish writing to the output xAOD");
+  EL_RETURN_CHECK("finalize()", m_event->finishWritingTo( file_xAOD ));//, "Could not finish writing to the output xAOD");
 
   return EL::StatusCode::SUCCESS;
 }
