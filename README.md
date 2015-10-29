@@ -1,5 +1,5 @@
 
-<img src="http://i.imgur.com/cQ90uWb.jpg" width="400" align="right" alt="truth" />
+<img src="http://i.imgur.com/cQ90uWb.jpg" width="250" align="right" alt="truth" />
 
 The truth is out there.
 
