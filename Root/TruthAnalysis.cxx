@@ -71,6 +71,10 @@ EL::StatusCode TruthAnalysis :: setupJob (EL::Job& job)
   job.useXAOD ();
   EL_RETURN_CHECK( "setupJob()", xAOD::Init() ); // call before opening first file
 
+  // outputs
+  EL::OutputStream out_xAOD ("output_xAOD", "xAOD");
+  job.outputAdd (out_xAOD);
+
   return EL::StatusCode::SUCCESS;
 }
 
@@ -118,6 +122,11 @@ EL::StatusCode TruthAnalysis :: initialize ()
   // input events.
 
   m_event = wk()->xaodEvent(); // you should have already added this as described before
+
+  // set the m_event output to this file
+  TFile *file_xAOD = wk()->getOutputFile ("output_xAOD");
+  EL_RETURN_CHECK("initialize()", m_event->writeTo(file_xAOD));//, "Could not set output to file");
+
   /*
   if(TruthJets->empty()){
     Error("initialize()", "Cannot do reclustering if the input jet container is empty");
@@ -156,10 +165,10 @@ EL::StatusCode TruthAnalysis :: execute ()
 
   const xAOD::JetContainer* TruthJets = 0;
   EL_RETURN_CHECK("Get jets", m_event->retrieve( TruthJets, "AntiKt4TruthJets" ) );
-  
+
   static SG::AuxElement::ConstAccessor< int > GhostBHadrons("GhostBHadronsFinalCount");
   static SG::AuxElement::ConstAccessor< int > GhostCHadrons("GhostCHadronsFinalCount");
-  
+
   static SG::AuxElement::ConstAccessor< float > Tau2("Tau2_wta");
   static SG::AuxElement::ConstAccessor< float > Tau3("Tau3_wta");
 
@@ -173,7 +182,7 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
 
     // handle b-jets now
-    
+
     if(fabs(jet->eta()) > 2.5 || jet->pt() / MEV < 20.){
       continue;
     }
@@ -207,7 +216,7 @@ EL::StatusCode TruthAnalysis :: execute ()
   }
 
   //std::cout << " Measured " << SelectedBJets->size() << " truth number " << TruthBNum << std::endl;
-  
+
   // Jet Reclustering!
   ConstDataVector<xAOD::JetContainer> * SelectedRCJets   =  new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
   ConstDataVector<xAOD::JetContainer> * SelectedTopJets   =  new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
@@ -227,16 +236,16 @@ EL::StatusCode TruthAnalysis :: execute ()
 	    }
 	}
     }
-  
+
   const xAOD::TruthParticleContainer* TruthElectrons = 0;
   EL_RETURN_CHECK("Get electrons", m_event->retrieve( TruthElectrons, "TruthElectrons" ) );
-  
+
   // check pt cut on leptons; susytools defaults to 10.
   ConstDataVector<xAOD::TruthParticleContainer> * SignalElectrons    =  new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
   ConstDataVector<xAOD::TruthParticleContainer> * BaselineElectrons  =  new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
- 
+
   for(const auto electron : *TruthElectrons)
-    { 
+    {
      if(fabs(electron->eta()) < 2.47 && electron->pt() / MEV > 20.)
 	{
 	  SignalElectrons->push_back(electron);
@@ -264,7 +273,7 @@ EL::StatusCode TruthAnalysis :: execute ()
 
   const xAOD::MissingETContainer* TruthMET = 0;
   EL_RETURN_CHECK("Get MET", m_event->retrieve( TruthMET, "MET_Truth" ) );
- 
+
   xAOD::MissingETContainer::const_iterator TruthMET_it = TruthMET->find("NonInt");
   if (TruthMET_it == TruthMET->end()) std::cout << "No NonINT inside MET container" << std::endl;
   xAOD::MissingET* TruthMET_NonInt = *TruthMET_it;
@@ -277,8 +286,8 @@ EL::StatusCode TruthAnalysis :: execute ()
   float var_HT = Variables::Ht(TruthJets, TruthMuons, TruthElectrons);
   float var_Met = TruthMET_NonInt->met()/1000.0;
   float var_MetSig = Variables::Met_significance(TruthMET_NonInt, TruthJets, 4 /* How many jets to use in HT? */);
-  
-      
+
+
   int NSignalElectrons = SignalElectrons->size();
   int NSignalMuons     = SignalMuons->size();
   int NBaseElectrons   = BaselineElectrons->size();
@@ -306,7 +315,7 @@ EL::StatusCode TruthAnalysis :: execute ()
   std::cout << "NJets is " << NJets << std::endl;
   std::cout << "NBJets is " << NBJets << std::endl;
   */
-  
+
   /*
     Commented lines such as 'configMgr.cutsDict*' are taken from the HistFitter config file ... it can be found here:
     https://svnweb.cern.ch/trac/atlasphys-susy/browser/Physics/SUSY/Analyses/MultiBJets/HistFitter/trunk/ananlisis_multib/python/My3bGtt.py
@@ -342,9 +351,9 @@ EL::StatusCode TruthAnalysis :: execute ()
           isPreselect_Gbb = true;
         }
       else isPreselect_Gbb = false;
-      
+
       //configMgr.cutsDict["Presel_Gtt_0l"] = "(signal_electrons_n + signal_muons_n)==0 && jets_n>=6 && bjets_n>=3 && met>200 && meff_incl<1000."
-      if(NBaseLeptons == 0 
+      if(NBaseLeptons == 0
          && NJets >= 6
          && NBJets >= 3
          && var_Met > 200.0
@@ -405,7 +414,7 @@ EL::StatusCode TruthAnalysis :: execute ()
          && SelectedJets->at(3)->pt()/MEV > 90.0
          && SelectedBJets->at(2)->pt()/MEV > 90.0
          && var_Met > 400.0
-         && var_Meff_4j > 1200.0) 
+         && var_Meff_4j > 1200.0)
         {
           isGbbSRB2=true;
         }
@@ -417,7 +426,7 @@ EL::StatusCode TruthAnalysis :: execute ()
          && SelectedJets->at(3)->pt()/MEV > 50.0
          && SelectedBJets->at(2)->pt()/MEV > 50.0
          && var_Met > 300.0
-         && var_Meff_4j > 1600.0) 
+         && var_Meff_4j > 1600.0)
         {
           isGbbSRC2=true;
         }
@@ -450,10 +459,10 @@ EL::StatusCode TruthAnalysis :: execute ()
 
   // Gtt 1L SR flags
   bool isGtt1LSRA2=false, isGtt1LSRB2=false, isGtt1LSRC2=false, isGtt1LSRA4=false, isGtt1LSRB4=false, isGtt1LSRC4=false;
-  if(isPreselect_Gtt_1l) 
+  if(isPreselect_Gtt_1l)
     {
       // And here, the various one-lepton signal regions ...
-      
+
       //configMgr.cutsDict["SR_Gtt_1l_A_2"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=1 && met>200 && meff_incl>1100"
       if(var_mT > 150
          && var_mTb > 160
@@ -466,7 +475,7 @@ EL::StatusCode TruthAnalysis :: execute ()
           isGtt1LSRA2=true;
         }
       else isGtt1LSRA2=false;
-      
+
       //configMgr.cutsDict["SR_Gtt_1l_B_2"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=0 && met>300 && meff_incl>900"
       if(var_mT > 150
          && var_mTb > 160
@@ -531,7 +540,7 @@ EL::StatusCode TruthAnalysis :: execute ()
       else isGtt1LSRC4=false;
 
    }
-  
+
   // Gtt 0L signal region flags
   bool isGtt0LSRA=false, isGtt0LSRB=false, isGtt0LSRC=false, isGtt0LSRD=false;
   if(isPreselect_Gtt_0l)
@@ -590,16 +599,20 @@ EL::StatusCode TruthAnalysis :: execute ()
         }
       else isGtt0LSRD=false;
     }
-  
+
   if(isGbbSRA1 || isGbbSRB1 || isGbbSRA2 || isGbbSRB2 || isGbbSRC2 || isGbbSRA4 || isGbbSRB4)
     std::cout << "Gbb 0L SR" << std::endl;
-  
-  if(isGtt1LSRA2 || isGtt1LSRB2 || isGtt1LSRC2 || isGtt1LSRA4 || isGtt1LSRB4 || isGtt1LSRC4) 
+
+  if(isGtt1LSRA2 || isGtt1LSRB2 || isGtt1LSRC2 || isGtt1LSRA4 || isGtt1LSRB4 || isGtt1LSRC4)
     std::cout << "Gtt 1L SR" << std::endl;
-  
+
   if(isGtt0LSRA || isGtt0LSRB || isGtt0LSRC || isGtt0LSRD)
     std::cout << "Gtt 0L SR" << std::endl;
-  
+
+  // copy EventInfo at least
+  m_event->copy("EventInfo");
+  m_event->fill(); // copy things into file
+
   return EL::StatusCode::SUCCESS;
 }
 
@@ -626,6 +639,11 @@ EL::StatusCode TruthAnalysis :: finalize ()
   // submission node after all your histogram outputs have been
   // merged.  This is different from histFinalize() in that it only
   // gets called on worker nodes that processed input events.
+
+  // output xAOD
+  TFile *file_xAOD = wk()->getOutputFile ("output_xAOD");
+  EL_RETURN_CHECK("finalize()", m_event->finishWritingTo( file_xAOD ));//, "Could not finish writing to the output xAOD");
+
   return EL::StatusCode::SUCCESS;
 }
 
