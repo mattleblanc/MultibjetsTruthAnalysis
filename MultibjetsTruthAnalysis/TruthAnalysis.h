@@ -3,6 +3,8 @@
 
 #include <EventLoop/Algorithm.h>
 
+#include "MultibjetsTruthAnalysis/Variables.h"
+
 // reclustering forward declaration
 class JetReclusteringTool;
 

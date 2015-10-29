@@ -9,7 +9,7 @@
 #include "xAODJet/JetContainer.h"
 #include "xAODMuon/MuonContainer.h"
 #include "xAODEgamma/ElectronContainer.h"
-
+#include "xAODTruth/TruthParticleContainer.h"
 
 class Variables {
 
@@ -22,6 +22,11 @@ class Variables {
                             const xAOD::JetContainer*       v_jets, 
                             const xAOD::MuonContainer*      v_muons,
                             const xAOD::ElectronContainer*  v_electrons);
+
+  static Float_t Meff_incl(const xAOD::MissingET* v_met,
+			   const xAOD::JetContainer*       v_jets,
+			   const xAOD::TruthParticleContainer*      v_muons,
+			   const xAOD::TruthParticleContainer*  v_electrons);
   
   // Meff calculated with the n leading jets with pt > 30 GeV. The 4 leading jets are used by default
   static Float_t Meff_4j(const xAOD::MissingET* v_met,  const xAOD::JetContainer* v_jets, u_int njets=4);
@@ -31,13 +36,21 @@ class Variables {
                     const xAOD::MuonContainer*       v_muons,
                     const xAOD::ElectronContainer*   v_electrons);
 
+  static Float_t Ht(const xAOD::JetContainer*        v_jets,
+                    const xAOD::TruthParticleContainer*       v_muons,
+                    const xAOD::TruthParticleContainer*   v_electrons);
+
   // Met significance calculated with the n leading jets with pt > 30 GeV. The 4 leading jets are used by default
   static Float_t Met_significance(const xAOD::MissingET* v_met, const xAOD::JetContainer* v_jets, u_int njets=4);
 
   // Transverse mass calculated with the leading lepton and the met
-  static Float_t mT(const xAOD::MissingET* v_met, 
+  static Float_t mT(const xAOD::MissingET* v_met,
                     const xAOD::MuonContainer*       v_muons,
                     const xAOD::ElectronContainer*   v_electrons);
+  
+  static Float_t mT(const xAOD::MissingET* v_met, 
+                    const xAOD::TruthParticleContainer*       v_muons,
+                    const xAOD::TruthParticleContainer*   v_electrons);
 
   // Minimum transverse mass of b-jets and the met with a mass set at 0 (default) or m(W)
   static Float_t mT_min_bjets( const xAOD::MissingET* v_met, const xAOD::JetContainer* v_jets, bool set_mw=false);

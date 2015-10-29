@@ -145,7 +145,11 @@ EL::StatusCode TruthAnalysis :: execute ()
   // histograms and trees.  This is where most of your actual analysis
   // code will go.
 
-  //std::cout << "TruthAnalysis::execute()" << std::endl;
+  static int count = 0;
+  if(count==0) std::cout << "TruthAnalysis::execute() BEGIN" << std::endl;
+  count++;
+  if(count % 1000 == 0) std::cout << "TruthAnalysis::execute()\tProcessed " << count << " events."  << std::endl;;
+
 
   // TODO: Seed this properly
   TRandom3* myRand = new TRandom3();
@@ -163,7 +167,6 @@ EL::StatusCode TruthAnalysis :: execute ()
   ConstDataVector<xAOD::JetContainer> * SelectedBJets  =  new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
 
   int TruthBNum = 0;
-
   for(const auto jet : *TruthJets){
     if(fabs(jet->eta()) < 2.8 && jet->pt() / MEV > 20.){
       SelectedJets->push_back(jet);
@@ -206,27 +209,24 @@ EL::StatusCode TruthAnalysis :: execute ()
   //std::cout << " Measured " << SelectedBJets->size() << " truth number " << TruthBNum << std::endl;
   
   // Jet Reclustering!
+  ConstDataVector<xAOD::JetContainer> * SelectedRCJets   =  new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
+  ConstDataVector<xAOD::JetContainer> * SelectedTopJets   =  new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
+
   m_reclusteringTool->execute();
   const xAOD::JetContainer* RC10TruthJets = 0;
   m_event->retrieve( RC10TruthJets, "RC10TruthJets");
   for(const auto jet : *RC10TruthJets)
     {
-      // What do we want to do per-RC-jet?
+      if(fabs(jet->eta()) < 2.0 && jet->pt() / MEV > 300.0)
+	{
+	  SelectedRCJets->push_back(jet);
+
+	  if(jet->m() / MEV > 100.0)
+	    {
+	      SelectedTopJets->push_back(jet);
+	    }
+	}
     }
-  
-  // else if (taggingShortCut == "FixedCut_LowPt_50") {
-  //   return configSubstTagger(tagname, std::vector<std::string>{ "102000<m" , "Tau32_wta<0.64" } );
-  // }                                   
-  // else if (taggingShortCut == "FixedCut_LowPt_80") {
-  //   return configSubstTagger(tagname, std::vector<std::string>{ "75000<m" , "Tau32_wta<0.77" } );
-      
-  // }                                   
-  // else if (taggingShortCut == "FixedCut_HighPt_50") {
-  //   return configSubstTagger(tagname, std::vector<std::string>{ "120000<m" , "Tau32_wta<0.57" } );
-  // }                                   
-  // else if (taggingShortCut == "FixedCut_HighPt_80") {
-  //   return configSubstTagger(tagname, std::vector<std::string>{ "71000<m" , "Tau32_wta<0.69" } );      
-  // }    
   
   const xAOD::TruthParticleContainer* TruthElectrons = 0;
   EL_RETURN_CHECK("Get electrons", m_event->retrieve( TruthElectrons, "TruthElectrons" ) );
@@ -269,29 +269,336 @@ EL::StatusCode TruthAnalysis :: execute ()
   if (TruthMET_it == TruthMET->end()) std::cout << "No NonINT inside MET container" << std::endl;
   xAOD::MissingET* TruthMET_NonInt = *TruthMET_it;
 
-
+  float var_dPhiMin = Variables::delta_phi_nj(TruthMET_NonInt, TruthJets, TruthJets->size()); // Should it be this MET?
+  float var_Meff = Variables::Meff_incl(TruthMET_NonInt, TruthJets, TruthMuons, TruthElectrons);
+  float var_Meff_4j = Variables::Meff_4j(TruthMET_NonInt, TruthJets, 4 /* How many jets to use? */);
+  float var_mT = Variables::mT(TruthMET_NonInt, TruthMuons, TruthElectrons);
+  float var_mTb = Variables::mT_min_bjets(TruthMET_NonInt, TruthJets, false /* set_mw? */);
+  float var_HT = Variables::Ht(TruthJets, TruthMuons, TruthElectrons);
+  float var_Met = TruthMET_NonInt->met()/1000.0;
+  float var_MetSig = Variables::Met_significance(TruthMET_NonInt, TruthJets, 4 /* How many jets to use in HT? */);
+  
+      
   int NSignalElectrons = SignalElectrons->size();
   int NSignalMuons     = SignalMuons->size();
   int NBaseElectrons   = BaselineElectrons->size();
   int NBaseMuons       = BaselineMuons->size();
+  int NJets	       = SelectedJets->size();
+  int NBJets           = SelectedBJets->size();
+  int NTopJets	       = SelectedTopJets->size();
 
   int NSignalLeptons   = NSignalElectrons + NSignalMuons;
   int NBaseLeptons     = NBaseElectrons + NBaseMuons;
 
+  bool isOneLepton; isOneLepton = (NSignalLeptons == 1);
+  bool isZeroLepton; isZeroLepton = (NBaseLeptons == 0);
+  bool isPreselect_Gbb=false, isPreselect_Gtt_1l=false, isPreselect_Gtt_0l=false;
+  bool isPreselect=false;
 
-  std::cout << "Applying signal region criteria." << std::endl;
+  // debug variables
+  /*
+  std::cout << "var_dPhiMin is " << var_dPhiMin << std::endl;
+  std::cout << "var_Meff is " << var_Meff << std::endl;
+  std::cout << "var_mT is " << var_mT << std::endl;
+  std::cout << "var_HT is " << var_HT << std::endl;
+  std::cout << "var_Met is " << var_Met << std::endl;
+  std::cout << "var_MetSig is " << var_MetSig << std::endl;
+  std::cout << "NJets is " << NJets << std::endl;
+  std::cout << "NBJets is " << NBJets << std::endl;
+  */
   
-  // 1 lepton region
-  if(NSignalLeptons == 1)
+  /*
+    Commented lines such as 'configMgr.cutsDict*' are taken from the HistFitter config file ... it can be found here:
+    https://svnweb.cern.ch/trac/atlasphys-susy/browser/Physics/SUSY/Analyses/MultiBJets/HistFitter/trunk/ananlisis_multib/python/My3bGtt.py
+    ... they're just for my own reference, so don't please don't fuss about them too much.
+  */
+
+  // Gtt 1 lepton region
+  if(isOneLepton)
     {
-      std::cout << "One-lepton region." << std::endl;
+      //configMgr.cutsDict["Presel_Gtt_1l"] = "(signal_electrons_n + signal_muons_n)>=1 && jets_n>=6 && bjets_n>=3 && met>200 && meff_incl<1000."
+      if(NSignalLeptons >= 1
+         && NJets >= 6
+         && NBJets >= 3
+         && var_Met > 200.0
+         && var_Meff < 1000.0) // Gtt 1L preselection
+	{
+	  isPreselect_Gtt_1l = true;
+	}
+      else isPreselect_Gtt_1l = false;
     }
 
-  // 0 lepton region
-  if(NBaseLeptons == 0)
+  // Gbb preselection and Gtt 0 lepton preselection regions
+  if(isZeroLepton)
     {
-      std::cout    << "Zero-lepton region."    << std::endl;
+      //configMgr.cutsDict["Presel_Gbb"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && jets_n>=4 && bjets_n>=3 && met>200 && meff_4j < 1000."
+      if(NBaseLeptons == 0
+         && var_dPhiMin > 0.4
+         && NJets >= 4
+         && NBJets >= 3
+         && var_Met > 200.0
+         && var_Meff_4j < 1000.0) // Gbb 0L preselection
+	{
+          isPreselect_Gbb = true;
+        }
+      else isPreselect_Gbb = false;
+      
+      //configMgr.cutsDict["Presel_Gtt_0l"] = "(signal_electrons_n + signal_muons_n)==0 && jets_n>=6 && bjets_n>=3 && met>200 && meff_incl<1000."
+      if(NBaseLeptons == 0 
+         && NJets >= 6
+         && NBJets >= 3
+         && var_Met > 200.0
+         && var_Meff < 1000.0) // Gtt 0L Preselection
+	{
+	  isPreselect_Gtt_0l = true;
+	}
+      else isPreselect_Gtt_0l = false;
     }
+
+  isPreselect = (isPreselect_Gbb || isPreselect_Gtt_0l || isPreselect_Gtt_1l);
+  //if(!isPreselect) continue;
+
+  // Gbb SR flags
+  bool isGbbSRA1=false, isGbbSRB1=false, isGbbSRA2=false, isGbbSRB2=false, isGbbSRC2=false, isGbbSRA4=false, isGbbSRB4=false;
+  if(isPreselect_Gbb)
+    {
+      //configMgr.cutsDict["SR_Gbb_A_1"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>50 && pt_bjet_3>50 && met>300 && meff_4j>1600"
+      if(var_dPhiMin > 0.4
+	 && SelectedJets->size() >= 4
+	 && SelectedJets->at(3)->pt()/MEV > 50.0
+	 && SelectedBJets->at(2)->pt()/MEV > 50.0
+	 && var_Met > 300.0
+	 && var_Meff_4j > 1600.0)
+	{
+	  isGbbSRA1=true;
+	}
+      else isGbbSRA1=false;
+
+      //configMgr.cutsDict["SR_Gbb_B_1"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>70 && pt_bjet_3>70 && met>400 && meff_4j>800"
+      if(var_dPhiMin > 0.4
+	 && SelectedJets->size() >= 4
+         && SelectedJets->at(3)->pt()/MEV > 70.0
+         && SelectedBJets->at(2)->pt()/MEV > 70.0
+         && var_Met > 400.0
+         && var_Meff_4j > 800.0)
+        {
+          isGbbSRB1=true;
+        }
+      else isGbbSRB1=false;
+
+
+      //configMgr.cutsDict["SR_Gbb_A_2"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>350 && meff_4j>1400"
+      if(var_dPhiMin > 0.4
+	 && SelectedJets->size() >= 4
+         && SelectedJets->at(3)->pt()/MEV > 90.0
+         && SelectedBJets->at(2)->pt()/MEV > 90.0
+         && var_Met > 350.0
+         && var_Meff_4j > 1400.0)
+        {
+          isGbbSRA2=true;
+        }
+      else isGbbSRA2=false;
+
+      //configMgr.cutsDict["SR_Gbb_B_2"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>400 && meff_4j>1200"
+      if(var_dPhiMin > 0.4
+	 && SelectedJets->size() >= 4
+         && SelectedJets->at(3)->pt()/MEV > 90.0
+         && SelectedBJets->at(2)->pt()/MEV > 90.0
+         && var_Met > 400.0
+         && var_Meff_4j > 1200.0) 
+        {
+          isGbbSRB2=true;
+        }
+      else isGbbSRB2=false;
+
+      //configMgr.cutsDict["SR_Gbb_C_2"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>30 && pt_bjet_3>30 && met>500 && meff_4j>1400"
+      if(var_dPhiMin > 0.4
+	 && SelectedJets->size() >= 4
+         && SelectedJets->at(3)->pt()/MEV > 50.0
+         && SelectedBJets->at(2)->pt()/MEV > 50.0
+         && var_Met > 300.0
+         && var_Meff_4j > 1600.0) 
+        {
+          isGbbSRC2=true;
+        }
+      else isGbbSRC2=false;
+
+      //configMgr.cutsDict["SR_Gbb_A_4"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>350 && meff_4j>1600"
+      if(var_dPhiMin > 0.4
+	 && SelectedJets->size() >= 4
+         && SelectedJets->at(3)->pt()/MEV > 90.0
+         && SelectedBJets->at(2)->pt()/MEV > 90.0
+         && var_Met > 350.0
+         && var_Meff_4j > 1600.0)
+        {
+          isGbbSRA4=true;
+        }
+      else isGbbSRA4=false;
+
+      //configMgr.cutsDict["SR_Gbb_B_4"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>450 && meff_4j>1400"
+      if(var_dPhiMin > 0.4
+	 && SelectedJets->size() >= 4
+         && SelectedJets->at(3)->pt()/MEV > 90.0
+         && SelectedBJets->at(2)->pt()/MEV > 90.0
+         && var_Met > 450.0
+         && var_Meff_4j > 1400.0)
+        {
+          isGbbSRB4=true;
+        }
+      else isGbbSRB4=false;
+    }
+
+  // Gtt 1L SR flags
+  bool isGtt1LSRA2=false, isGtt1LSRB2=false, isGtt1LSRC2=false, isGtt1LSRA4=false, isGtt1LSRB4=false, isGtt1LSRC4=false;
+  if(isPreselect_Gtt_1l) 
+    {
+      // And here, the various one-lepton signal regions ...
+      
+      //configMgr.cutsDict["SR_Gtt_1l_A_2"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=1 && met>200 && meff_incl>1100"
+      if(var_mT > 150
+         && var_mTb > 160
+	 && NJets >= 6
+	 && NBJets >= 3
+	 && NTopJets >= 1
+         && var_Met > 200.0
+         && var_Meff > 1100.0)
+        {
+          isGtt1LSRA2=true;
+        }
+      else isGtt1LSRA2=false;
+      
+      //configMgr.cutsDict["SR_Gtt_1l_B_2"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=0 && met>300 && meff_incl>900"
+      if(var_mT > 150
+         && var_mTb > 160
+	 && NJets >= 6
+         && NBJets >= 3
+	 && NTopJets >= 0
+         && var_Met > 300.0
+         && var_Meff > 900.0)
+        {
+          isGtt1LSRB2=true;
+        }
+      else isGtt1LSRB2=false;
+
+      //configMgr.cutsDict["SR_Gtt_1l_C_2"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>0   && jets_n>=6 && bjets_n>=4 && top_n>=0 && met>200 && meff_incl>600"
+      if(var_mT > 150
+	 && NJets >= 6
+         && NBJets >= 4
+         && NTopJets >= 0
+         && var_Met > 200.0
+         && var_Meff > 600.0)
+        {
+          isGtt1LSRC2=true;
+        }
+      else isGtt1LSRC2=false;
+
+      //configMgr.cutsDict["SR_Gtt_1l_A_4"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=1 && met>250 && meff_incl>1600"
+      if(var_mT > 150
+         && var_mTb > 160
+          && NJets >= 6
+         && NBJets >= 3
+         && NTopJets >= 1
+         && var_Met > 250.0
+         && var_Meff > 1600.0)
+        {
+          isGtt1LSRA4=true;
+        }
+      else isGtt1LSRA4=false;
+
+      //configMgr.cutsDict["SR_Gtt_1l_B_4"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=0 && met>350 && meff_incl>1100"
+      if(var_mT > 150
+         && var_mTb > 160
+	 && NJets >= 6
+         && NBJets >= 3
+         && NTopJets >= 0
+         && var_Met > 350.0
+         && var_Meff > 1100.0)
+        {
+          isGtt1LSRB4=true;
+        }
+      else isGtt1LSRB4=false;
+
+      //configMgr.cutsDict["SR_Gtt_1l_C_4"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>0   && jets_n>=6 && bjets_n>=4 && top_n>=0 && met>250 && meff_incl>700"
+      if(var_mT > 150
+	 && NJets >= 6
+         && NBJets >= 4
+         && NTopJets >= 0
+         && var_Met > 250.0
+         && var_Meff > 700.0)
+        {
+          isGtt1LSRC4=true;
+        }
+      else isGtt1LSRC4=false;
+
+   }
+  
+  // Gtt 0L signal region flags
+  bool isGtt0LSRA=false, isGtt0LSRB=false, isGtt0LSRC=false, isGtt0LSRD=false;
+  if(isPreselect_Gtt_0l)
+    {
+      // And here, the various zero-lepton signal regions ...
+
+      //configMgr.cutsDict["SR_Gtt_0l_A"] = "(signal_electrons_n + signal_muons_n)==0 && dphi_min>0.4 && mTb_min>80 && jets_n>=8 && bjets_n>=4 && top_n>=0 && met>350 && meff_incl>1250
+      if(var_dPhiMin > 0.4
+	 && var_mTb > 80
+         && NJets >= 8
+         && NBJets >= 4
+         && NTopJets >= 0
+         && var_Met > 350.0
+         && var_Meff > 1250.0)
+        {
+          isGtt0LSRA=true;
+        }
+      else isGtt0LSRA=false;
+
+      //configMgr.cutsDict["SR_Gtt_0l_B"] = "(signal_electrons_n + signal_muons_n)==0 && dphi_min>0.4 && mTb_min>80 && jets_n>=8 && bjets_n>=4 && top_n>=1 && met>350 && meff_incl>1250"
+      if(var_dPhiMin > 0.4
+	 && var_mTb > 80
+         && NJets >= 8
+         && NBJets >= 4
+         && NTopJets >= 1
+         && var_Met > 350.0
+         && var_Meff > 1250.0)
+        {
+          isGtt0LSRB=true;
+        }
+      else isGtt0LSRB=false;
+
+      //configMgr.cutsDict["SR_Gtt_0l_C"] = "(signal_electrons_n + signal_muons_n)==0 && dphi_min>0.4 && mTb_min>80 && jets_n>=8 && bjets_n>=3 && top_n>=1 && met>400 && meff_incl>1700"
+      if(var_dPhiMin > 0.4
+	 && var_mTb > 80
+         && NJets >= 8
+         && NBJets >= 3
+         && NTopJets >= 1
+         && var_Met > 400.0
+         && var_Meff > 1700.0)
+        {
+          isGtt0LSRC=true;
+        }
+      else isGtt0LSRC=false;
+
+      //configMgr.cutsDict["SR_Gtt_0l_D"] = "(signal_electrons_n + signal_muons_n)==0 && dphi_min>0.4 && mTb_min>80 && jets_n>=8 && bjets_n>=3 && top_n>=2 && met>400 && meff_incl>1700"
+      if(var_dPhiMin > 0.4
+	 && var_mTb > 80
+         && NJets >= 8
+         && NBJets >= 3
+         && NTopJets >= 2
+         && var_Met > 400.0
+         && var_Meff > 1700.0)
+        {
+          isGtt0LSRD=true;
+        }
+      else isGtt0LSRD=false;
+    }
+  
+  if(isGbbSRA1 || isGbbSRB1 || isGbbSRA2 || isGbbSRB2 || isGbbSRC2 || isGbbSRA4 || isGbbSRB4)
+    std::cout << "Gbb 0L SR" << std::endl;
+  
+  if(isGtt1LSRA2 || isGtt1LSRB2 || isGtt1LSRC2 || isGtt1LSRA4 || isGtt1LSRB4 || isGtt1LSRC4) 
+    std::cout << "Gtt 1L SR" << std::endl;
+  
+  if(isGtt0LSRA || isGtt0LSRB || isGtt0LSRC || isGtt0LSRD)
+    std::cout << "Gtt 0L SR" << std::endl;
   
   return EL::StatusCode::SUCCESS;
 }

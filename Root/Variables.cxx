@@ -34,6 +34,28 @@ Float_t Variables::Meff_incl(const xAOD::MissingET* v_met, const xAOD::JetContai
   return meff;
 }
 
+Float_t Variables::Meff_incl(const xAOD::MissingET* v_met, const xAOD::JetContainer* v_jets, const xAOD::TruthParticleContainer*  v_muons, const xAOD::TruthParticleContainer*  v_electrons){
+
+  Float_t meff = v_met->met() / MEV;
+
+  for (auto jet : *v_jets) {
+    if(jet->pt() / MEV <30.) continue;
+    meff += jet->pt() / MEV;
+  }
+
+  for (auto muon : *v_muons) {
+    if(muon->pt() / MEV < 25.) continue;
+    meff += muon->pt() / MEV;
+  }
+
+  for (auto elec : *v_electrons) {
+    if(elec->pt() / MEV < 25.) continue;
+    meff += elec->pt() / MEV;
+  }
+
+  return meff;
+}
+
 //-----------------------------------------------------------------------------------------------------------------
   
 // Meff calculated with the n leading jets with pt > 30 GeV. The 4 leading jets are used by default
@@ -70,6 +92,28 @@ Float_t Variables::Ht(const xAOD::JetContainer* v_jets, const xAOD::MuonContaine
     ht += muon->pt() / MEV;
   }
   
+  for (auto elec : *v_electrons) {
+    if(elec->pt() / MEV < 25.) continue;
+    ht += elec->pt() / MEV;
+  }
+
+  return ht;
+}
+
+Float_t Variables::Ht(const xAOD::JetContainer* v_jets, const xAOD::TruthParticleContainer*  v_muons,  const xAOD::TruthParticleContainer* v_electrons){
+
+  Float_t ht = 0;
+
+  for (auto jet : *v_jets) {
+    if(jet->pt() / MEV <30.) continue;
+    ht += jet->pt() / MEV;
+  }
+
+  for (auto muon : *v_muons) {
+    if(muon->pt() / MEV < 25.) continue;
+    ht += muon->pt() / MEV;
+  }
+
   for (auto elec : *v_electrons) {
     if(elec->pt() / MEV < 25.) continue;
     ht += elec->pt() / MEV;
@@ -156,6 +200,54 @@ Float_t Variables::mT(const xAOD::MissingET* v_met, const xAOD::MuonContainer*  
   return sqrt(fabs(mt));
 }
 
+Float_t Variables::mT(const xAOD::MissingET* v_met, const xAOD::TruthParticleContainer*  v_muons,  const xAOD::TruthParticleContainer*  v_electrons){
+  
+
+  //Removed old code.
+
+  // Float_t mt = 0;
+
+  // return mt;
+  // // find the leading lepton
+  // TLorentzVector *v_lepton;
+  // if(v_muons->size()==0 && v_electrons->size()==0) return mt;
+  // // else if(v_muons.size()==0 && v_electrons->size()>0) v_lepton = (TLorentzVector*) v_electrons.at(0);
+  // // else if(v_muons->size()>0 && v_electrons->size()==0) v_lepton = (TLorentzVector*) v_muons.at(0);
+  // // else return mt; // this is a hack because the electrons are being changed
+  // // else v_lepton = (v_muons.at(0)->Pt() > v_electrons->at(0)->Pt()) ? (TLorentzVector*) v_muons.at(0) : (TLorentzVector*) v_electrons->at(0);
+
+// // mt = 2*v_lepton->Pt()*v_met.Pt()*(1-TMath::Cos(v_lepton->Phi() - v_met.Phi()));
+// // mt = (mt >= 0.) ? sqrt(mt) : sqrt(-mt);
+
+// return mt;
+float mt(0.0);
+
+bool els_exist = v_electrons && v_electrons->size() > 0;
+bool muons_exist = v_muons && v_muons->size() > 0;
+
+// get leading lepton
+const xAOD::IParticle* leadingLepton(nullptr);
+
+// if no leptons passed, return 0.0
+if     (!muons_exist && !els_exist)
+  return mt;
+ else if(muons_exist && !els_exist)
+   leadingLepton = static_cast<const xAOD::IParticle*>(v_muons->at(0));
+ else if(!muons_exist && els_exist)
+   leadingLepton = static_cast<const xAOD::IParticle*>(v_electrons->at(0));
+ else {
+   // if muon pt > electron pt, then leading lepton is muon
+   if(v_muons->at(0)->pt() > v_electrons->at(0)->pt())
+     leadingLepton = static_cast<const xAOD::IParticle*>(v_muons->at(0));
+   // otherwise it is electron
+   else
+     leadingLepton = static_cast<const xAOD::IParticle*>(v_electrons->at(0));
+ }
+
+mt = 2*leadingLepton->pt()/MEV*v_met->met()/MEV*(1-cos(xAOD::P4Helpers::deltaPhi(leadingLepton, v_met)));
+return sqrt(fabs(mt));
+}
+
 //-----------------------------------------------------------------------------------------------------------------
   
 // Minimum transverse mass of b-jets and the met with a mass set at 0 (default) or m(W)
@@ -189,7 +281,6 @@ Float_t Variables::mT_min_bjets(const xAOD::MissingET* v_met, const xAOD::JetCon
   if(nb_bjets==0) return 0;
   else return mt_min;
 }
-
 
 //-----------------------------------------------------------------------------------------------------------------
  
