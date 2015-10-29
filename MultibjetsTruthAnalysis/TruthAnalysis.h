@@ -5,6 +5,8 @@
 
 #include "MultibjetsTruthAnalysis/Variables.h"
 
+#include "EventLoop/OutputStream.h"
+
 // reclustering forward declaration
 class JetReclusteringTool;
 

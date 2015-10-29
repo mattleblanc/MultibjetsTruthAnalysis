@@ -21,6 +21,8 @@
 #  --doTRF=DOTRF         TRF flag [0/1]
 #  --process=PROCESS     name of the process added to the output grid jobs
 
+rm -rf /home/mleblanc/susyGtt/MultibjetsTruthAnalysis/truthOut/*
+
 python MultibjetsTruthAnalysis/scripts/Run.py \
     --submitDir=/home/mleblanc/susyGtt/MultibjetsTruthAnalysis/truthOut/ \
     --inputDS="mc15_13TeV:mc15_13TeV.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad.merge.DAOD_TRUTH1.e3698_p2375/" \

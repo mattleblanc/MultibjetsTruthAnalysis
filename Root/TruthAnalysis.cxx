@@ -27,6 +27,8 @@
 #include <xAODJetReclustering/JetReclusteringTool.h>
 
 #include "TRandom3.h"
+#include "TTree.h"
+#include "TFile.h"
 
 /// Helper macro for checking xAOD::TReturnCode return values
 #define EL_RETURN_CHECK( CONTEXT, EXP )                     \
@@ -72,8 +74,8 @@ EL::StatusCode TruthAnalysis :: setupJob (EL::Job& job)
   EL_RETURN_CHECK( "setupJob()", xAOD::Init() ); // call before opening first file
 
   // outputs
-  EL::OutputStream out_xAOD ("output_xAOD", "xAOD");
-  job.outputAdd (out_xAOD);
+  EL::OutputStream out_tree ("output_tree");
+  job.outputAdd (out_tree);
 
   return EL::StatusCode::SUCCESS;
 }
@@ -124,7 +126,7 @@ EL::StatusCode TruthAnalysis :: initialize ()
   m_event = wk()->xaodEvent(); // you should have already added this as described before
 
   // set the m_event output to this file
-  TFile *file_xAOD = wk()->getOutputFile ("output_xAOD");
+  TFile *file_xAOD = wk()->getOutputFile ("output_tree");
   EL_RETURN_CHECK("initialize()", m_event->writeTo(file_xAOD));//, "Could not set output to file");
 
   /*
@@ -609,9 +611,43 @@ EL::StatusCode TruthAnalysis :: execute ()
   if(isGtt0LSRA || isGtt0LSRB || isGtt0LSRC || isGtt0LSRD)
     std::cout << "Gtt 0L SR" << std::endl;
 
+  TFile* file_tree = wk()->getOutputFile ("output_tree");
+  TTree* out_tree; out_tree = new TTree("out_tree","output tree");
+  out_tree->SetDirectory(file_tree);
+
+  Int_t m_all_events = 1;
+
+  out_tree->Branch("all_events",&m_all_events,"all_events/I");
+  out_tree->Branch("isGbbSRA1",&isGbbSRA1,"isGbbSRA1/I");
+  out_tree->Branch("isGbbSRB1",&isGbbSRB1,"isGbbSRB1/I");
+  out_tree->Branch("isGbbSRA2",&isGbbSRA2,"isGbbSRA2/I");
+  out_tree->Branch("isGbbSRB2",&isGbbSRB2,"isGbbSRB2/I");
+  out_tree->Branch("isGbbSRC2",&isGbbSRC2,"isGbbSRC2/I");
+  out_tree->Branch("isGbbSRA4",&isGbbSRA4,"isGbbSRA4/I");
+  out_tree->Branch("isGbbSRB4",&isGbbSRB4,"isGbbSRB4/I");
+  out_tree->Branch("isGtt1LSRA2",&isGtt1LSRA2,"isGtt1LSRA2/I");
+  out_tree->Branch("isGtt1LSRB2",&isGtt1LSRB2,"isGtt1LSRB2/I");
+  out_tree->Branch("isGtt1LSRC2",&isGtt1LSRC2,"isGtt1LSRC2/I");
+  out_tree->Branch("isGtt1LSRA4",&isGtt1LSRA4,"isGtt1LSRA4/I");
+  out_tree->Branch("isGtt1LSRB4",&isGtt1LSRB4,"isGtt1LSRB4/I");
+  out_tree->Branch("isGtt1LSRC4",&isGtt1LSRC4,"isGtt1LSRC4/I");
+  out_tree->Branch("isGtt0LSRA",&isGtt0LSRA,"isGtt0LSRA/I");
+  out_tree->Branch("isGtt0LSRB",&isGtt0LSRA,"isGtt0LSRB/I");
+  out_tree->Branch("isGtt0LSRC",&isGtt0LSRA,"isGtt0LSRC/I");
+  out_tree->Branch("isGtt0LSRD",&isGtt0LSRA,"isGtt0LSRD/I");
+
+  out_tree->Fill();
+  out_tree->Write();
+
+  //TFile* file_tree = wk()->getOutputFile ("output_tree");
+  //out_tree->SetDirectory(file_tree);
+  //out_tree->Write();
+  
+  //file_tree->Write("test.root");
+
   // copy EventInfo at least
-  m_event->copy("EventInfo");
-  m_event->fill(); // copy things into file
+  //m_event->copy("EventInfo");
+  //m_event->fill(); // copy things into file
 
   return EL::StatusCode::SUCCESS;
 }
@@ -641,8 +677,8 @@ EL::StatusCode TruthAnalysis :: finalize ()
   // gets called on worker nodes that processed input events.
 
   // output xAOD
-  TFile *file_xAOD = wk()->getOutputFile ("output_xAOD");
-  EL_RETURN_CHECK("finalize()", m_event->finishWritingTo( file_xAOD ));//, "Could not finish writing to the output xAOD");
+  TFile *file_tree = wk()->getOutputFile ("output_tree");
+  EL_RETURN_CHECK("finalize()", m_event->finishWritingTo( file_tree ));
 
   return EL::StatusCode::SUCCESS;
 }
