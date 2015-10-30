@@ -127,6 +127,10 @@ EL::StatusCode TruthAnalysis :: initialize ()
   m_event = wk()->xaodEvent(); // you should have already added this as described before
 
   m_all_events = 1;
+  isPreselect_Gbb=false;
+  isPreselect_Gtt_1l=false;
+  isPreselect_Gtt_0l=false;
+  isPreselect=false;
   isGbbSRA1=false;
   isGbbSRB1=false;
   isGbbSRA2=false;
@@ -150,6 +154,10 @@ EL::StatusCode TruthAnalysis :: initialize ()
   out_tree->SetDirectory (file);
   
   out_tree->Branch("all_events",&m_all_events,"all_events/I");
+  out_tree->Branch("isPreselect_Gbb",&isPreselect_Gbb,"isPreselect_Gbb/I");
+  out_tree->Branch("isPreselect_Gtt_1l",&isPreselect_Gtt_1l,"isPreselect_Gtt_1l/I");
+  out_tree->Branch("isPreselect_Gtt_0l",&isPreselect_Gtt_0l,"isPreselect_Gtt_0l/I");
+  out_tree->Branch("isPreselect",&isPreselect,"isPreselect/I");
   out_tree->Branch("isGbbSRA1",&isGbbSRA1,"isGbbSRA1/I");
   out_tree->Branch("isGbbSRB1",&isGbbSRB1,"isGbbSRB1/I");
   out_tree->Branch("isGbbSRA2",&isGbbSRA2,"isGbbSRA2/I");
@@ -174,6 +182,7 @@ EL::StatusCode TruthAnalysis :: initialize ()
     return EL::StatusCode::FAILURE;
   }
   */
+
   // reclustering jets
   m_reclusteringTool = new JetReclusteringTool("MBJTruth_JetReclusteringTool");
   m_reclusteringTool->setProperty("InputJetContainer",  "AntiKt4TruthJets");
@@ -342,9 +351,7 @@ EL::StatusCode TruthAnalysis :: execute ()
 
   bool isOneLepton; isOneLepton = (NSignalLeptons == 1);
   bool isZeroLepton; isZeroLepton = (NBaseLeptons == 0);
-  bool isPreselect_Gbb=false, isPreselect_Gtt_1l=false, isPreselect_Gtt_0l=false;
-  bool isPreselect=false;
-
+  
   // debug variables
   /*
   std::cout << "var_dPhiMin is " << var_dPhiMin << std::endl;

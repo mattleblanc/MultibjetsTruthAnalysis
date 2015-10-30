@@ -57,6 +57,10 @@ public:
   TTree* out_tree; // !
   
   Int_t m_all_events; //!
+  bool isPreselect_Gbb; //!
+  bool isPreselect_Gtt_1l; //!
+  bool isPreselect_Gtt_0l; //!
+  bool isPreselect; //!
   bool isGbbSRA1; //!
   bool isGbbSRB1; //!
   bool isGbbSRA2; //!
