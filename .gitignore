@@ -32,5 +32,7 @@
 gh.sh
 
 # Output
+testOut/
+testOut/*
 truthOut/
 truthOut/*
