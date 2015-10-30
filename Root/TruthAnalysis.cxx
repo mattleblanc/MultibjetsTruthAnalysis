@@ -27,7 +27,6 @@
 #include <xAODJetReclustering/JetReclusteringTool.h>
 
 #include "TRandom3.h"
-#include "TTree.h"
 #include "TFile.h"
 
 /// Helper macro for checking xAOD::TReturnCode return values
@@ -56,6 +55,8 @@ TruthAnalysis :: TruthAnalysis ()
   // called on both the submission and the worker node.  Most of your
   // initialization code will go into histInitialize() and
   // initialize().
+
+  out_tree = new TTree("out_tree", "output tree");
 }
 
 
@@ -74,8 +75,8 @@ EL::StatusCode TruthAnalysis :: setupJob (EL::Job& job)
   EL_RETURN_CHECK( "setupJob()", xAOD::Init() ); // call before opening first file
 
   // outputs
-  EL::OutputStream out_tree ("output_tree");
-  job.outputAdd (out_tree);
+  EL::OutputStream outTree ("outTree");
+  job.outputAdd (outTree);
 
   return EL::StatusCode::SUCCESS;
 }
@@ -125,9 +126,47 @@ EL::StatusCode TruthAnalysis :: initialize ()
 
   m_event = wk()->xaodEvent(); // you should have already added this as described before
 
-  // set the m_event output to this file
-  TFile *file_xAOD = wk()->getOutputFile ("output_tree");
-  EL_RETURN_CHECK("initialize()", m_event->writeTo(file_xAOD));//, "Could not set output to file");
+  m_all_events = 1;
+  isGbbSRA1=false;
+  isGbbSRB1=false;
+  isGbbSRA2=false;
+  isGbbSRB2=false;
+  isGbbSRC2=false;
+  isGbbSRA4=false;
+  isGbbSRB4=false;
+  isGtt1LSRA2=false;
+  isGtt1LSRB2=false;
+  isGtt1LSRC2=false;
+  isGtt1LSRA4=false;
+  isGtt1LSRB4=false;
+  isGtt1LSRC4=false;
+  isGtt0LSRA=false;
+  isGtt0LSRB=false;
+  isGtt0LSRC=false;
+  isGtt0LSRD=false;
+
+  //TTree* out_tree; out_tree = new TTree("out_tree","output tree");
+  TFile *file = wk()->getOutputFile ("outTree");
+  out_tree->SetDirectory (file);
+  
+  out_tree->Branch("all_events",&m_all_events,"all_events/I");
+  out_tree->Branch("isGbbSRA1",&isGbbSRA1,"isGbbSRA1/I");
+  out_tree->Branch("isGbbSRB1",&isGbbSRB1,"isGbbSRB1/I");
+  out_tree->Branch("isGbbSRA2",&isGbbSRA2,"isGbbSRA2/I");
+  out_tree->Branch("isGbbSRB2",&isGbbSRB2,"isGbbSRB2/I");
+  out_tree->Branch("isGbbSRC2",&isGbbSRC2,"isGbbSRC2/I");
+  out_tree->Branch("isGbbSRA4",&isGbbSRA4,"isGbbSRA4/I");
+  out_tree->Branch("isGbbSRB4",&isGbbSRB4,"isGbbSRB4/I");
+  out_tree->Branch("isGtt1LSRA2",&isGtt1LSRA2,"isGtt1LSRA2/I");
+  out_tree->Branch("isGtt1LSRB2",&isGtt1LSRB2,"isGtt1LSRB2/I");
+  out_tree->Branch("isGtt1LSRC2",&isGtt1LSRC2,"isGtt1LSRC2/I");
+  out_tree->Branch("isGtt1LSRA4",&isGtt1LSRA4,"isGtt1LSRA4/I");
+  out_tree->Branch("isGtt1LSRB4",&isGtt1LSRB4,"isGtt1LSRB4/I");
+  out_tree->Branch("isGtt1LSRC4",&isGtt1LSRC4,"isGtt1LSRC4/I");
+  out_tree->Branch("isGtt0LSRA",&isGtt0LSRA,"isGtt0LSRA/I");
+  out_tree->Branch("isGtt0LSRB",&isGtt0LSRA,"isGtt0LSRB/I");
+  out_tree->Branch("isGtt0LSRC",&isGtt0LSRA,"isGtt0LSRC/I");
+  out_tree->Branch("isGtt0LSRD",&isGtt0LSRA,"isGtt0LSRD/I");
 
   /*
   if(TruthJets->empty()){
@@ -370,7 +409,7 @@ EL::StatusCode TruthAnalysis :: execute ()
   //if(!isPreselect) continue;
 
   // Gbb SR flags
-  bool isGbbSRA1=false, isGbbSRB1=false, isGbbSRA2=false, isGbbSRB2=false, isGbbSRC2=false, isGbbSRA4=false, isGbbSRB4=false;
+  //bool isGbbSRA1=false, isGbbSRB1=false, isGbbSRA2=false, isGbbSRB2=false, isGbbSRC2=false, isGbbSRA4=false, isGbbSRB4=false;
   if(isPreselect_Gbb)
     {
       //configMgr.cutsDict["SR_Gbb_A_1"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>50 && pt_bjet_3>50 && met>300 && meff_4j>1600"
@@ -460,7 +499,7 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
 
   // Gtt 1L SR flags
-  bool isGtt1LSRA2=false, isGtt1LSRB2=false, isGtt1LSRC2=false, isGtt1LSRA4=false, isGtt1LSRB4=false, isGtt1LSRC4=false;
+  //bool isGtt1LSRA2=false, isGtt1LSRB2=false, isGtt1LSRC2=false, isGtt1LSRA4=false, isGtt1LSRB4=false, isGtt1LSRC4=false;
   if(isPreselect_Gtt_1l)
     {
       // And here, the various one-lepton signal regions ...
@@ -544,7 +583,7 @@ EL::StatusCode TruthAnalysis :: execute ()
    }
 
   // Gtt 0L signal region flags
-  bool isGtt0LSRA=false, isGtt0LSRB=false, isGtt0LSRC=false, isGtt0LSRD=false;
+  //bool isGtt0LSRA=false, isGtt0LSRB=false, isGtt0LSRC=false, isGtt0LSRD=false;
   if(isPreselect_Gtt_0l)
     {
       // And here, the various zero-lepton signal regions ...
@@ -611,43 +650,7 @@ EL::StatusCode TruthAnalysis :: execute ()
   if(isGtt0LSRA || isGtt0LSRB || isGtt0LSRC || isGtt0LSRD)
     std::cout << "Gtt 0L SR" << std::endl;
 
-  TFile* file_tree = wk()->getOutputFile ("output_tree");
-  TTree* out_tree; out_tree = new TTree("out_tree","output tree");
-  out_tree->SetDirectory(file_tree);
-
-  Int_t m_all_events = 1;
-
-  out_tree->Branch("all_events",&m_all_events,"all_events/I");
-  out_tree->Branch("isGbbSRA1",&isGbbSRA1,"isGbbSRA1/I");
-  out_tree->Branch("isGbbSRB1",&isGbbSRB1,"isGbbSRB1/I");
-  out_tree->Branch("isGbbSRA2",&isGbbSRA2,"isGbbSRA2/I");
-  out_tree->Branch("isGbbSRB2",&isGbbSRB2,"isGbbSRB2/I");
-  out_tree->Branch("isGbbSRC2",&isGbbSRC2,"isGbbSRC2/I");
-  out_tree->Branch("isGbbSRA4",&isGbbSRA4,"isGbbSRA4/I");
-  out_tree->Branch("isGbbSRB4",&isGbbSRB4,"isGbbSRB4/I");
-  out_tree->Branch("isGtt1LSRA2",&isGtt1LSRA2,"isGtt1LSRA2/I");
-  out_tree->Branch("isGtt1LSRB2",&isGtt1LSRB2,"isGtt1LSRB2/I");
-  out_tree->Branch("isGtt1LSRC2",&isGtt1LSRC2,"isGtt1LSRC2/I");
-  out_tree->Branch("isGtt1LSRA4",&isGtt1LSRA4,"isGtt1LSRA4/I");
-  out_tree->Branch("isGtt1LSRB4",&isGtt1LSRB4,"isGtt1LSRB4/I");
-  out_tree->Branch("isGtt1LSRC4",&isGtt1LSRC4,"isGtt1LSRC4/I");
-  out_tree->Branch("isGtt0LSRA",&isGtt0LSRA,"isGtt0LSRA/I");
-  out_tree->Branch("isGtt0LSRB",&isGtt0LSRA,"isGtt0LSRB/I");
-  out_tree->Branch("isGtt0LSRC",&isGtt0LSRA,"isGtt0LSRC/I");
-  out_tree->Branch("isGtt0LSRD",&isGtt0LSRA,"isGtt0LSRD/I");
-
   out_tree->Fill();
-  out_tree->Write();
-
-  //TFile* file_tree = wk()->getOutputFile ("output_tree");
-  //out_tree->SetDirectory(file_tree);
-  //out_tree->Write();
-  
-  //file_tree->Write("test.root");
-
-  // copy EventInfo at least
-  //m_event->copy("EventInfo");
-  //m_event->fill(); // copy things into file
 
   return EL::StatusCode::SUCCESS;
 }
@@ -659,6 +662,7 @@ EL::StatusCode TruthAnalysis :: postExecute ()
   // Here you do everything that needs to be done after the main event
   // processing.  This is typically very rare, particularly in user
   // code.  It is mainly used in implementing the NTupleSvc.
+
   return EL::StatusCode::SUCCESS;
 }
 
@@ -675,10 +679,6 @@ EL::StatusCode TruthAnalysis :: finalize ()
   // submission node after all your histogram outputs have been
   // merged.  This is different from histFinalize() in that it only
   // gets called on worker nodes that processed input events.
-
-  // output xAOD
-  TFile *file_tree = wk()->getOutputFile ("output_tree");
-  EL_RETURN_CHECK("finalize()", m_event->finishWritingTo( file_tree ));
 
   return EL::StatusCode::SUCCESS;
 }
@@ -697,5 +697,6 @@ EL::StatusCode TruthAnalysis :: histFinalize ()
   // outputs have been merged.  This is different from finalize() in
   // that it gets called on all worker nodes regardless of whether
   // they processed input events.
+
   return EL::StatusCode::SUCCESS;
 }

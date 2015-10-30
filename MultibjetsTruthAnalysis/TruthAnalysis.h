@@ -7,6 +7,8 @@
 
 #include "EventLoop/OutputStream.h"
 
+#include "TTree.h"
+
 // reclustering forward declaration
 class JetReclusteringTool;
 
@@ -51,6 +53,27 @@ public:
 
  private:
   JetReclusteringTool* m_reclusteringTool = nullptr; //!
+
+  TTree* out_tree; // !
+  
+  Int_t m_all_events; //!
+  bool isGbbSRA1; //!
+  bool isGbbSRB1; //!
+  bool isGbbSRA2; //!
+  bool isGbbSRB2; //!
+  bool isGbbSRC2; //!
+  bool isGbbSRA4; //!
+  bool isGbbSRB4; //!
+  bool isGtt1LSRA2; //!
+  bool isGtt1LSRB2; //!
+  bool isGtt1LSRC2; //!
+  bool isGtt1LSRA4; //!
+  bool isGtt1LSRB4; //!
+  bool isGtt1LSRC4; //!
+  bool isGtt0LSRA; //!
+  bool isGtt0LSRB; //!
+  bool isGtt0LSRC; //!
+  bool isGtt0LSRD; //!
 };
 
 #endif
