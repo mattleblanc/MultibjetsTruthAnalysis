@@ -11,7 +11,7 @@ parser = OptionParser()
 # job configuration
 parser.add_option("--submitDir", help="dir to store the output", default="submit_dir")
 parser.add_option("--inputDS", help="input DS from DQ2", default="none")
-parser.add_option("--driver", help="select where to run", choices=("direct", "prooflite", "proof", "grid"), default="direct")
+parser.add_option("--driver", help="select where to run", choices=("direct", "condor", "prooflite", "proof", "grid"), default="direct")
 parser.add_option("--nevents", type=int, help="number of events to process for all the datasets")
 parser.add_option("--skip-events", type=int, help="skip the first n events")
 parser.add_option("-w", "--overwrite", action='store_true', default=True, help="overwrite previous submitDir")
@@ -100,6 +100,11 @@ if (options.driver == "direct"):
     driver = ROOT.EL.DirectDriver()
     logging.info("submit job")
     driver.submit(job, options.submitDir)
+elif (options.driver == "condor" ):
+    driver = ROOT.EL.CondorDriver()
+    driver.options().setBool(ROOT.EL.Job.optBatchSharedFileSystem, False)
+    driver.options().setString(ROOT.EL.Job.optCondorConf, "stream_output = true")
+    driver.submitOnly(job, options.submitDir)
 elif (options.driver == "prooflite"):
     logging.info("running on prooflite")
     driver = ROOT.EL.ProofDriver()
