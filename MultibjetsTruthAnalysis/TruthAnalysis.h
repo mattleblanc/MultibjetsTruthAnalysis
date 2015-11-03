@@ -57,6 +57,10 @@ public:
   TTree* out_tree; // !
   
   Int_t m_all_events; //!
+
+  Int_t mc_channel; //!
+  float mc_weight; //!
+
   bool isPreselect_Gbb; //!
   bool isPreselect_Gtt_1l; //!
   bool isPreselect_Gtt_0l; //!
