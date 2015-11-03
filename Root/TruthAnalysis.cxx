@@ -59,8 +59,6 @@ TruthAnalysis :: TruthAnalysis ()
   out_tree = new TTree("out_tree", "output tree");
 }
 
-
-
 EL::StatusCode TruthAnalysis :: setupJob (EL::Job& job)
 {
   // Here you put code that sets up the job on the submission object
@@ -127,6 +125,8 @@ EL::StatusCode TruthAnalysis :: initialize ()
   m_event = wk()->xaodEvent(); // you should have already added this as described before
 
   m_all_events = 1;
+  mc_channel=-1;
+  mc_weight=0.0;
   isPreselect_Gbb=false;
   isPreselect_Gtt_1l=false;
   isPreselect_Gtt_0l=false;
@@ -154,6 +154,8 @@ EL::StatusCode TruthAnalysis :: initialize ()
   out_tree->SetDirectory (file);
   
   out_tree->Branch("all_events",&m_all_events,"all_events/I");
+  out_tree->Branch("mc_channel",&mc_channel,"mc_channel/I");
+  out_tree->Branch("mc_weight",&mc_weight,"mc_weight/F");
   out_tree->Branch("isPreselect_Gbb",&isPreselect_Gbb,"isPreselect_Gbb/I");
   out_tree->Branch("isPreselect_Gtt_1l",&isPreselect_Gtt_1l,"isPreselect_Gtt_1l/I");
   out_tree->Branch("isPreselect_Gtt_0l",&isPreselect_Gtt_0l,"isPreselect_Gtt_0l/I");
@@ -208,7 +210,8 @@ EL::StatusCode TruthAnalysis :: execute ()
   if(count==0) std::cout << "TruthAnalysis::execute() BEGIN" << std::endl;
   count++;
   if(count % 1000 == 0) std::cout << "TruthAnalysis::execute()\tProcessed " << count << " events."  << std::endl;;
-
+  
+  Bool_t debug = false;
 
   // TODO: Seed this properly
   TRandom3* myRand = new TRandom3();
@@ -227,13 +230,13 @@ EL::StatusCode TruthAnalysis :: execute ()
 
   int TruthBNum = 0;
   for(const auto jet : *TruthJets){
-    if(fabs(jet->eta()) < 2.8 && jet->pt() / MEV > 20.){
+    if(fabs(jet->eta()) < 2.8 && jet->pt() / MEV > 30.){
       SelectedJets->push_back(jet);
     }
 
     // handle b-jets now
 
-    if(fabs(jet->eta()) > 2.5 || jet->pt() / MEV < 20.){
+    if(fabs(jet->eta()) > 2.5 || jet->pt() / MEV < 30.){
       continue;
     }
     bool HasB = (GhostBHadrons(*jet) >= 1);
@@ -328,14 +331,14 @@ EL::StatusCode TruthAnalysis :: execute ()
   if (TruthMET_it == TruthMET->end()) std::cout << "No NonINT inside MET container" << std::endl;
   xAOD::MissingET* TruthMET_NonInt = *TruthMET_it;
 
-  float var_dPhiMin = Variables::delta_phi_nj(TruthMET_NonInt, TruthJets, TruthJets->size()); // Should it be this MET?
-  float var_Meff = Variables::Meff_incl(TruthMET_NonInt, TruthJets, TruthMuons, TruthElectrons);
-  float var_Meff_4j = Variables::Meff_4j(TruthMET_NonInt, TruthJets, 4 /* How many jets to use? */);
-  float var_mT = Variables::mT(TruthMET_NonInt, TruthMuons, TruthElectrons);
-  float var_mTb = Variables::mT_min_bjets(TruthMET_NonInt, TruthJets, false /* set_mw? */);
-  float var_HT = Variables::Ht(TruthJets, TruthMuons, TruthElectrons);
+  float var_dPhiMin = Variables::delta_phi_nj(TruthMET_NonInt, SelectedJets->asDataVector(), SelectedJets->size()); // Should it be this MET?
+  float var_Meff = Variables::Meff_incl(TruthMET_NonInt, SelectedJets->asDataVector(), SignalMuons->asDataVector(), SignalElectrons->asDataVector());
+  float var_Meff_4j = Variables::Meff_4j(TruthMET_NonInt, SelectedJets->asDataVector(), 4 /* How many jets to use? */);
+  float var_mT = Variables::mT(TruthMET_NonInt, SignalMuons->asDataVector(), SignalElectrons->asDataVector());
+  float var_mTb = Variables::mT_min_bjets(TruthMET_NonInt, SelectedBJets->asDataVector(), false /* set_mw? */);
+  float var_HT = Variables::Ht(SelectedJets->asDataVector(), SignalMuons->asDataVector(), SignalElectrons->asDataVector());
   float var_Met = TruthMET_NonInt->met()/1000.0;
-  float var_MetSig = Variables::Met_significance(TruthMET_NonInt, TruthJets, 4 /* How many jets to use in HT? */);
+  float var_MetSig = Variables::Met_significance(TruthMET_NonInt, SelectedJets->asDataVector(), 4 /* How many jets to use in HT? */);
 
 
   int NSignalElectrons = SignalElectrons->size();
@@ -353,16 +356,20 @@ EL::StatusCode TruthAnalysis :: execute ()
   bool isZeroLepton; isZeroLepton = (NBaseLeptons == 0);
   
   // debug variables
-  /*
-  std::cout << "var_dPhiMin is " << var_dPhiMin << std::endl;
-  std::cout << "var_Meff is " << var_Meff << std::endl;
-  std::cout << "var_mT is " << var_mT << std::endl;
-  std::cout << "var_HT is " << var_HT << std::endl;
-  std::cout << "var_Met is " << var_Met << std::endl;
-  std::cout << "var_MetSig is " << var_MetSig << std::endl;
-  std::cout << "NJets is " << NJets << std::endl;
-  std::cout << "NBJets is " << NBJets << std::endl;
-  */
+  if(debug)
+    {
+      std::cout << "var_dPhiMin is " << var_dPhiMin << std::endl;
+      std::cout << "var_Meff is " << var_Meff << std::endl;
+      std::cout << "var_Meff_4j is " << var_Meff_4j << std::endl;
+      std::cout << "var_mT is " << var_mT << std::endl;
+      std::cout << "var_mTb is " << var_mTb << std::endl;
+      std::cout << "var_HT is " << var_HT << std::endl;
+      std::cout << "var_Met is " << var_Met << std::endl;
+      std::cout << "var_MetSig is " << var_MetSig << std::endl;
+      std::cout << "NJets is " << NJets << std::endl;
+      std::cout << "NBJets is " << NBJets << std::endl;
+      std::cout << "NTopJets is " << NTopJets << std::endl;
+    }
 
   /*
     Commented lines such as 'configMgr.cutsDict*' are taken from the HistFitter config file ... it can be found here:
@@ -381,6 +388,7 @@ EL::StatusCode TruthAnalysis :: execute ()
          && var_Meff < 1000.0) // Gtt 1L preselection
 	{
 	  isPreselect_Gtt_1l = true;
+	  if(debug) std::cout << "DEBUG::PRESEL\tisGtt1L" << std::endl;
 	}
       else isPreselect_Gtt_1l = false;
     }
@@ -397,17 +405,19 @@ EL::StatusCode TruthAnalysis :: execute ()
          && var_Meff_4j < 1000.0) // Gbb 0L preselection
 	{
           isPreselect_Gbb = true;
+	  if(debug) std::cout << "DEBUG::PRESEL\tisGbb" << std::endl;
         }
       else isPreselect_Gbb = false;
 
       //configMgr.cutsDict["Presel_Gtt_0l"] = "(signal_electrons_n + signal_muons_n)==0 && jets_n>=6 && bjets_n>=3 && met>200 && meff_incl<1000."
-      if(NBaseLeptons == 0
+      if(NSignalLeptons == 0
          && NJets >= 6
          && NBJets >= 3
          && var_Met > 200.0
          && var_Meff < 1000.0) // Gtt 0L Preselection
 	{
 	  isPreselect_Gtt_0l = true;
+	  if(debug) std::cout << "DEBUG::PRESEL\tisGtt0L" << std::endl;
 	}
       else isPreselect_Gtt_0l = false;
     }
@@ -428,9 +438,10 @@ EL::StatusCode TruthAnalysis :: execute ()
 	 && var_Meff_4j > 1600.0)
 	{
 	  isGbbSRA1=true;
+	  if(debug) std::cout << "DEBUG::SR\tisGbbSRA1" << std::endl;
 	}
       else isGbbSRA1=false;
-
+      
       //configMgr.cutsDict["SR_Gbb_B_1"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>70 && pt_bjet_3>70 && met>400 && meff_4j>800"
       if(var_dPhiMin > 0.4
 	 && SelectedJets->size() >= 4
@@ -440,6 +451,7 @@ EL::StatusCode TruthAnalysis :: execute ()
          && var_Meff_4j > 800.0)
         {
           isGbbSRB1=true;
+	  if(debug) std::cout << "DEBUG::SR\tisGbbSRB1" << std::endl;
         }
       else isGbbSRB1=false;
 
@@ -453,6 +465,7 @@ EL::StatusCode TruthAnalysis :: execute ()
          && var_Meff_4j > 1400.0)
         {
           isGbbSRA2=true;
+	  if(debug) std::cout << "DEBUG::SR\tisGbbSRA2" << std::endl;
         }
       else isGbbSRA2=false;
 
@@ -465,6 +478,7 @@ EL::StatusCode TruthAnalysis :: execute ()
          && var_Meff_4j > 1200.0)
         {
           isGbbSRB2=true;
+	  if(debug) std::cout << "DEBUG::SR\tisGbbSRB2" << std::endl;
         }
       else isGbbSRB2=false;
 
@@ -477,6 +491,7 @@ EL::StatusCode TruthAnalysis :: execute ()
          && var_Meff_4j > 1600.0)
         {
           isGbbSRC2=true;
+	  if(debug) std::cout << "DEBUG::SR\tisGbbSRC2" << std::endl;
         }
       else isGbbSRC2=false;
 
@@ -489,6 +504,7 @@ EL::StatusCode TruthAnalysis :: execute ()
          && var_Meff_4j > 1600.0)
         {
           isGbbSRA4=true;
+	  if(debug) std::cout << "DEBUG::SR\tisGbbSRA4" << std::endl;
         }
       else isGbbSRA4=false;
 
@@ -497,10 +513,11 @@ EL::StatusCode TruthAnalysis :: execute ()
 	 && SelectedJets->size() >= 4
          && SelectedJets->at(3)->pt()/MEV > 90.0
          && SelectedBJets->at(2)->pt()/MEV > 90.0
-         && var_Met > 450.0
+	 && var_Met > 450.0
          && var_Meff_4j > 1400.0)
         {
           isGbbSRB4=true;
+	  if(debug) std::cout << "DEBUG::SR\tisGbbSRB4" << std::endl;
         }
       else isGbbSRB4=false;
     }
@@ -521,6 +538,7 @@ EL::StatusCode TruthAnalysis :: execute ()
          && var_Meff > 1100.0)
         {
           isGtt1LSRA2=true;
+	  if(debug) std::cout << "DEBUG::SR\tisGtt1LSRA2" << std::endl;
         }
       else isGtt1LSRA2=false;
 
@@ -534,6 +552,7 @@ EL::StatusCode TruthAnalysis :: execute ()
          && var_Meff > 900.0)
         {
           isGtt1LSRB2=true;
+          if(debug) std::cout << "DEBUG::SR\tisGtt1LSRB2" << std::endl;
         }
       else isGtt1LSRB2=false;
 
@@ -546,6 +565,7 @@ EL::StatusCode TruthAnalysis :: execute ()
          && var_Meff > 600.0)
         {
           isGtt1LSRC2=true;
+          if(debug) std::cout << "DEBUG::SR\tisGtt1LSRC2" << std::endl;
         }
       else isGtt1LSRC2=false;
 
@@ -559,6 +579,7 @@ EL::StatusCode TruthAnalysis :: execute ()
          && var_Meff > 1600.0)
         {
           isGtt1LSRA4=true;
+          if(debug) std::cout << "DEBUG::SR\tisGtt1LSRA4" << std::endl;
         }
       else isGtt1LSRA4=false;
 
@@ -572,6 +593,7 @@ EL::StatusCode TruthAnalysis :: execute ()
          && var_Meff > 1100.0)
         {
           isGtt1LSRB4=true;
+          if(debug) std::cout << "DEBUG::SR\tisGtt1LSRB4" << std::endl;
         }
       else isGtt1LSRB4=false;
 
@@ -584,6 +606,7 @@ EL::StatusCode TruthAnalysis :: execute ()
          && var_Meff > 700.0)
         {
           isGtt1LSRC4=true;
+          if(debug) std::cout << "DEBUG::SR\tisGtt1LSRC4" << std::endl;
         }
       else isGtt1LSRC4=false;
 
@@ -605,6 +628,7 @@ EL::StatusCode TruthAnalysis :: execute ()
          && var_Meff > 1250.0)
         {
           isGtt0LSRA=true;
+          if(debug) std::cout << "DEBUG::SR\tisGtt0LSRA" << std::endl;
         }
       else isGtt0LSRA=false;
 
@@ -618,6 +642,7 @@ EL::StatusCode TruthAnalysis :: execute ()
          && var_Meff > 1250.0)
         {
           isGtt0LSRB=true;
+          if(debug) std::cout << "DEBUG::SR\tisGtt0LSRB" << std::endl;
         }
       else isGtt0LSRB=false;
 
@@ -631,6 +656,7 @@ EL::StatusCode TruthAnalysis :: execute ()
          && var_Meff > 1700.0)
         {
           isGtt0LSRC=true;
+          if(debug) std::cout << "DEBUG::SR\tisGtt0LSRC" << std::endl;
         }
       else isGtt0LSRC=false;
 
@@ -644,10 +670,12 @@ EL::StatusCode TruthAnalysis :: execute ()
          && var_Meff > 1700.0)
         {
           isGtt0LSRD=true;
+          if(debug) std::cout << "DEBUG::SR\tisGtt0LSRD" << std::endl;
         }
       else isGtt0LSRD=false;
     }
 
+  /*
   if(isGbbSRA1 || isGbbSRB1 || isGbbSRA2 || isGbbSRB2 || isGbbSRC2 || isGbbSRA4 || isGbbSRB4)
     std::cout << "Gbb 0L SR" << std::endl;
 
@@ -656,7 +684,14 @@ EL::StatusCode TruthAnalysis :: execute ()
 
   if(isGtt0LSRA || isGtt0LSRB || isGtt0LSRC || isGtt0LSRD)
     std::cout << "Gtt 0L SR" << std::endl;
+  */
 
+  const xAOD::EventInfo* EventInfo = 0;
+  m_event->retrieve(EventInfo, "EventInfo");
+  
+  mc_channel=-1.0;
+  mc_weight = EventInfo->mcEventWeight();
+  
   out_tree->Fill();
 
   return EL::StatusCode::SUCCESS;
