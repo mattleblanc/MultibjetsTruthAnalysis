@@ -264,7 +264,7 @@ Float_t Variables::mT_min_bjets(const xAOD::MissingET* v_met, const xAOD::JetCon
 
   for (auto jet : *v_jets) {
     
-    if(!bjet.isAvailable(*jet) || bjet(*jet) == 0) continue;
+    //if(!bjet.isAvailable(*jet) || bjet(*jet) == 0) continue;
 
     nb_bjets ++;
     if(nb_bjets>3) break;
