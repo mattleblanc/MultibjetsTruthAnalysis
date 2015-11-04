@@ -82,4 +82,37 @@ python MultibjetsTruthAnalysis/scripts/Run.py \
     --doTRF=0 \
     --process="testMLB00"
 
+#407032
+python MultibjetsTruthAnalysis/scripts/Run.py \
+    --submitDir=/home/mleblanc/out/truthOut/407032/ \
+    --inputDS="mc15_13TeV:mc15_13TeV.407032.PhPyEG_CT10_P2012radHiC6L1_ttbarMET200_hdamp345_down_nonAH.merge.DAOD_TRUTH1.e4505_p2436/" \
+    --driver=condor \
+    --doRcJets=1 \
+    --doAK10Jets=0 \
+    --debug=1 \
+    --doTRF=0 \
+    --process="testMLB00"
+
+#407036    
+python MultibjetsTruthAnalysis/scripts/Run.py \
+    --submitDir=/home/mleblanc/out/truthOut/407036/ \
+    --inputDS="mc15_13TeV:mc15_13TeV.407036.PhPyEG_CT10_P2012radLoC6L1_ttbarMET200_hdamp172_up_nonAH.merge.DAOD_TRUTH1.e4505_p2436/" \
+    --driver=condor \
+    --doRcJets=1 \
+    --doAK10Jets=0 \
+    --debug=1 \
+    --doTRF=0 \
+    --process="testMLB00"
+
+#407012
+#python MultibjetsTruthAnalysis/scripts/Run.py \
+#    --submitDir=/home/mleblanc/out/truthOut/407012/ \
+#    --inputDS="" \ #doesn't exist yet
+#    --driver=condor \
+#    --doRcJets=1 \
+#    --doAK10Jets=0 \
+#    --debug=1 \
+#    --doTRF=0 \
+#    --process="testMLB00"
+
 exit 0
