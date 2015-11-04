@@ -8,6 +8,7 @@
 #include "EventLoop/OutputStream.h"
 
 #include "TTree.h"
+#include "TH1F.h"
 
 // reclustering forward declaration
 class JetReclusteringTool;
@@ -55,7 +56,8 @@ public:
   JetReclusteringTool* m_reclusteringTool = nullptr; //!
 
   TTree* out_tree; // !
-  
+  TH1F* out_cutflow; //!
+
   Int_t m_all_events; //!
 
   Int_t mc_channel; //!

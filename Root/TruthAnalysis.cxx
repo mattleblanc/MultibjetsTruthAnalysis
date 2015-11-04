@@ -57,6 +57,7 @@ TruthAnalysis :: TruthAnalysis ()
   // initialize().
 
   out_tree = new TTree("out_tree", "output tree");
+  out_cutflow = new TH1F("out_cutflow", "output cutflow",20,1,21);
 }
 
 EL::StatusCode TruthAnalysis :: setupJob (EL::Job& job)
@@ -151,7 +152,8 @@ EL::StatusCode TruthAnalysis :: initialize ()
 
   //TTree* out_tree; out_tree = new TTree("out_tree","output tree");
   TFile *file = wk()->getOutputFile ("outTree");
-  out_tree->SetDirectory (file);
+  out_tree->SetDirectory(file);
+  out_cutflow->SetDirectory(file);
   
   out_tree->Branch("all_events",&m_all_events,"all_events/I");
   out_tree->Branch("mc_channel",&mc_channel,"mc_channel/I");
@@ -691,7 +693,8 @@ EL::StatusCode TruthAnalysis :: execute ()
   
   mc_channel=-1.0;
   mc_weight = EventInfo->mcEventWeight();
-  
+
+  //fillCutFlow(out_cutflow, var_*);
   out_tree->Fill();
 
   return EL::StatusCode::SUCCESS;
