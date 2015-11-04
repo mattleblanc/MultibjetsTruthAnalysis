@@ -694,7 +694,19 @@ EL::StatusCode TruthAnalysis :: execute ()
   mc_channel=-1.0;
   mc_weight = EventInfo->mcEventWeight();
 
-  //fillCutFlow(out_cutflow, var_*);
+  TruthAnalysis::cutflow(out_cutflow,
+			 NJets,
+			 NBJets,
+			 NTopJets,
+			 var_dPhiMin,
+			 var_Meff,
+			 var_Meff_4j,
+			 var_mT,
+			 var_mTb,
+                         var_HT,
+			 var_Met,
+			 var_MetSig,
+			 debug);
   out_tree->Fill();
 
   return EL::StatusCode::SUCCESS;
@@ -742,6 +754,56 @@ EL::StatusCode TruthAnalysis :: histFinalize ()
   // outputs have been merged.  This is different from finalize() in
   // that it gets called on all worker nodes regardless of whether
   // they processed input events.
+
+  return EL::StatusCode::SUCCESS;
+}
+
+EL::StatusCode TruthAnalysis :: cutflow (TH1F*& hist,
+					 Int_t v_NJets,
+					 Int_t v_NBJets,
+					 Int_t v_NTopJets,
+					 Float_t v_dPhiMin,
+					 Float_t v_Meff,
+					 Float_t v_Meff_4j,
+					 Float_t v_mT,
+					 Float_t v_mTb,
+					 Float_t v_HT,
+					 Float_t v_Met,
+					 Float_t v_MetSig,
+					 Bool_t debug)
+{
+  hist->Fill("all",1.0);
+
+  // A bit of a weird cutflow, but this will show the efficiency of each individual cut ...
+  // A bit more interesting, since we can't compare with anyone.
+
+  if(v_NJets >= 4) hist->Fill("Jets_4",1.0);
+  if(v_NJets >= 5) hist->Fill("Jets_5",1.0);
+  if(v_NJets >= 6) hist->Fill("Jets_6",1.0);
+
+  if(v_NBJets >= 1) hist->Fill("BJets_1",1.0);
+  if(v_NBJets >= 2) hist->Fill("BJets_2",1.0);
+  if(v_NBJets >= 3) hist->Fill("BJets_3",1.0);
+  
+  if(v_NTopJets >= 1) hist->Fill("TopJets_1",1.0);
+  if(v_NTopJets >= 2) hist->Fill("TopJets_2",1.0);
+  
+  if(v_dPhiMin > 0.4) hist->Fill("dPhiMin_04",1.0);
+
+  if(v_Meff < 1000.0) hist->Fill("Meff_1k",1.0);
+  if(v_Meff_4j < 1000.0) hist->Fill("Meff4j_1k",1.0);
+  if(v_mT > 150.0) hist->Fill("mT_150",1.0);
+  if(v_mTb > 150.0) hist->Fill("mTb_1k",1.0);
+
+  if(v_HT > 1000.0) hist->Fill("HT_1k",1.0);
+
+  if(v_Met > 200.0) hist->Fill("Met_200",1.0);
+  if(v_Met > 300.0) hist->Fill("Met_300",1.0);
+  if(v_Met > 350.0) hist->Fill("Met_350",1.0);
+  
+  if(v_MetSig > 3) hist->Fill("MetSig_3",1.0);
+  if(v_MetSig > 10) hist->Fill("MetSig_10",1.0);
+  if(v_MetSig > 15) hist->Fill("MetSig_15",1.0);
 
   return EL::StatusCode::SUCCESS;
 }

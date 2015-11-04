@@ -52,6 +52,21 @@ public:
   // this is needed to distribute the algorithm to the workers
   ClassDef(TruthAnalysis, 1);
 
+  // cutflow
+  EL::StatusCode cutflow(TH1F*& hist,
+			 Int_t v_NJets,
+			 Int_t v_NBJets,
+			 Int_t v_NTopJets,
+			 Float_t v_dPhiMin,
+			 Float_t v_Meff,
+			 Float_t v_Meff_4j,
+			 Float_t v_mT,
+			 Float_t v_mTb,
+			 Float_t v_HT,
+			 Float_t v_Met,
+			 Float_t v_MetSig,
+			 Bool_t debug);
+
  private:
   JetReclusteringTool* m_reclusteringTool = nullptr; //!
 
