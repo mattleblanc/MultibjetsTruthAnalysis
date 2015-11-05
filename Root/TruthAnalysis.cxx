@@ -150,6 +150,27 @@ EL::StatusCode TruthAnalysis :: initialize ()
   isGtt0LSRC=false;
   isGtt0LSRD=false;
 
+  var_dPhiMin = 0;
+  var_Meff = 0;
+  var_Meff_4j = 0;
+  var_mT = 0;
+  var_mTb = 0;
+  var_HT = 0;
+  var_Met = 0;
+  var_MetSig = 0;
+
+
+  NSignalElectrons = 0;
+  NSignalMuons = 0;
+  NBaseElectrons = 0;
+  NBaseMuons = 0;
+  NJets = 0;
+  NBJets = 0;
+  NTopJets = 0;
+
+  NSignalLeptons = 0;
+  NBaseLeptons = 0;
+
   //TTree* out_tree; out_tree = new TTree("out_tree","output tree");
   TFile *file = wk()->getOutputFile ("outTree");
   out_tree->SetDirectory(file);
@@ -176,9 +197,30 @@ EL::StatusCode TruthAnalysis :: initialize ()
   out_tree->Branch("isGtt1LSRB4",&isGtt1LSRB4,"isGtt1LSRB4/I");
   out_tree->Branch("isGtt1LSRC4",&isGtt1LSRC4,"isGtt1LSRC4/I");
   out_tree->Branch("isGtt0LSRA",&isGtt0LSRA,"isGtt0LSRA/I");
-  out_tree->Branch("isGtt0LSRB",&isGtt0LSRA,"isGtt0LSRB/I");
-  out_tree->Branch("isGtt0LSRC",&isGtt0LSRA,"isGtt0LSRC/I");
-  out_tree->Branch("isGtt0LSRD",&isGtt0LSRA,"isGtt0LSRD/I");
+  out_tree->Branch("isGtt0LSRB",&isGtt0LSRB,"isGtt0LSRB/I");
+  out_tree->Branch("isGtt0LSRC",&isGtt0LSRC,"isGtt0LSRC/I");
+  out_tree->Branch("isGtt0LSRD",&isGtt0LSRD,"isGtt0LSRD/I");
+
+  out_tree->Branch("var_dPhiMin",&var_dPhiMin, "var_dPhiMin/F");
+  out_tree->Branch("var_Meff",&var_Meff, "var_Meff/F");
+  out_tree->Branch("var_Meff_4j",&var_Meff_4j, "var_Meff_4j/F");
+  out_tree->Branch("var_mT",&var_mT, "var_mT/F");
+  out_tree->Branch("var_mTb",&var_mTb, "var_mTb/F");
+  out_tree->Branch("var_HT",&var_HT, "var_HT/F");
+  out_tree->Branch("var_Met",&var_Met, "var_Met/F");
+  out_tree->Branch("var_MetSig",&var_MetSig, "var_MetSig/F");
+
+
+  out_tree->Branch("NSignalElectrons",&NSignalElectrons, "NSignalElectrons/I");
+  out_tree->Branch("NSignalMuons",&NSignalMuons, "NSignalMuons/I");
+  out_tree->Branch("NBaseElectrons",&NBaseElectrons, "NBaseElectrons/I");
+  out_tree->Branch("NBaseMuons",&NBaseMuons, "NBaseMuons/I");
+  out_tree->Branch("NJets",&NJets, "NJets/I");
+  out_tree->Branch("NBJets",&NBJets, "NBJets/I");
+  out_tree->Branch("NTopJets",&NTopJets, "NTopJets/I");
+
+  out_tree->Branch("NSignalLeptons",&NSignalLeptons, "NSignalLeptons/I");
+  out_tree->Branch("NBaseLeptons",&NBaseLeptons, "NBaseLeptons/I");
 
   /*
   if(TruthJets->empty()){
@@ -333,29 +375,29 @@ EL::StatusCode TruthAnalysis :: execute ()
   if (TruthMET_it == TruthMET->end()) std::cout << "No NonINT inside MET container" << std::endl;
   xAOD::MissingET* TruthMET_NonInt = *TruthMET_it;
 
-  float var_dPhiMin = Variables::delta_phi_nj(TruthMET_NonInt, SelectedJets->asDataVector(), SelectedJets->size()); // Should it be this MET?
-  float var_Meff = Variables::Meff_incl(TruthMET_NonInt, SelectedJets->asDataVector(), SignalMuons->asDataVector(), SignalElectrons->asDataVector());
-  float var_Meff_4j = Variables::Meff_4j(TruthMET_NonInt, SelectedJets->asDataVector(), 4 /* How many jets to use? */);
-  float var_mT = Variables::mT(TruthMET_NonInt, SignalMuons->asDataVector(), SignalElectrons->asDataVector());
-  float var_mTb = Variables::mT_min_bjets(TruthMET_NonInt, SelectedBJets->asDataVector(), false /* set_mw? */);
-  float var_HT = Variables::Ht(SelectedJets->asDataVector(), SignalMuons->asDataVector(), SignalElectrons->asDataVector());
-  float var_Met = TruthMET_NonInt->met()/1000.0;
-  float var_MetSig = Variables::Met_significance(TruthMET_NonInt, SelectedJets->asDataVector(), 4 /* How many jets to use in HT? */);
+  var_dPhiMin = Variables::delta_phi_nj(TruthMET_NonInt, SelectedJets->asDataVector(), SelectedJets->size()); // Should it be this MET?
+  var_Meff = Variables::Meff_incl(TruthMET_NonInt, SelectedJets->asDataVector(), SignalMuons->asDataVector(), SignalElectrons->asDataVector());
+  var_Meff_4j = Variables::Meff_4j(TruthMET_NonInt, SelectedJets->asDataVector(), 4 /* How many jets to use? */);
+  var_mT = Variables::mT(TruthMET_NonInt, SignalMuons->asDataVector(), SignalElectrons->asDataVector());
+  var_mTb = Variables::mT_min_bjets(TruthMET_NonInt, SelectedBJets->asDataVector(), false /* set_mw? */);
+  var_HT = Variables::Ht(SelectedJets->asDataVector(), SignalMuons->asDataVector(), SignalElectrons->asDataVector());
+  var_Met = TruthMET_NonInt->met()/1000.0;
+  var_MetSig = Variables::Met_significance(TruthMET_NonInt, SelectedJets->asDataVector(), 4 /* How many jets to use in HT? */);
 
 
-  int NSignalElectrons = SignalElectrons->size();
-  int NSignalMuons     = SignalMuons->size();
-  int NBaseElectrons   = BaselineElectrons->size();
-  int NBaseMuons       = BaselineMuons->size();
-  int NJets	       = SelectedJets->size();
-  int NBJets           = SelectedBJets->size();
-  int NTopJets	       = SelectedTopJets->size();
-
-  int NSignalLeptons   = NSignalElectrons + NSignalMuons;
-  int NBaseLeptons     = NBaseElectrons + NBaseMuons;
-
-  bool isOneLepton; isOneLepton = (NSignalLeptons == 1);
-  bool isZeroLepton; isZeroLepton = (NBaseLeptons == 0);
+  NSignalElectrons = SignalElectrons->size();
+  NSignalMuons     = SignalMuons->size();
+  NBaseElectrons   = BaselineElectrons->size();
+  NBaseMuons       = BaselineMuons->size();
+  NJets	       = SelectedJets->size();
+  NBJets           = SelectedBJets->size();
+  NTopJets	       = SelectedTopJets->size();
+  
+  NSignalLeptons   = NSignalElectrons + NSignalMuons;
+  NBaseLeptons     = NBaseElectrons + NBaseMuons;
+  
+  Bool_t isOneLepton; isOneLepton = (NSignalLeptons == 1);
+  Bool_t isZeroLepton; isZeroLepton = (NBaseLeptons == 0);
   
   // debug variables
   if(debug)
@@ -428,7 +470,6 @@ EL::StatusCode TruthAnalysis :: execute ()
   //if(!isPreselect) continue;
 
   // Gbb SR flags
-  //bool isGbbSRA1=false, isGbbSRB1=false, isGbbSRA2=false, isGbbSRB2=false, isGbbSRC2=false, isGbbSRA4=false, isGbbSRB4=false;
   if(isPreselect_Gbb)
     {
       //configMgr.cutsDict["SR_Gbb_A_1"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>50 && pt_bjet_3>50 && met>300 && meff_4j>1600"
@@ -456,7 +497,6 @@ EL::StatusCode TruthAnalysis :: execute ()
 	  if(debug) std::cout << "DEBUG::SR\tisGbbSRB1" << std::endl;
         }
       else isGbbSRB1=false;
-
 
       //configMgr.cutsDict["SR_Gbb_A_2"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>350 && meff_4j>1400"
       if(var_dPhiMin > 0.4
@@ -525,7 +565,6 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
 
   // Gtt 1L SR flags
-  //bool isGtt1LSRA2=false, isGtt1LSRB2=false, isGtt1LSRC2=false, isGtt1LSRA4=false, isGtt1LSRB4=false, isGtt1LSRC4=false;
   if(isPreselect_Gtt_1l)
     {
       // And here, the various one-lepton signal regions ...
@@ -615,7 +654,6 @@ EL::StatusCode TruthAnalysis :: execute ()
    }
 
   // Gtt 0L signal region flags
-  //bool isGtt0LSRA=false, isGtt0LSRB=false, isGtt0LSRC=false, isGtt0LSRD=false;
   if(isPreselect_Gtt_0l)
     {
       // And here, the various zero-lepton signal regions ...
@@ -676,17 +714,6 @@ EL::StatusCode TruthAnalysis :: execute ()
         }
       else isGtt0LSRD=false;
     }
-
-  /*
-  if(isGbbSRA1 || isGbbSRB1 || isGbbSRA2 || isGbbSRB2 || isGbbSRC2 || isGbbSRA4 || isGbbSRB4)
-    std::cout << "Gbb 0L SR" << std::endl;
-
-  if(isGtt1LSRA2 || isGtt1LSRB2 || isGtt1LSRC2 || isGtt1LSRA4 || isGtt1LSRB4 || isGtt1LSRC4)
-    std::cout << "Gtt 1L SR" << std::endl;
-
-  if(isGtt0LSRA || isGtt0LSRB || isGtt0LSRC || isGtt0LSRD)
-    std::cout << "Gtt 0L SR" << std::endl;
-  */
 
   const xAOD::EventInfo* EventInfo = 0;
   m_event->retrieve(EventInfo, "EventInfo");

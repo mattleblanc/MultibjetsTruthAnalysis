@@ -105,14 +105,14 @@ python MultibjetsTruthAnalysis/scripts/Run.py \
     --process="testMLB00"
 
 #407012
-#python MultibjetsTruthAnalysis/scripts/Run.py \
-#    --submitDir=/home/mleblanc/out/truthOut/407012/ \
-#    --inputDS="" \ #doesn't exist yet
-#    --driver=condor \
-#    --doRcJets=1 \
-#    --doAK10Jets=0 \
-#    --debug=1 \
-#    --doTRF=0 \
-#    --process="testMLB00"
+python MultibjetsTruthAnalysis/scripts/Run.py \
+    --submitDir=/home/mleblanc/out/truthOut/407012/ \
+    --inputDS="mc15_13TeV:mc15_13TeV.407012.PowhegPythiaEvtGen_P2012CT10_ttbarMET200_hdamp172p5_nonAH.merge.DAOD_TRUTH1.e4023_p2436/" \
+    --driver=condor \
+    --doRcJets=1 \
+    --doAK10Jets=0 \
+    --debug=1 \
+    --doTRF=0 \
+    --process="testMLB00"
 
 exit 0

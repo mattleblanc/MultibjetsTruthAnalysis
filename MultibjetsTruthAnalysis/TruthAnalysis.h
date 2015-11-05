@@ -99,6 +99,27 @@ public:
   bool isGtt0LSRB; //!
   bool isGtt0LSRC; //!
   bool isGtt0LSRD; //!
+  
+  float var_dPhiMin;
+  float var_Meff;
+  float var_Meff_4j;
+  float var_mT;
+  float var_mTb;
+  float var_HT;
+  float var_Met;
+  float var_MetSig;
+
+
+  int NSignalElectrons;
+  int NSignalMuons;
+  int NBaseElectrons;
+  int NBaseMuons;
+  int NJets;
+  int NBJets;
+  int NTopJets;
+
+  int NSignalLeptons;
+  int NBaseLeptons;
 };
 
 #endif
