@@ -421,6 +421,28 @@ EL::StatusCode TruthAnalysis :: execute ()
     ... they're just for my own reference, so don't please don't fuss about them too much.
   */
 
+  isPreselect_Gbb=false;
+  isPreselect_Gtt_1l=false;
+  isPreselect_Gtt_0l=false;
+  isPreselect=false;
+  isGbbSRA1=false;
+  isGbbSRB1=false;
+  isGbbSRA2=false;
+  isGbbSRB2=false;
+  isGbbSRC2=false;
+  isGbbSRA4=false;
+  isGbbSRB4=false;
+  isGtt1LSRA2=false;
+  isGtt1LSRB2=false;
+  isGtt1LSRC2=false;
+  isGtt1LSRA4=false;
+  isGtt1LSRB4=false;
+  isGtt1LSRC4=false;
+  isGtt0LSRA=false;
+  isGtt0LSRB=false;
+  isGtt0LSRC=false;
+  isGtt0LSRD=false;
+
   // Gtt 1 lepton region
   if(isOneLepton)
     {
