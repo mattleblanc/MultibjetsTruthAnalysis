@@ -78,27 +78,27 @@ public:
   Int_t mc_channel; //!
   float mc_weight; //!
 
-  bool isPreselect_Gbb; //!
-  bool isPreselect_Gtt_1l; //!
-  bool isPreselect_Gtt_0l; //!
-  bool isPreselect; //!
-  bool isGbbSRA1; //!
-  bool isGbbSRB1; //!
-  bool isGbbSRA2; //!
-  bool isGbbSRB2; //!
-  bool isGbbSRC2; //!
-  bool isGbbSRA4; //!
-  bool isGbbSRB4; //!
-  bool isGtt1LSRA2; //!
-  bool isGtt1LSRB2; //!
-  bool isGtt1LSRC2; //!
-  bool isGtt1LSRA4; //!
-  bool isGtt1LSRB4; //!
-  bool isGtt1LSRC4; //!
-  bool isGtt0LSRA; //!
-  bool isGtt0LSRB; //!
-  bool isGtt0LSRC; //!
-  bool isGtt0LSRD; //!
+  Int_t isPreselect_Gbb; //!
+  Int_t isPreselect_Gtt_1l; //!
+  Int_t isPreselect_Gtt_0l; //!
+  Int_t isPreselect; //!
+  Int_t isGbbSRA1; //!
+  Int_t isGbbSRB1; //!
+  Int_t isGbbSRA2; //!
+  Int_t isGbbSRB2; //!
+  Int_t isGbbSRC2; //!
+  Int_t isGbbSRA4; //!
+  Int_t isGbbSRB4; //!
+  Int_t isGtt1LSRA2; //!
+  Int_t isGtt1LSRB2; //!
+  Int_t isGtt1LSRC2; //!
+  Int_t isGtt1LSRA4; //!
+  Int_t isGtt1LSRB4; //!
+  Int_t isGtt1LSRC4; //!
+  Int_t isGtt0LSRA; //!
+  Int_t isGtt0LSRB; //!
+  Int_t isGtt0LSRC; //!
+  Int_t isGtt0LSRD; //!
   
   float var_dPhiMin;
   float var_Meff;

@@ -210,7 +210,6 @@ EL::StatusCode TruthAnalysis :: initialize ()
   out_tree->Branch("var_Met",&var_Met, "var_Met/F");
   out_tree->Branch("var_MetSig",&var_MetSig, "var_MetSig/F");
 
-
   out_tree->Branch("NSignalElectrons",&NSignalElectrons, "NSignalElectrons/I");
   out_tree->Branch("NSignalMuons",&NSignalMuons, "NSignalMuons/I");
   out_tree->Branch("NBaseElectrons",&NBaseElectrons, "NBaseElectrons/I");
@@ -384,20 +383,19 @@ EL::StatusCode TruthAnalysis :: execute ()
   var_Met = TruthMET_NonInt->met()/1000.0;
   var_MetSig = Variables::Met_significance(TruthMET_NonInt, SelectedJets->asDataVector(), 4 /* How many jets to use in HT? */);
 
-
   NSignalElectrons = SignalElectrons->size();
   NSignalMuons     = SignalMuons->size();
   NBaseElectrons   = BaselineElectrons->size();
   NBaseMuons       = BaselineMuons->size();
-  NJets	       = SelectedJets->size();
+  NJets	  	   = SelectedJets->size();
   NBJets           = SelectedBJets->size();
-  NTopJets	       = SelectedTopJets->size();
+  NTopJets	   = SelectedTopJets->size();
   
   NSignalLeptons   = NSignalElectrons + NSignalMuons;
   NBaseLeptons     = NBaseElectrons + NBaseMuons;
   
-  Bool_t isOneLepton; isOneLepton = (NSignalLeptons == 1);
-  Bool_t isZeroLepton; isZeroLepton = (NBaseLeptons == 0);
+  Bool_t isOneLepton=false; isOneLepton = (NSignalLeptons == 1);
+  Bool_t isZeroLepton=false; isZeroLepton = (NBaseLeptons == 0);
   
   // debug variables
   if(debug)
@@ -444,304 +442,307 @@ EL::StatusCode TruthAnalysis :: execute ()
   isGtt0LSRD=false;
 
   // Gtt 1 lepton region
-  if(isOneLepton)
+  //configMgr.cutsDict["Presel_Gtt_1l"] = "(signal_electrons_n + signal_muons_n)>=1 && jets_n>=6 && bjets_n>=3 && met>200 && meff_incl<1000."
+  
+  if(NSignalLeptons >= 1
+     && NJets >= 4
+     && NBJets >= 3
+     && var_Met > 200.0) // Gtt 1L preselection
     {
-      //configMgr.cutsDict["Presel_Gtt_1l"] = "(signal_electrons_n + signal_muons_n)>=1 && jets_n>=6 && bjets_n>=3 && met>200 && meff_incl<1000."
-      if(NSignalLeptons >= 1
-         && NJets >= 6
-         && NBJets >= 3
-         && var_Met > 200.0
-         && var_Meff < 1000.0) // Gtt 1L preselection
-	{
-	  isPreselect_Gtt_1l = true;
-	  if(debug) std::cout << "DEBUG::PRESEL\tisGtt1L" << std::endl;
-	}
-      else isPreselect_Gtt_1l = false;
+      isPreselect_Gtt_1l = true;
+      if(debug) std::cout << "DEBUG::PRESEL\tisGtt1L" << std::endl;
     }
+  else isPreselect_Gtt_1l = false;
+
 
   // Gbb preselection and Gtt 0 lepton preselection regions
-  if(isZeroLepton)
+  //configMgr.cutsDict["Presel_Gbb"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && jets_n>=4 && bjets_n>=3 && met>200 && meff_4j < 1000."
+  if(NBaseLeptons == 0
+     && var_dPhiMin > 0.4
+     && NJets >= 4
+     && NBJets >= 3
+     && var_Met > 200.0) // Gbb 0L preselection
     {
-      //configMgr.cutsDict["Presel_Gbb"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && jets_n>=4 && bjets_n>=3 && met>200 && meff_4j < 1000."
-      if(NBaseLeptons == 0
-         && var_dPhiMin > 0.4
-         && NJets >= 4
-         && NBJets >= 3
-         && var_Met > 200.0
-         && var_Meff_4j < 1000.0) // Gbb 0L preselection
-	{
-          isPreselect_Gbb = true;
-	  if(debug) std::cout << "DEBUG::PRESEL\tisGbb" << std::endl;
-        }
-      else isPreselect_Gbb = false;
-
-      //configMgr.cutsDict["Presel_Gtt_0l"] = "(signal_electrons_n + signal_muons_n)==0 && jets_n>=6 && bjets_n>=3 && met>200 && meff_incl<1000."
-      if(NSignalLeptons == 0
-         && NJets >= 6
-         && NBJets >= 3
-         && var_Met > 200.0
-         && var_Meff < 1000.0) // Gtt 0L Preselection
-	{
-	  isPreselect_Gtt_0l = true;
-	  if(debug) std::cout << "DEBUG::PRESEL\tisGtt0L" << std::endl;
-	}
-      else isPreselect_Gtt_0l = false;
+      isPreselect_Gbb = true;
+      if(debug) std::cout << "DEBUG::PRESEL\tisGbb" << std::endl;
     }
-
+  else isPreselect_Gbb = false;
+  
+  //configMgr.cutsDict["Presel_Gtt_0l"] = "(signal_electrons_n + signal_muons_n)==0 && jets_n>=6 && bjets_n>=3 && met>200 && meff_incl<1000."
+  if(NSignalLeptons == 0
+     && NJets >= 4
+     && NBJets >= 3
+     && var_Met > 200.0) // Gtt 0L Preselection
+    {
+      isPreselect_Gtt_0l = true;
+      if(debug) std::cout << "DEBUG::PRESEL\tisGtt0L" << std::endl;
+    }
+  else isPreselect_Gtt_0l = false;
+  
   isPreselect = (isPreselect_Gbb || isPreselect_Gtt_0l || isPreselect_Gtt_1l);
-  //if(!isPreselect) continue;
-
+  
   // Gbb SR flags
-  if(isPreselect_Gbb)
+  //configMgr.cutsDict["SR_Gbb_A_1"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>50 && pt_bjet_3>50 && met>300 && meff_4j>1600"
+  if(isPreselect_Gbb
+     &&var_dPhiMin > 0.4
+     && SelectedJets->size() >= 4
+     && SelectedJets->at(3)->pt()/MEV > 50.0
+     && SelectedBJets->at(2)->pt()/MEV > 50.0
+     && var_Met > 300.0
+     && var_Meff_4j > 1600.0)
     {
-      //configMgr.cutsDict["SR_Gbb_A_1"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>50 && pt_bjet_3>50 && met>300 && meff_4j>1600"
-      if(var_dPhiMin > 0.4
-	 && SelectedJets->size() >= 4
-	 && SelectedJets->at(3)->pt()/MEV > 50.0
-	 && SelectedBJets->at(2)->pt()/MEV > 50.0
-	 && var_Met > 300.0
-	 && var_Meff_4j > 1600.0)
-	{
-	  isGbbSRA1=true;
-	  if(debug) std::cout << "DEBUG::SR\tisGbbSRA1" << std::endl;
-	}
-      else isGbbSRA1=false;
-      
-      //configMgr.cutsDict["SR_Gbb_B_1"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>70 && pt_bjet_3>70 && met>400 && meff_4j>800"
-      if(var_dPhiMin > 0.4
-	 && SelectedJets->size() >= 4
-         && SelectedJets->at(3)->pt()/MEV > 70.0
-         && SelectedBJets->at(2)->pt()/MEV > 70.0
-         && var_Met > 400.0
-         && var_Meff_4j > 800.0)
-        {
-          isGbbSRB1=true;
-	  if(debug) std::cout << "DEBUG::SR\tisGbbSRB1" << std::endl;
-        }
-      else isGbbSRB1=false;
-
-      //configMgr.cutsDict["SR_Gbb_A_2"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>350 && meff_4j>1400"
-      if(var_dPhiMin > 0.4
-	 && SelectedJets->size() >= 4
-         && SelectedJets->at(3)->pt()/MEV > 90.0
-         && SelectedBJets->at(2)->pt()/MEV > 90.0
-         && var_Met > 350.0
-         && var_Meff_4j > 1400.0)
-        {
-          isGbbSRA2=true;
-	  if(debug) std::cout << "DEBUG::SR\tisGbbSRA2" << std::endl;
-        }
-      else isGbbSRA2=false;
-
-      //configMgr.cutsDict["SR_Gbb_B_2"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>400 && meff_4j>1200"
-      if(var_dPhiMin > 0.4
-	 && SelectedJets->size() >= 4
-         && SelectedJets->at(3)->pt()/MEV > 90.0
-         && SelectedBJets->at(2)->pt()/MEV > 90.0
-         && var_Met > 400.0
-         && var_Meff_4j > 1200.0)
-        {
-          isGbbSRB2=true;
-	  if(debug) std::cout << "DEBUG::SR\tisGbbSRB2" << std::endl;
-        }
-      else isGbbSRB2=false;
-
-      //configMgr.cutsDict["SR_Gbb_C_2"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>30 && pt_bjet_3>30 && met>500 && meff_4j>1400"
-      if(var_dPhiMin > 0.4
-	 && SelectedJets->size() >= 4
-         && SelectedJets->at(3)->pt()/MEV > 50.0
-         && SelectedBJets->at(2)->pt()/MEV > 50.0
-         && var_Met > 300.0
-         && var_Meff_4j > 1600.0)
-        {
-          isGbbSRC2=true;
-	  if(debug) std::cout << "DEBUG::SR\tisGbbSRC2" << std::endl;
-        }
-      else isGbbSRC2=false;
-
-      //configMgr.cutsDict["SR_Gbb_A_4"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>350 && meff_4j>1600"
-      if(var_dPhiMin > 0.4
-	 && SelectedJets->size() >= 4
-         && SelectedJets->at(3)->pt()/MEV > 90.0
-         && SelectedBJets->at(2)->pt()/MEV > 90.0
-         && var_Met > 350.0
-         && var_Meff_4j > 1600.0)
-        {
-          isGbbSRA4=true;
-	  if(debug) std::cout << "DEBUG::SR\tisGbbSRA4" << std::endl;
-        }
-      else isGbbSRA4=false;
-
-      //configMgr.cutsDict["SR_Gbb_B_4"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>450 && meff_4j>1400"
-      if(var_dPhiMin > 0.4
-	 && SelectedJets->size() >= 4
-         && SelectedJets->at(3)->pt()/MEV > 90.0
-         && SelectedBJets->at(2)->pt()/MEV > 90.0
-	 && var_Met > 450.0
-         && var_Meff_4j > 1400.0)
-        {
-          isGbbSRB4=true;
-	  if(debug) std::cout << "DEBUG::SR\tisGbbSRB4" << std::endl;
-        }
-      else isGbbSRB4=false;
+      isGbbSRA1=true;
+      if(debug) std::cout << "DEBUG::SR\tisGbbSRA1" << std::endl;
     }
+  else isGbbSRA1=false;
+
+  //configMgr.cutsDict["SR_Gbb_B_1"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>70 && pt_bjet_3>70 && met>400 && meff_4j>800"
+  if(isPreselect_Gbb
+     && var_dPhiMin > 0.4
+     && SelectedJets->size() >= 4
+     && SelectedJets->at(3)->pt()/MEV > 70.0
+     && SelectedBJets->at(2)->pt()/MEV > 70.0
+     && var_Met > 400.0
+     && var_Meff_4j > 800.0)
+    {
+      isGbbSRB1=true;
+      if(debug) std::cout << "DEBUG::SR\tisGbbSRB1" << std::endl;
+    }
+  else isGbbSRB1=false;
+
+  //configMgr.cutsDict["SR_Gbb_A_2"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>350 && meff_4j>1400"
+  if(isPreselect_Gbb
+     && var_dPhiMin > 0.4
+     && SelectedJets->size() >= 4
+     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && SelectedBJets->at(2)->pt()/MEV > 90.0
+     && var_Met > 350.0
+     && var_Meff_4j > 1400.0)
+    {
+      isGbbSRA2=true;
+      if(debug) std::cout << "DEBUG::SR\tisGbbSRA2" << std::endl;
+    }
+  else isGbbSRA2=false;
+  
+  //configMgr.cutsDict["SR_Gbb_B_2"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>400 && meff_4j>1200"
+  if(isPreselect_Gbb
+     &&var_dPhiMin > 0.4
+     && SelectedJets->size() >= 4
+     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && SelectedBJets->at(2)->pt()/MEV > 90.0
+     && var_Met > 400.0
+     && var_Meff_4j > 1200.0)
+    {
+      isGbbSRB2=true;
+      if(debug) std::cout << "DEBUG::SR\tisGbbSRB2" << std::endl;
+    }
+  else isGbbSRB2=false;
+  
+  //configMgr.cutsDict["SR_Gbb_C_2"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>30 && pt_bjet_3>30 && met>500 && meff_4j>1400"
+  if(isPreselect_Gbb
+     &&var_dPhiMin > 0.4
+     && SelectedJets->size() >= 4
+     && SelectedJets->at(3)->pt()/MEV > 30.0
+     && SelectedBJets->at(2)->pt()/MEV > 30.0
+     && var_Met > 500.0
+     && var_Meff_4j > 1400.0)
+    {
+      isGbbSRC2=true;
+      if(debug) std::cout << "DEBUG::SR\tisGbbSRC2" << std::endl;
+    }
+  else isGbbSRC2=false;
+
+  //configMgr.cutsDict["SR_Gbb_A_4"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>350 && meff_4j>1600"
+  if(isPreselect_Gbb
+     && var_dPhiMin > 0.4
+     && SelectedJets->size() >= 4
+     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && SelectedBJets->at(2)->pt()/MEV > 90.0
+     && var_Met > 350.0
+     && var_Meff_4j > 1600.0)
+    {
+      isGbbSRA4=true;
+      if(debug) std::cout << "DEBUG::SR\tisGbbSRA4" << std::endl;
+    }
+  else isGbbSRA4=false;
+  
+  //configMgr.cutsDict["SR_Gbb_B_4"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>450 && meff_4j>1400"
+  if(isPreselect_Gbb
+     && var_dPhiMin > 0.4
+     && SelectedJets->size() >= 4
+     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && SelectedBJets->at(2)->pt()/MEV > 90.0
+     && var_Met > 450.0
+     && var_Meff_4j > 1400.0)
+    {
+      isGbbSRB4=true;
+      if(debug) std::cout << "DEBUG::SR\tisGbbSRB4" << std::endl;
+    }
+  else isGbbSRB4=false;
+
 
   // Gtt 1L SR flags
-  if(isPreselect_Gtt_1l)
+  // And here, the various one-lepton signal regions ...
+  
+  //configMgr.cutsDict["SR_Gtt_1l_A_2"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=1 && met>200 && meff_incl>1100"
+  if(isPreselect_Gtt_1l
+     && var_mT > 150
+     && var_mTb > 160
+     && NJets >= 6
+     && NBJets >= 3
+     && NTopJets >= 1
+     && var_Met > 200.0
+     && var_Meff > 1100.0)
     {
-      // And here, the various one-lepton signal regions ...
-
-      //configMgr.cutsDict["SR_Gtt_1l_A_2"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=1 && met>200 && meff_incl>1100"
-      if(var_mT > 150
-         && var_mTb > 160
-	 && NJets >= 6
-	 && NBJets >= 3
-	 && NTopJets >= 1
-         && var_Met > 200.0
-         && var_Meff > 1100.0)
-        {
-          isGtt1LSRA2=true;
-	  if(debug) std::cout << "DEBUG::SR\tisGtt1LSRA2" << std::endl;
-        }
-      else isGtt1LSRA2=false;
-
-      //configMgr.cutsDict["SR_Gtt_1l_B_2"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=0 && met>300 && meff_incl>900"
-      if(var_mT > 150
-         && var_mTb > 160
-	 && NJets >= 6
-         && NBJets >= 3
-	 && NTopJets >= 0
-         && var_Met > 300.0
-         && var_Meff > 900.0)
-        {
-          isGtt1LSRB2=true;
-          if(debug) std::cout << "DEBUG::SR\tisGtt1LSRB2" << std::endl;
-        }
-      else isGtt1LSRB2=false;
-
-      //configMgr.cutsDict["SR_Gtt_1l_C_2"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>0   && jets_n>=6 && bjets_n>=4 && top_n>=0 && met>200 && meff_incl>600"
-      if(var_mT > 150
-	 && NJets >= 6
-         && NBJets >= 4
-         && NTopJets >= 0
-         && var_Met > 200.0
-         && var_Meff > 600.0)
-        {
-          isGtt1LSRC2=true;
-          if(debug) std::cout << "DEBUG::SR\tisGtt1LSRC2" << std::endl;
-        }
-      else isGtt1LSRC2=false;
-
-      //configMgr.cutsDict["SR_Gtt_1l_A_4"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=1 && met>250 && meff_incl>1600"
-      if(var_mT > 150
-         && var_mTb > 160
-          && NJets >= 6
-         && NBJets >= 3
-         && NTopJets >= 1
-         && var_Met > 250.0
-         && var_Meff > 1600.0)
-        {
-          isGtt1LSRA4=true;
-          if(debug) std::cout << "DEBUG::SR\tisGtt1LSRA4" << std::endl;
-        }
-      else isGtt1LSRA4=false;
-
-      //configMgr.cutsDict["SR_Gtt_1l_B_4"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=0 && met>350 && meff_incl>1100"
-      if(var_mT > 150
-         && var_mTb > 160
-	 && NJets >= 6
-         && NBJets >= 3
-         && NTopJets >= 0
-         && var_Met > 350.0
-         && var_Meff > 1100.0)
-        {
-          isGtt1LSRB4=true;
-          if(debug) std::cout << "DEBUG::SR\tisGtt1LSRB4" << std::endl;
-        }
-      else isGtt1LSRB4=false;
-
-      //configMgr.cutsDict["SR_Gtt_1l_C_4"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>0   && jets_n>=6 && bjets_n>=4 && top_n>=0 && met>250 && meff_incl>700"
-      if(var_mT > 150
-	 && NJets >= 6
-         && NBJets >= 4
-         && NTopJets >= 0
-         && var_Met > 250.0
-         && var_Meff > 700.0)
-        {
-          isGtt1LSRC4=true;
-          if(debug) std::cout << "DEBUG::SR\tisGtt1LSRC4" << std::endl;
-        }
-      else isGtt1LSRC4=false;
-
-   }
-
-  // Gtt 0L signal region flags
-  if(isPreselect_Gtt_0l)
-    {
-      // And here, the various zero-lepton signal regions ...
-
-      //configMgr.cutsDict["SR_Gtt_0l_A"] = "(signal_electrons_n + signal_muons_n)==0 && dphi_min>0.4 && mTb_min>80 && jets_n>=8 && bjets_n>=4 && top_n>=0 && met>350 && meff_incl>1250
-      if(var_dPhiMin > 0.4
-	 && var_mTb > 80
-         && NJets >= 8
-         && NBJets >= 4
-         && NTopJets >= 0
-         && var_Met > 350.0
-         && var_Meff > 1250.0)
-        {
-          isGtt0LSRA=true;
-          if(debug) std::cout << "DEBUG::SR\tisGtt0LSRA" << std::endl;
-        }
-      else isGtt0LSRA=false;
-
-      //configMgr.cutsDict["SR_Gtt_0l_B"] = "(signal_electrons_n + signal_muons_n)==0 && dphi_min>0.4 && mTb_min>80 && jets_n>=8 && bjets_n>=4 && top_n>=1 && met>350 && meff_incl>1250"
-      if(var_dPhiMin > 0.4
-	 && var_mTb > 80
-         && NJets >= 8
-         && NBJets >= 4
-         && NTopJets >= 1
-         && var_Met > 350.0
-         && var_Meff > 1250.0)
-        {
-          isGtt0LSRB=true;
-          if(debug) std::cout << "DEBUG::SR\tisGtt0LSRB" << std::endl;
-        }
-      else isGtt0LSRB=false;
-
-      //configMgr.cutsDict["SR_Gtt_0l_C"] = "(signal_electrons_n + signal_muons_n)==0 && dphi_min>0.4 && mTb_min>80 && jets_n>=8 && bjets_n>=3 && top_n>=1 && met>400 && meff_incl>1700"
-      if(var_dPhiMin > 0.4
-	 && var_mTb > 80
-         && NJets >= 8
-         && NBJets >= 3
-         && NTopJets >= 1
-         && var_Met > 400.0
-         && var_Meff > 1700.0)
-        {
-          isGtt0LSRC=true;
-          if(debug) std::cout << "DEBUG::SR\tisGtt0LSRC" << std::endl;
-        }
-      else isGtt0LSRC=false;
-
-      //configMgr.cutsDict["SR_Gtt_0l_D"] = "(signal_electrons_n + signal_muons_n)==0 && dphi_min>0.4 && mTb_min>80 && jets_n>=8 && bjets_n>=3 && top_n>=2 && met>400 && meff_incl>1700"
-      if(var_dPhiMin > 0.4
-	 && var_mTb > 80
-         && NJets >= 8
-         && NBJets >= 3
-         && NTopJets >= 2
-         && var_Met > 400.0
-         && var_Meff > 1700.0)
-        {
-          isGtt0LSRD=true;
-          if(debug) std::cout << "DEBUG::SR\tisGtt0LSRD" << std::endl;
-        }
-      else isGtt0LSRD=false;
+      isGtt1LSRA2=true;
+      if(debug) std::cout << "DEBUG::SR\tisGtt1LSRA2" << std::endl;
     }
-
+  else isGtt1LSRA2=false;
+  
+  //configMgr.cutsDict["SR_Gtt_1l_B_2"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=0 && met>300 && meff_incl>900"
+  if(isPreselect_Gtt_1l
+     && var_mT > 150
+     && var_mTb > 160
+     && NJets >= 6
+     && NBJets >= 3
+     && NTopJets >= 0
+     && var_Met > 300.0
+     && var_Meff > 900.0)
+    {
+      isGtt1LSRB2=true;
+      if(debug) std::cout << "DEBUG::SR\tisGtt1LSRB2" << std::endl;
+    }
+  else isGtt1LSRB2=false;
+  
+  //configMgr.cutsDict["SR_Gtt_1l_C_2"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>0   && jets_n>=6 && bjets_n>=4 && top_n>=0 && met>200 && meff_incl>600"
+  if(isPreselect_Gtt_1l
+     && var_mT > 150
+     && NJets >= 6
+     && NBJets >= 4
+     && NTopJets >= 0
+     && var_Met > 200.0
+     && var_Meff > 600.0)
+    {
+      isGtt1LSRC2=true;
+      if(debug) std::cout << "DEBUG::SR\tisGtt1LSRC2" << std::endl;
+    }
+  else isGtt1LSRC2=false;
+  
+  //configMgr.cutsDict["SR_Gtt_1l_A_4"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=1 && met>250 && meff_incl>1600"
+  if(isPreselect_Gtt_1l
+     && var_mT > 150
+     && var_mTb > 160
+     && NJets >= 6
+     && NBJets >= 3
+     && NTopJets >= 1
+     && var_Met > 250.0
+     && var_Meff > 1600.0)
+    {
+      isGtt1LSRA4=true;
+      if(debug) std::cout << "DEBUG::SR\tisGtt1LSRA4" << std::endl;
+    }
+  else isGtt1LSRA4=false;
+  
+  //configMgr.cutsDict["SR_Gtt_1l_B_4"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=0 && met>350 && meff_incl>1100"
+  if(isPreselect_Gtt_1l
+     && var_mT > 150
+     && var_mTb > 160
+     && NJets >= 6
+     && NBJets >= 3
+     && NTopJets >= 0
+     && var_Met > 350.0
+     && var_Meff > 1100.0)
+    {
+      isGtt1LSRB4=true;
+      if(debug) std::cout << "DEBUG::SR\tisGtt1LSRB4" << std::endl;
+    }
+  else isGtt1LSRB4=false;
+  
+  //configMgr.cutsDict["SR_Gtt_1l_C_4"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>0   && jets_n>=6 && bjets_n>=4 && top_n>=0 && met>250 && meff_incl>700"
+  if(isPreselect_Gtt_1l
+     && var_mT > 150
+     && NJets >= 6
+     && NBJets >= 4
+     && NTopJets >= 0
+     && var_Met > 250.0
+     && var_Meff > 700.0)
+   {
+     isGtt1LSRC4=true;
+     if(debug) std::cout << "DEBUG::SR\tisGtt1LSRC4" << std::endl;
+   }
+  else isGtt1LSRC4=false;
+ 
+  // Gtt 0L signal region flags
+  // And here, the various zero-lepton signal regions ...
+  
+  //configMgr.cutsDict["SR_Gtt_0l_A"] = "(signal_electrons_n + signal_muons_n)==0 && dphi_min>0.4 && mTb_min>80 && jets_n>=8 && bjets_n>=4 && top_n>=0 && met>350 && meff_incl>1250
+  if(isPreselect_Gtt_0l
+     && var_dPhiMin > 0.4
+     && var_mTb > 80
+     && NJets >= 8
+     && NBJets >= 4
+     && NTopJets >= 0
+     && var_Met > 350.0
+     && var_Meff > 1250.0)
+    {
+      isGtt0LSRA=true;
+      if(debug) std::cout << "DEBUG::SR\tisGtt0LSRA" << std::endl;
+    }
+  else isGtt0LSRA=false;
+  
+  //configMgr.cutsDict["SR_Gtt_0l_B"] = "(signal_electrons_n + signal_muons_n)==0 && dphi_min>0.4 && mTb_min>80 && jets_n>=8 && bjets_n>=4 && top_n>=1 && met>350 && meff_incl>1250"
+  if(isPreselect_Gtt_0l
+     && var_dPhiMin > 0.4
+     && var_mTb > 80
+     && NJets >= 8
+     && NBJets >= 4
+     && NTopJets >= 1
+     && var_Met > 350.0
+     && var_Meff > 1250.0)
+    {
+      isGtt0LSRB=true;
+      if(debug) std::cout << "DEBUG::SR\tisGtt0LSRB" << std::endl;
+    }
+  else isGtt0LSRB=false;
+  
+  //configMgr.cutsDict["SR_Gtt_0l_C"] = "(signal_electrons_n + signal_muons_n)==0 && dphi_min>0.4 && mTb_min>80 && jets_n>=8 && bjets_n>=3 && top_n>=1 && met>400 && meff_incl>1700"
+  if(isPreselect_Gtt_0l
+     && var_dPhiMin > 0.4
+     && var_mTb > 80
+     && NJets >= 8
+     && NBJets >= 3
+     && NTopJets >= 1
+     && var_Met > 400.0
+     && var_Meff > 1700.0)
+    {
+      isGtt0LSRC=true;
+      if(debug) std::cout << "DEBUG::SR\tisGtt0LSRC" << std::endl;
+    }
+  else isGtt0LSRC=false;
+  
+  //configMgr.cutsDict["SR_Gtt_0l_D"] = "(signal_electrons_n + signal_muons_n)==0 && dphi_min>0.4 && mTb_min>80 && jets_n>=8 && bjets_n>=3 && top_n>=2 && met>400 && meff_incl>1700"
+  if(isPreselect_Gtt_0l
+     && var_dPhiMin > 0.4
+     && var_mTb > 80
+     && NJets >= 8
+     && NBJets >= 3
+     && NTopJets >= 2
+     && var_Met > 400.0
+     && var_Meff > 1700.0)
+    {
+      isGtt0LSRD=true;
+      if(debug) std::cout << "DEBUG::SR\tisGtt0LSRD" << std::endl;
+    }
+  else isGtt0LSRD=false;
+  
+  
   const xAOD::EventInfo* EventInfo = 0;
   m_event->retrieve(EventInfo, "EventInfo");
   
   mc_channel=-1.0;
   mc_weight = EventInfo->mcEventWeight();
+
+  //std::cout << mc_weight << std::endl;
 
   TruthAnalysis::cutflow(out_cutflow,
 			 NJets,
@@ -752,12 +753,12 @@ EL::StatusCode TruthAnalysis :: execute ()
 			 var_Meff_4j,
 			 var_mT,
 			 var_mTb,
-                         var_HT,
+			 var_HT,
 			 var_Met,
 			 var_MetSig,
 			 debug);
   out_tree->Fill();
-
+  
   return EL::StatusCode::SUCCESS;
 }
 
