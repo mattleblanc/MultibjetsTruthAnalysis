@@ -115,4 +115,24 @@ python MultibjetsTruthAnalysis/scripts/Run.py \
     --doTRF=0 \
     --process="testMLB00"
 
+python MultibjetsTruthAnalysis/scripts/Run.py \
+    --submitDir=/home/mleblanc/out/truthOut/407040/ \
+    --inputDS="mc15_13TeV:mc15_13TeV.407040.PhHppEG_CT10_UE5C6L1_ttbarMET200_hdamp172p5_nonAH.merge.DAOD_TRUTH1.e4497_p2436/" \
+    --driver=condor \
+    --doRcJets=1 \
+    --doAK10Jets=0 \
+    --debug=1 \
+    --doTRF=0 \
+    --process="testMLB00"
+
+python MultibjetsTruthAnalysis/scripts/Run.py \
+    --submitDir=/home/mleblanc/out/truthOut/407044/ \
+    --inputDS="mc15_13TeV:mc15_13TeV.407044.PhPy8EG_CT10_A14N23LO_ttbarMET200_hdamp172p5_nonAH.merge.DAOD_TRUTH1.e4497_p2436/" \
+    --driver=condor \
+    --doRcJets=1 \
+    --doAK10Jets=0 \
+    --debug=1 \
+    --doTRF=0 \
+    --process="testMLB00"
+
 exit 0
