@@ -149,6 +149,21 @@ EL::StatusCode TruthAnalysis :: initialize ()
   isGtt0LSRB=false;
   isGtt0LSRC=false;
   isGtt0LSRD=false;
+  isGbbCRA2 = 0;
+  isGbbCRB2 = 0;
+  isGbbCRC2 = 0;
+  isGbbCRA4 = 0;
+  isGbbCRB4 = 0;
+  isGtt1LCRA2 = 0;
+  isGtt1LCRB2 = 0;
+  isGtt1LCRC2 = 0;
+  isGtt1LCRA4 = 0;
+  isGtt1LCRB4 = 0;
+  isGtt1LCRC4 = 0;
+  isGtt0LCRA = 0;
+  isGtt0LCRB = 0;
+  isGtt0LCRC = 0;
+  isGtt0LCRD = 0;
 
   var_dPhiMin = 0;
   var_Meff = 0;
@@ -200,6 +215,24 @@ EL::StatusCode TruthAnalysis :: initialize ()
   out_tree->Branch("isGtt0LSRB",&isGtt0LSRB,"isGtt0LSRB/I");
   out_tree->Branch("isGtt0LSRC",&isGtt0LSRC,"isGtt0LSRC/I");
   out_tree->Branch("isGtt0LSRD",&isGtt0LSRD,"isGtt0LSRD/I");
+
+  out_tree->Branch("isGbbCRA2",&isGbbCRA2,"isGbbCRA2/I");
+  out_tree->Branch("isGbbCRB2",&isGbbCRB2,"isGbbCRB2/I");
+  out_tree->Branch("isGbbCRC2",&isGbbCRC2,"isGbbCRC2/I");
+  out_tree->Branch("isGbbCRA4",&isGbbCRA4,"isGbbCRA4/I");
+  out_tree->Branch("isGbbCRB4",&isGbbCRB4,"isGbbCRB4/I");
+  
+  out_tree->Branch("isGtt1LCRA2",&isGtt1LCRA2,"isGtt1LCRA2/I");
+  out_tree->Branch("isGtt1LCRB2",&isGtt1LCRB2,"isGtt1LCRB2/I");
+  out_tree->Branch("isGtt1LCRC2",&isGtt1LCRC2,"isGtt1LCRC2/I");
+  out_tree->Branch("isGtt1LCRA4",&isGtt1LCRA4,"isGtt1LCRA4/I");
+  out_tree->Branch("isGtt1LCRB4",&isGtt1LCRB4,"isGtt1LCRB4/I");
+  out_tree->Branch("isGtt1LCRC4",&isGtt1LCRC4,"isGtt1LCRC4/I");
+
+  out_tree->Branch("isGtt0LCRA",&isGtt0LCRA,"isGtt0LCRA/I");
+  out_tree->Branch("isGtt0LCRB",&isGtt0LCRB,"isGtt0LCRB/I");
+  out_tree->Branch("isGtt0LCRC",&isGtt0LCRC,"isGtt0LCRC/I");
+  out_tree->Branch("isGtt0LCRD",&isGtt0LCRD,"isGtt0LCRD/I");
 
   out_tree->Branch("var_dPhiMin",&var_dPhiMin, "var_dPhiMin/F");
   out_tree->Branch("var_Meff",&var_Meff, "var_Meff/F");
@@ -440,6 +473,21 @@ EL::StatusCode TruthAnalysis :: execute ()
   isGtt0LSRB=false;
   isGtt0LSRC=false;
   isGtt0LSRD=false;
+  isGbbCRA2 = 0;
+  isGbbCRB2 = 0;
+  isGbbCRC2 = 0;
+  isGbbCRA4 = 0;
+  isGbbCRB4 = 0;
+  isGtt1LCRA2 = 0;
+  isGtt1LCRB2 = 0;
+  isGtt1LCRC2 = 0;
+  isGtt1LCRA4 = 0;
+  isGtt1LCRB4 = 0;
+  isGtt1LCRC4 = 0;
+  isGtt0LCRA = 0;
+  isGtt0LCRB = 0;
+  isGtt0LCRC = 0;
+  isGtt0LCRD = 0;
 
   // Gtt 1 lepton region
   //configMgr.cutsDict["Presel_Gtt_1l"] = "(signal_electrons_n + signal_muons_n)>=1 && jets_n>=6 && bjets_n>=3 && met>200 && meff_incl<1000."
@@ -734,15 +782,195 @@ EL::StatusCode TruthAnalysis :: execute ()
       if(debug) std::cout << "DEBUG::SR\tisGtt0LSRD" << std::endl;
     }
   else isGtt0LSRD=false;
+
+  // Gbb CRs
+  if((NSignalElectrons+NSignalMuons)==1
+     && NJets >= 4
+     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && NBJets >= 3
+     && var_mT < 150
+     && var_Met > 250
+     && var_Meff_4j > 1100)
+    {
+      isGbbCRA2=true;
+    }
+  else isGbbCRA2=false;
+
+  if((NSignalElectrons+NSignalMuons)==1
+     &&    NJets >= 4
+     &&    SelectedJets->at(3)->pt()/MEV > 90.0
+     &&    NBJets >= 3
+     &&    var_mT < 150
+     && var_Met > 250
+     && var_Meff_4j > 900)
+    {
+      isGbbCRB2=true;
+    }
+  else isGbbCRB2=false;
+
+  if((NSignalElectrons+NSignalMuons)==1
+     &&    NJets >= 4     
+     &&    SelectedJets->at(3)->pt()/MEV > 30.0
+     &&    NBJets >= 3
+     &&    var_mT < 150
+     && var_Met > 250
+     && var_Meff_4j > 900)
+    {
+      isGbbCRC2=true;
+    }
+  else isGbbCRC2=false;
   
+  if((NSignalElectrons+NSignalMuons)==1
+     &&    NJets >= 4
+     &&    SelectedJets->at(3)->pt()/MEV > 90.0
+     &&    NBJets >= 3
+     &&    var_mT < 150 
+     && var_Met > 250
+     && var_Meff_4j > 1200)
+    {
+      isGbbCRA4=true;
+    }
+  else isGbbCRA4=false;
+  
+  if((NSignalElectrons+NSignalMuons)==1
+     &&    NJets >= 4
+     &&    SelectedJets->at(3)->pt()/MEV > 90.0
+     &&    NBJets >= 3
+     &&    var_mT < 150
+     && var_Met > 300
+     && var_Meff_4j > 1100)
+    {
+      isGbbCRB4=true;
+    }
+  else isGbbCRB4=false;
+  
+  // Gtt 1L signal regions
+  if((NSignalElectrons+NSignalMuons)==1
+     && NJets >= 6
+     && NBJets >= 3
+     && NTopJets >= 1
+     && var_mT < 150
+     && var_Met >= 200
+     && var_Meff >= 1100)
+    {
+      isGtt1LCRA2=true;
+    }
+  else isGtt1LCRA2=false;
+
+  if((NSignalElectrons+NSignalMuons)==1
+     && NJets >= 6
+     && NBJets >= 3
+     && NTopJets >= 0
+     && var_mT < 150
+     && var_Met >= 300
+     && var_Meff >= 900)
+    {
+      isGtt1LCRB2=true;
+    }
+  else isGtt1LCRB2=false;
+
+  if((NSignalElectrons+NSignalMuons)==1
+     && NJets >= 6
+     && NBJets >= 4
+     && NTopJets >= 0
+     && var_mT < 80
+     && var_Met >= 200
+     && var_Meff >= 900)
+    {
+      isGtt1LCRC2=true;
+    }
+  else isGtt1LCRC2=false;
+
+  if((NSignalElectrons+NSignalMuons)==1
+     && NJets >= 6
+     && NBJets >= 3
+     && NTopJets >= 1
+     && var_mT < 150
+     && var_Met >= 250
+     && var_Meff >= 1600)
+    {
+      isGtt1LCRA4=true;
+    }
+  else isGtt1LCRA4=false;
+
+  if((NSignalElectrons+NSignalMuons)==1
+     && NJets >= 6
+     && NBJets >= 3
+     && NTopJets >= 0
+     && var_mT < 150
+     && var_Met >= 350
+     && var_Meff >= 1100)
+    {
+      isGtt1LCRB4=true;
+    }
+  else isGtt1LCRB4=false;
+
+  if((NSignalElectrons+NSignalMuons)==1
+     && NJets >= 6
+     && NBJets >= 4
+     && NTopJets >= 0
+     && var_mT < 80
+     && var_Met >= 250
+     && var_Meff >= 700)
+    {
+      isGtt1LCRC4=true;
+    }
+  else isGtt1LCRC4=false;
+  
+  // Gtt 0L signal regions
+  if((NSignalElectrons+NSignalMuons)==1
+     && NJets >= 7
+     && NBJets >= 4
+     &&	NTopJets >= 0
+     && var_mT < 150
+     && var_Met >= 200
+     && var_Meff >= 1000)
+    {
+      isGtt0LCRA=true;
+    }
+  else isGtt0LCRA=false;
+  
+  if((NSignalElectrons+NSignalMuons)==1
+     && NJets >= 7
+     && NBJets >= 4
+     && NTopJets >=1
+     && var_mT < 150
+     && var_Met >= 200
+     && var_Meff >= 1000)
+    {
+      isGtt0LCRB=true;
+    }
+  else isGtt0LCRB=false;
+  
+  if((NSignalElectrons+NSignalMuons)==1
+     && NJets >= 7
+     && NBJets >= 4
+     && NTopJets >=1
+     && var_mT < 150
+     && var_Met >= 250
+     && var_Meff >= 1350)
+    {
+      isGtt0LCRC=true;
+    }
+  else isGtt0LCRC=false;
+  
+  if((NSignalElectrons+NSignalMuons)==1
+     && NJets >= 7
+     && NBJets >= 4
+     && NTopJets >=2
+     && var_mT < 150
+     && var_Met >= 200
+     && var_Meff >= 1200)
+    {
+      isGtt0LCRD=true;
+    }
+  else isGtt0LCRD=false;
   
   const xAOD::EventInfo* EventInfo = 0;
   m_event->retrieve(EventInfo, "EventInfo");
   
   mc_channel=-1.0;
-  mc_weight = EventInfo->mcEventWeight();
-
-  //std::cout << mc_weight << std::endl;
+  mc_weight = EventInfo->mcEventWeights().at(0);
 
   TruthAnalysis::cutflow(out_cutflow,
 			 NJets,

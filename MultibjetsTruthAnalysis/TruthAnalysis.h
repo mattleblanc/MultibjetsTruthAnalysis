@@ -82,6 +82,7 @@ public:
   Int_t isPreselect_Gtt_1l; //!
   Int_t isPreselect_Gtt_0l; //!
   Int_t isPreselect; //!
+
   Int_t isGbbSRA1; //!
   Int_t isGbbSRB1; //!
   Int_t isGbbSRA2; //!
@@ -89,17 +90,39 @@ public:
   Int_t isGbbSRC2; //!
   Int_t isGbbSRA4; //!
   Int_t isGbbSRB4; //!
+
   Int_t isGtt1LSRA2; //!
   Int_t isGtt1LSRB2; //!
   Int_t isGtt1LSRC2; //!
   Int_t isGtt1LSRA4; //!
   Int_t isGtt1LSRB4; //!
   Int_t isGtt1LSRC4; //!
+
   Int_t isGtt0LSRA; //!
   Int_t isGtt0LSRB; //!
   Int_t isGtt0LSRC; //!
   Int_t isGtt0LSRD; //!
   
+  // CRs
+  Int_t isGbbCRA2; //!
+  Int_t isGbbCRB2; //!
+  Int_t isGbbCRC2; //!
+  Int_t isGbbCRA4; //!
+  Int_t isGbbCRB4; //!
+
+  Int_t isGtt1LCRA2; //!
+  Int_t isGtt1LCRB2; //!
+  Int_t isGtt1LCRC2; //!
+  Int_t isGtt1LCRA4; //!
+  Int_t isGtt1LCRB4; //!
+  Int_t isGtt1LCRC4; //!
+
+  Int_t isGtt0LCRA; //!
+  Int_t isGtt0LCRB; //!
+  Int_t isGtt0LCRC; //!
+  Int_t isGtt0LCRD; //!
+
+  // Observables
   float var_dPhiMin;
   float var_Meff;
   float var_Meff_4j;
