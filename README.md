@@ -39,7 +39,11 @@ To check that things are working, you can run a quick test job on 20k events usi
 # Links
 
 [CERN](http://home.cern)
+
 [The ATLAS Collaboration](http://atlas.ch/)
+
 [University of Victoria](https://www.uvic.ca/science/physics/)
+
 [University of Chicago](http://physics.uchicago.edu/)
+
 [SLAC](https://www6.slac.stanford.edu/)
