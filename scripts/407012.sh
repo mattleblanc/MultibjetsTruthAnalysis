@@ -21,13 +21,13 @@
 #  --doTRF=DOTRF         TRF flag [0/1]
 #  --process=PROCESS     name of the process added to the output grid jobs
 
-rm -rf /home/mleblanc/out/testOut/*
 
+
+#407012
 python MultibjetsTruthAnalysis/scripts/Run.py \
-    --submitDir=/home/mleblanc/out/testOut/407012/ \
-    --inputDS="mc15_13TeV:mc15_13TeV.407012.PowhegPythiaEvtGen_P2012CT10_ttbarMET200_hdamp172p5_nonAH.merge.DAOD_TRUTH1.e4023_p2440/" \
-    --driver=direct \
-    --nevents=50000 \
+    --submitDir=/home/mleblanc/out/truthOut/407012/ \
+    --inputDS="mc15_13TeV:mc15_13TeV.407012.PowhegPythiaEvtGen_P2012CT10_ttbarMET200_hdamp172p5_nonAH.merge.DAOD_TRUTH1.e4023_p2436/" \
+    --driver=condor \
     --doRcJets=1 \
     --doAK10Jets=0 \
     --debug=1 \
