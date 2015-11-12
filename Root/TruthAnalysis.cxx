@@ -40,7 +40,7 @@
       }                                                     \
    } while( false )
 
-#define MEV 1000
+#define MEV 1000.0
 
 // this is needed to distribute the algorithm to the workers
 ClassImp(TruthAnalysis)
@@ -295,6 +295,7 @@ EL::StatusCode TruthAnalysis :: execute ()
   const xAOD::JetContainer* TruthJets = 0;
   EL_RETURN_CHECK("Get jets", m_event->retrieve( TruthJets, "AntiKt4TruthJets" ) );
 
+  static SG::AuxElement::ConstAccessor< int > GhostTaus("GhostTausFinalCount");
   static SG::AuxElement::ConstAccessor< int > GhostBHadrons("GhostBHadronsFinalCount");
   static SG::AuxElement::ConstAccessor< int > GhostCHadrons("GhostCHadronsFinalCount");
 
@@ -305,6 +306,8 @@ EL::StatusCode TruthAnalysis :: execute ()
   ConstDataVector<xAOD::JetContainer> * SelectedBJets  =  new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
 
   int TruthBNum = 0;
+  int TruthCNum = 0;
+  int TruthTauNum = 0;
   for(const auto jet : *TruthJets){
     if(fabs(jet->eta()) < 2.8 && jet->pt() / MEV > 30.){
       SelectedJets->push_back(jet);
@@ -317,10 +320,17 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
     bool HasB = (GhostBHadrons(*jet) >= 1);
     bool HasC = (GhostCHadrons(*jet) >= 1);
+    bool HasTau = (GhostTaus(*jet) >= 1);
     // Should we look at taus as well?
 
     if(HasB)
       TruthBNum++;
+
+    if(HasC)
+      TruthCNum++;
+
+    if(HasTau)
+      TruthTauNum++;
 
     if(HasB){
       double randB = myRand->Rndm();
@@ -336,6 +346,13 @@ EL::StatusCode TruthAnalysis :: execute ()
         SelectedBJets->push_back(jet);
       }
     }
+    else if(HasTau){
+      double randTau = myRand->Rndm();
+      if(randTau < 0.26){
+	// it's  b, even so
+	SelectedBJets->push_back(jet);
+	}
+    }
     else{ // it's a light jet in truth
       double randL = myRand->Rndm();
       if(randL < 0.036){
@@ -344,7 +361,11 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   }
 
-  //std::cout << " Measured " << SelectedBJets->size() << " truth number " << TruthBNum << std::endl;
+  /*
+  std::cout << " Measured " << SelectedBJets->size() << " truth number b's " << TruthBNum 
+  	    << " truth number c's " << TruthCNum << " truth number tau's " << TruthTauNum 
+	    << " out of total jets, " << SelectedJets->size() << std::endl;
+  */
 
   // Jet Reclustering!
   ConstDataVector<xAOD::JetContainer> * SelectedRCJets   =  new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
@@ -355,11 +376,11 @@ EL::StatusCode TruthAnalysis :: execute ()
   m_event->retrieve( RC10TruthJets, "RC10TruthJets");
   for(const auto jet : *RC10TruthJets)
     {
-      if(fabs(jet->eta()) < 2.0 && jet->pt() / MEV > 300.0)
+      if(fabs(jet->eta()) < 2.0 && (jet->pt() / MEV) > 300.0)
 	{
 	  SelectedRCJets->push_back(jet);
-
-	  if(jet->m() / MEV > 100.0)
+	  	 
+	  if((jet->m() / MEV) > 100.0)
 	    {
 	      SelectedTopJets->push_back(jet);
 	    }
@@ -379,7 +400,7 @@ EL::StatusCode TruthAnalysis :: execute ()
 	{
 	  SignalElectrons->push_back(electron);
 	}
-      if(fabs(electron->eta()) < 2.47 && electron->pt() / MEV > 10.)
+      if(fabs(electron->eta()) < 2.47 && electron->pt() / MEV > 20.)
 	{
 	  BaselineElectrons->push_back(electron);
 	}
@@ -402,10 +423,16 @@ EL::StatusCode TruthAnalysis :: execute ()
 
   const xAOD::MissingETContainer* TruthMET = 0;
   EL_RETURN_CHECK("Get MET", m_event->retrieve( TruthMET, "MET_Truth" ) );
-
+  
   xAOD::MissingETContainer::const_iterator TruthMET_it = TruthMET->find("NonInt");
-  if (TruthMET_it == TruthMET->end()) std::cout << "No NonINT inside MET container" << std::endl;
+  if (TruthMET_it == TruthMET->end()) std::cout << "No NonINT inside MET container" << std::endl;  
   xAOD::MissingET* TruthMET_NonInt = *TruthMET_it;
+
+  TruthMET_it = TruthMET->find("Int");
+  if (TruthMET_it == TruthMET->end()) std::cout << "No INT inside MET container" << std::endl;
+  xAOD::MissingET* TruthMET_Int = *TruthMET_it;
+
+  //std::cout << "MET " << TruthMET_NonInt->met()/1000.0 << "\t" << TruthMET_Int->met()/1000.0 << std::endl;
 
   var_dPhiMin = Variables::delta_phi_nj(TruthMET_NonInt, SelectedJets->asDataVector(), SelectedJets->size()); // Should it be this MET?
   var_Meff = Variables::Meff_incl(TruthMET_NonInt, SelectedJets->asDataVector(), SignalMuons->asDataVector(), SignalElectrons->asDataVector());
@@ -414,7 +441,10 @@ EL::StatusCode TruthAnalysis :: execute ()
   var_mTb = Variables::mT_min_bjets(TruthMET_NonInt, SelectedBJets->asDataVector(), false /* set_mw? */);
   var_HT = Variables::Ht(SelectedJets->asDataVector(), SignalMuons->asDataVector(), SignalElectrons->asDataVector());
   var_Met = TruthMET_NonInt->met()/1000.0;
+  //var_Met = TruthMET_Int->met()/1000.0;
   var_MetSig = Variables::Met_significance(TruthMET_NonInt, SelectedJets->asDataVector(), 4 /* How many jets to use in HT? */);
+
+  var_dPhiMin = 1.0; // REMOVED TO TEST, MLB ON 11-11-15
 
   NSignalElectrons = SignalElectrons->size();
   NSignalMuons     = SignalMuons->size();
@@ -976,6 +1006,10 @@ EL::StatusCode TruthAnalysis :: execute ()
 			 NJets,
 			 NBJets,
 			 NTopJets,
+			 NSignalElectrons,
+			 NSignalMuons,
+			 NBaseElectrons,
+			 NBaseMuons,
 			 var_dPhiMin,
 			 var_Meff,
 			 var_Meff_4j,
@@ -1040,6 +1074,10 @@ EL::StatusCode TruthAnalysis :: cutflow (TH1F*& hist,
 					 Int_t v_NJets,
 					 Int_t v_NBJets,
 					 Int_t v_NTopJets,
+					 Int_t v_NSigEl,
+					 Int_t v_NSigMu,
+					 Int_t v_NBaseEl,
+                                         Int_t v_NBaseMu,
 					 Float_t v_dPhiMin,
 					 Float_t v_Meff,
 					 Float_t v_Meff_4j,
@@ -1052,36 +1090,47 @@ EL::StatusCode TruthAnalysis :: cutflow (TH1F*& hist,
 {
   hist->Fill("all",1.0);
 
-  // A bit of a weird cutflow, but this will show the efficiency of each individual cut ...
-  // A bit more interesting, since we can't compare with anyone.
+  // Want to match e.g. https://twiki.cern.ch/twiki/pub/AtlasProtected/SusyMultibjetAnalysis/cut_flow_2015_09_16.pdf
 
-  if(v_NJets >= 4) hist->Fill("Jets_4",1.0);
-  if(v_NJets >= 5) hist->Fill("Jets_5",1.0);
-  if(v_NJets >= 6) hist->Fill("Jets_6",1.0);
+  /*
+    Initial 3815132
+    met_truth_filter>200 3798844
+    HLT_xe70 3738328
+    >=4 signal jets with pT > 30 GeV 2477655
+    >=1 signal electron (pt>20 GeV) 420495
+    >=1 signal muon 420331
+    ==0 baseline lepton 1556221
+    met > 250 GeV 1063291
+    dphi(met,jets)>0.4 1577063
+    >=3 b-jets (85% OP) 391194
+    meff > 1000 GeV 648457
+    mtmin(b,MET)>160 GeV 650960
+    >=1 top-tagged loose 785494
+    >=1 top-tagged tight 502097
+    >=1 top-tagged looser 718243
+  */
 
-  if(v_NBJets >= 1) hist->Fill("BJets_1",1.0);
-  if(v_NBJets >= 2) hist->Fill("BJets_2",1.0);
-  if(v_NBJets >= 3) hist->Fill("BJets_3",1.0);
+  if(v_Met>200.0) hist->Fill("MET_200",1.0);
+  else return EL::StatusCode::SUCCESS;
+
+  if(v_NJets>=4)  hist->Fill("jets4",1.0);
+  else return EL::StatusCode::SUCCESS;
+
+  if(v_NSigEl>=1)  hist->Fill("NSigEl1",1.0);
+  if(v_NSigMu>=1)  hist->Fill("NSigMu1",1.0);
+  if((v_NBaseMu+v_NBaseEl)==0)  hist->Fill("ZeroLep",1.0);
+
+  if(v_Met>250.0) hist->Fill("MET_250",1.0);
+
+  //if(v_dPhiMin>0.4) hist->Fill("dPhiMin04",1.0);
+
+  if(v_NBJets>=3) hist->Fill("bjets3",1.0);
+
+  if(v_Meff>1000.0) hist->Fill("MEFF_1000",1.0);
+
+  if(v_mTb>160.0) hist->Fill("MTB_160",1.0);
+
+  if(v_NTopJets>=1) hist->Fill("VLooseTop",1.0);
   
-  if(v_NTopJets >= 1) hist->Fill("TopJets_1",1.0);
-  if(v_NTopJets >= 2) hist->Fill("TopJets_2",1.0);
-  
-  if(v_dPhiMin > 0.4) hist->Fill("dPhiMin_04",1.0);
-
-  if(v_Meff < 1000.0) hist->Fill("Meff_1k",1.0);
-  if(v_Meff_4j < 1000.0) hist->Fill("Meff4j_1k",1.0);
-  if(v_mT > 150.0) hist->Fill("mT_150",1.0);
-  if(v_mTb > 150.0) hist->Fill("mTb_1k",1.0);
-
-  if(v_HT > 1000.0) hist->Fill("HT_1k",1.0);
-
-  if(v_Met > 200.0) hist->Fill("Met_200",1.0);
-  if(v_Met > 300.0) hist->Fill("Met_300",1.0);
-  if(v_Met > 350.0) hist->Fill("Met_350",1.0);
-  
-  if(v_MetSig > 3) hist->Fill("MetSig_3",1.0);
-  if(v_MetSig > 10) hist->Fill("MetSig_10",1.0);
-  if(v_MetSig > 15) hist->Fill("MetSig_15",1.0);
-
   return EL::StatusCode::SUCCESS;
 }
