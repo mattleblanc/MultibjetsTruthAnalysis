@@ -24,7 +24,11 @@ git clone git@github.com:mattleblanc/MultibjetsTruthAnalysis.git
 git clone https://github.com/kratsg/xAODJetReclustering
 ```
 
-Be sure to set up FAX before RootCore. Be sure to initialise your proxy before trying to run: `voms-proxy-init -voms atlas`
+Be sure to set up FAX before RootCore. Be sure to initialise your proxy before trying to run: 
+
+```
+voms-proxy-init -voms atlas
+```
 
 To compile, always run `rc build`, which is equivalent to `rc find_packages && rc compile && rc make_par`.
 
