@@ -31,12 +31,12 @@ void plotTruth(TString reg)
 	TString inDir2 = "/fetch/data-outTree/";
 
 	//TFile* f_410000; f_410000 = new TFile(inDir+"mc15_13TeV:mc15_13TeV.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad.merge.DAOD_TRUTH1.e3698_p2375.root");
-	TFile* f_410000; f_410000 = new TFile(inDir+"410000"+inDir2+"410000.merge.root");
-	TFile* f_410001; f_410001 = new TFile(inDir+"410001"+inDir2+"410001.merge.root");
-	TFile* f_410002; f_410002 = new TFile(inDir+"410002"+inDir2+"410002.merge.root");
-	TFile* f_410003; f_410003 = new TFile(inDir+"410003"+inDir2+"410003.merge.root");
-	TFile* f_410004; f_410004 = new TFile(inDir+"410004"+inDir2+"410004.merge.root");
-	TFile* f_410006; f_410006 = new TFile(inDir+"410006"+inDir2+"410006.merge.root");
+	// TFile* f_410000; f_410000 = new TFile(inDir+"410000"+inDir2+"410000.merge.root");
+	// TFile* f_410001; f_410001 = new TFile(inDir+"410001"+inDir2+"410001.merge.root");
+	// TFile* f_410002; f_410002 = new TFile(inDir+"410002"+inDir2+"410002.merge.root");
+	// TFile* f_410003; f_410003 = new TFile(inDir+"410003"+inDir2+"410003.merge.root");
+	// TFile* f_410004; f_410004 = new TFile(inDir+"410004"+inDir2+"410004.merge.root");
+	// TFile* f_410006; f_410006 = new TFile(inDir+"410006"+inDir2+"410006.merge.root");
 	TFile* f_407012; f_407012 = new TFile(inDir+"407012"+inDir2+"407012.merge.root");
 	TFile* f_407032; f_407032 = new TFile(inDir+"407032"+inDir2+"407032.merge.root");
 	TFile* f_407036; f_407036 = new TFile(inDir+"407036"+inDir2+"407036.merge.root");
@@ -44,12 +44,12 @@ void plotTruth(TString reg)
 	TFile* f_407044; f_407044 = new TFile(inDir+"407044"+inDir2+"407044.merge.root");
 
 
-	TTree* t_410000; t_410000 = (TTree*)f_410000->Get("out_tree");
-	TTree* t_410001; t_410001 = (TTree*)f_410001->Get("out_tree");
-	TTree* t_410002; t_410002 = (TTree*)f_410002->Get("out_tree");
-	TTree* t_410003; t_410003 = (TTree*)f_410003->Get("out_tree");
-	TTree* t_410004; t_410004 = (TTree*)f_410004->Get("out_tree");
-	TTree* t_410006; t_410006 = (TTree*)f_410006->Get("out_tree");
+	// TTree* t_410000; t_410000 = (TTree*)f_410000->Get("out_tree");
+	// TTree* t_410001; t_410001 = (TTree*)f_410001->Get("out_tree");
+	// TTree* t_410002; t_410002 = (TTree*)f_410002->Get("out_tree");
+	// TTree* t_410003; t_410003 = (TTree*)f_410003->Get("out_tree");
+	// TTree* t_410004; t_410004 = (TTree*)f_410004->Get("out_tree");
+	// TTree* t_410006; t_410006 = (TTree*)f_410006->Get("out_tree");
 	TTree* t_407012; t_407012 = (TTree*)f_407012->Get("out_tree");
 	TTree* t_407032; t_407032 = (TTree*)f_407032->Get("out_tree");
 	TTree* t_407036; t_407036 = (TTree*)f_407036->Get("out_tree");
@@ -57,17 +57,17 @@ void plotTruth(TString reg)
 	TTree* t_407044; t_407044 = (TTree*)f_407044->Get("out_tree");
 
 	std::vector<pair<TTree*, Int_t>> v_trees;
-	v_trees.push_back(std::make_pair(t_410000,410000));
+	//v_trees.push_back(std::make_pair(t_410000,410000));
 	//v_trees.push_back(std::make_pair(t_410001,410001));
-	v_trees.push_back(std::make_pair(t_410002,410002));
-	v_trees.push_back(std::make_pair(t_410003,410003));
-	v_trees.push_back(std::make_pair(t_410004,410004));
-	v_trees.push_back(std::make_pair(t_410006,410006));
-	v_trees.push_back(std::make_pair(t_407012,407012)); // nothing in this one ...
+	// v_trees.push_back(std::make_pair(t_410002,410002));
+	// v_trees.push_back(std::make_pair(t_410003,410003));
+	// v_trees.push_back(std::make_pair(t_410004,410004));
+	// v_trees.push_back(std::make_pair(t_410006,410006));
+	v_trees.push_back(std::make_pair(t_407012,407012));
 	v_trees.push_back(std::make_pair(t_407032,407032));
 	v_trees.push_back(std::make_pair(t_407036,407036));
-	v_trees.push_back(std::make_pair(t_407032,407040));
-	v_trees.push_back(std::make_pair(t_407036,407044));
+	v_trees.push_back(std::make_pair(t_407040,407040));
+	v_trees.push_back(std::make_pair(t_407044,407044));
 
 	// Declare histograms ...
 	std::vector<TH1F*> v_truth_met;
@@ -110,21 +110,38 @@ void plotTruth(TString reg)
 		Float_t weight = 1.0;
 		Float_t mc_weight=v_trees.at(iTree).first->SetBranchAddress("mc_weight",&mc_weight);
 
-		if(dsid=="410000") weight *= 0.69611*5.4383E-01/20099000.0;
-		if(dsid=="410001") weight *= 0.78373*5.4382E-01/19995000.0;
-		if(dsid=="410002") weight *= 0.61110*5.4384E-01/20000000.0;
-		if(dsid=="410003") weight *= 0.69486*5.4396E-01/4910000.0;
-		if(dsid=="410004") weight *= 0.69632*5.4386E-01/9820000.0;
-		if(dsid=="410006") weight *= 0.69635*5.4386E-01/10000000.0;
+        // Always use nominal XS, k-factor.
+        // Get these from SUSYTools:
+        // https://svnweb.cern.ch/trac/atlasoff/browser/PhysicsAnalysis/SUSYPhys/SUSYTools/trunk/data/susy_crosssections_13TeV.txt
+      	if(dsid=="410000" || dsid=="410001" || dsid=="410002" || dsid=="410003" || dsid=="410004" || dsid=="410006")
+      		weight *= 831.76*1.*0.543*1.;
 
-  		if(reg=="407012") weight *= 0.69622*9.2205E-03/2.74497;//3995000.0; // XS*FE/NGEN, XS in nb from AMI
-		if(reg=="407032") weight *= 0.78383*9.4391E-03/2.95191;//4000000.0; // XS*FE/NGEN
-        if(reg=="407036") weight *= 0.61110*9.1213E-03/2.43458;//4000000.0; // XS*FE/NGEN
-        if(reg=="407040") weight *= 0.69632*7.7710E-03/3.7725e+06; // 3930000.0
-        if(reg=="407044") weight *= 0.69646*9.2430E-03/2.85515e+09; // 3995000.0
+      	if(dsid=="407012" || dsid=="407032" || dsid=="407036" || dsid=="407040" || dsid=="407044")
+      		weight *=  831.76*1.*0.0092194758*1.;
 
-		weight *= 3.5; // 2015 lumi
-		weight *= 1.e6; // nb to fb
+      	/*
+      		Make sure to use the proper sum-of-weights per-sample, though.
+      		Get these by opening up the merged files and running e.g.
+      			root > TH1F* histo_temp = new TH1F("blah", "blah", boundaries)
+				root > myTree->Draw("1>>blah", "(1)*mc_weight")
+				root > std::cout << histo_temp->Integral() << std::endl
+		*/
+
+        // if(dsid=="410000") weight /= 20099000.0;
+        // if(dsid=="410001") weight /= 19995000.0;
+        // if(dsid=="410002") weight /= 20000000.0;
+        // if(dsid=="410003") weight /= 4910000.0;
+        // if(dsid=="410004") weight /= 9820000.0;
+        // if(dsid=="410006") weight /= 10000000.0;
+
+        if(dsid=="407012") weight /= 2.74497;
+		if(dsid=="407032") weight /= 2.95191;
+        if(dsid=="407036") weight /= 2.43458;
+        if(dsid=="407040") weight /= 3.7725e6; 
+        if(dsid=="407044") weight /= 2.85515e9; 
+
+		weight*=1.e3; // pb to fb
+		weight*=3.3; // 2015 lumi
 
 		Int_t all; v_trees.at(iTree).first->SetBranchAddress("all_events",&all);
 
@@ -153,6 +170,24 @@ void plotTruth(TString reg)
 		Int_t isGtt0LSRC; v_trees.at(iTree).first->SetBranchAddress("isGtt0LSRC",&isGtt0LSRC);
 		Int_t isGtt0LSRD; v_trees.at(iTree).first->SetBranchAddress("isGtt0LSRD",&isGtt0LSRD);
 
+		Int_t isGbbCRA2; v_trees.at(iTree).first->SetBranchAddress("isGbbCRA2",&isGbbCRA2);
+		Int_t isGbbCRB2; v_trees.at(iTree).first->SetBranchAddress("isGbbCRB2",&isGbbCRB2);
+		Int_t isGbbCRC2; v_trees.at(iTree).first->SetBranchAddress("isGbbCRC2",&isGbbCRC2);
+		Int_t isGbbCRA4; v_trees.at(iTree).first->SetBranchAddress("isGbbCRA4",&isGbbCRA4);
+		Int_t isGbbCRB4; v_trees.at(iTree).first->SetBranchAddress("isGbbCRB4",&isGbbCRB4);
+
+		Int_t isGtt1LCRA2; v_trees.at(iTree).first->SetBranchAddress("isGtt1LCRA2",&isGtt1LCRA2);
+		Int_t isGtt1LCRB2; v_trees.at(iTree).first->SetBranchAddress("isGtt1LCRB2",&isGtt1LCRB2);
+		Int_t isGtt1LCRC2; v_trees.at(iTree).first->SetBranchAddress("isGtt1LCRC2",&isGtt1LCRC2);
+		Int_t isGtt1LCRA4; v_trees.at(iTree).first->SetBranchAddress("isGtt1LCRA4",&isGtt1LCRA4);
+		Int_t isGtt1LCRB4; v_trees.at(iTree).first->SetBranchAddress("isGtt1LCRB4",&isGtt1LCRB4);
+		Int_t isGtt1LCRC4; v_trees.at(iTree).first->SetBranchAddress("isGtt1LCRC4",&isGtt1LCRC4);
+
+		Int_t isGtt0LCRA; v_trees.at(iTree).first->SetBranchAddress("isGtt0LCRA",&isGtt0LCRA);
+		Int_t isGtt0LCRB; v_trees.at(iTree).first->SetBranchAddress("isGtt0LCRB",&isGtt0LCRB);		
+		Int_t isGtt0LCRC; v_trees.at(iTree).first->SetBranchAddress("isGtt0LCRC",&isGtt0LCRC);
+		Int_t isGtt0LCRD; v_trees.at(iTree).first->SetBranchAddress("isGtt0LCRD",&isGtt0LCRD);
+
 		// Also get the rest of the branches.
 		Float_t var_Met;  	  v_trees.at(iTree).first->SetBranchAddress("var_Met",&var_Met);
 		Float_t var_Meff;  	  v_trees.at(iTree).first->SetBranchAddress("var_Meff",&var_Meff);
@@ -179,6 +214,46 @@ void plotTruth(TString reg)
 			Bool_t fillPlots=false;
 			if(reg=="all") fillPlots=true;
 			if(reg=="Preselect_Gbb" && isPreselect_Gbb) fillPlots=true;
+			if(reg=="Preselect_Gtt_0l" && isPreselect_Gtt_0l) fillPlots=true;
+			if(reg=="Preselect_Gtt_1l" && isPreselect_Gtt_1l) fillPlots=true;
+
+			if(reg=="GbbSRA2" && isGbbSRA2) fillPlots=true;
+			if(reg=="GbbSRB2" && isGbbSRB2) fillPlots=true;
+			if(reg=="GbbSRC2" && isGbbSRC2) fillPlots=true;
+			if(reg=="GbbSRA4" && isGbbSRA4) fillPlots=true;
+			if(reg=="GbbSRB4" && isGbbSRB4) fillPlots=true;
+
+			if(reg=="Gtt1LSRA2" && isGtt1LSRA2) fillPlots=true;
+			if(reg=="Gtt1LSRB2" && isGtt1LSRB2) fillPlots=true;
+			if(reg=="Gtt1LSRC2" && isGtt1LSRC2) fillPlots=true;
+			if(reg=="Gtt1LSRA4" && isGtt1LSRA4) fillPlots=true;
+			if(reg=="Gtt1LSRB4" && isGtt1LSRB4) fillPlots=true;
+			if(reg=="Gtt1LSRC4" && isGtt1LSRC4) fillPlots=true;
+
+			if(reg=="Gtt0LSRA" && isGtt0LSRA) fillPlots=true;
+			if(reg=="Gtt0LSRB" && isGtt0LSRB) fillPlots=true;
+			if(reg=="Gtt0LSRC" && isGtt0LSRC) fillPlots=true;
+			if(reg=="Gtt0LSRD" && isGtt0LSRD) fillPlots=true;
+
+			if(reg=="GbbCRA2" && isGbbCRA2) fillPlots=true;
+			if(reg=="GbbCRB2" && isGbbCRB2) fillPlots=true;
+			if(reg=="GbbCRC2" && isGbbCRC2) fillPlots=true;
+			if(reg=="GbbCRA4" && isGbbCRA4) fillPlots=true;
+			if(reg=="GbbCRB4" && isGbbCRB4) fillPlots=true;
+
+			if(reg=="Gtt1LCRA2" && isGtt1LCRA2) fillPlots=true;
+			if(reg=="Gtt1LCRB2" && isGtt1LCRB2) fillPlots=true;
+			if(reg=="Gtt1LCRC2" && isGtt1LCRC2) fillPlots=true;
+			if(reg=="Gtt1LCRA4" && isGtt1LCRA4) fillPlots=true;
+			if(reg=="Gtt1LCRB4" && isGtt1LCRB4) fillPlots=true;
+			if(reg=="Gtt1LCRC4" && isGtt1LCRC4) fillPlots=true;
+
+			if(reg=="Gtt0LCRA" && isGtt0LCRA) fillPlots=true;
+			if(reg=="Gtt0LCRB" && isGtt0LCRB) fillPlots=true;
+			if(reg=="Gtt0LCRC" && isGtt0LCRC) fillPlots=true;
+			if(reg=="Gtt0LCRD" && isGtt0LCRD) fillPlots=true;
+
+
 
 			if(dsid=="407012" || dsid=="407032" || dsid=="407036" || dsid=="407040" || dsid=="407044")
 				if(var_Met < 200.0)
@@ -237,8 +312,8 @@ void plotTruth(TString reg)
 		Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
 
 		// missing transverse energy
-		v_truth_met.at(iTree)->SetMaximum(v_truth_met.at(iTree)->GetMaximum()*1.2);
-		v_truth_met.at(iTree)->GetXaxis()->SetRangeUser(0,750);
+		v_truth_met.at(iTree)->SetMaximum(v_truth_met.at(iTree)->GetMaximum()*10);
+		v_truth_met.at(iTree)->GetXaxis()->SetRangeUser(0,1200);
 		v_truth_met.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
 		leg->AddEntry(v_truth_met.at(iTree),dsid,"l");
 		v_truth_met.at(iTree)->GetXaxis()->SetTitle("Missing Transverse Energy [GeV]");
@@ -251,7 +326,7 @@ void plotTruth(TString reg)
 		c->SetLogy();
 		gPad->RedrawAxis();
 		c->Update();
-		if(isLast) c->SaveAs("plots/truth_met.pdf");
+		if(isLast) c->SaveAs("plots/"+reg+"/truth_met.pdf");
 	}
 
 	leg->Clear();
@@ -268,8 +343,8 @@ void plotTruth(TString reg)
 		Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
 
 		//effective mass
-		v_truth_Meff.at(iTree)->SetMaximum(v_truth_Meff.at(iTree)->GetMaximum()*1.2);
-		v_truth_Meff.at(iTree)->GetXaxis()->SetRangeUser(0,1200);
+		v_truth_Meff.at(iTree)->SetMaximum(v_truth_Meff.at(iTree)->GetMaximum()*20);
+		v_truth_Meff.at(iTree)->GetXaxis()->SetRangeUser(0,2000);
 		v_truth_Meff.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
 		leg->AddEntry(v_truth_Meff.at(iTree),dsid,"l");
 		v_truth_Meff.at(iTree)->GetXaxis()->SetTitle("Effective Mass [GeV]");
@@ -282,7 +357,7 @@ void plotTruth(TString reg)
 		c->SetLogy();
 		gPad->RedrawAxis();
 		c->Update();
-		if(isLast) c->SaveAs("plots/truth_Meff.pdf");
+		if(isLast) c->SaveAs("plots/"+reg+"/truth_Meff.pdf");
 	}
 
 	leg->Clear();
@@ -299,8 +374,8 @@ void plotTruth(TString reg)
 		Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
 
 		//effective mass
-		v_truth_Meff_4j.at(iTree)->SetMaximum(v_truth_Meff_4j.at(iTree)->GetMaximum()*1.2);
-		v_truth_Meff_4j.at(iTree)->GetXaxis()->SetRangeUser(0,1200);
+		v_truth_Meff_4j.at(iTree)->SetMaximum(v_truth_Meff_4j.at(iTree)->GetMaximum()*20);
+		v_truth_Meff_4j.at(iTree)->GetXaxis()->SetRangeUser(0,2000);
 		v_truth_Meff_4j.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
 		leg->AddEntry(v_truth_Meff_4j.at(iTree),dsid,"l");
 		v_truth_Meff_4j.at(iTree)->GetXaxis()->SetTitle("Effective Mass 4j [GeV]");
@@ -313,7 +388,7 @@ void plotTruth(TString reg)
 		c->SetLogy();
 		gPad->RedrawAxis();
 		c->Update();
-		if(isLast) c->SaveAs("plots/truth_Meff4j.pdf");
+		if(isLast) c->SaveAs("plots/"+reg+"/truth_Meff4j.pdf");
 	}
 
 	leg->Clear();
@@ -330,7 +405,7 @@ void plotTruth(TString reg)
 		Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
 
 		//effective mass
-		v_truth_mT.at(iTree)->SetMaximum(v_truth_mT.at(iTree)->GetMaximum()*1.2);
+		v_truth_mT.at(iTree)->SetMaximum(v_truth_mT.at(iTree)->GetMaximum()*10);
 		v_truth_mT.at(iTree)->GetXaxis()->SetRangeUser(0,600);
 		v_truth_mT.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
 		leg->AddEntry(v_truth_mT.at(iTree),dsid,"l");
@@ -344,7 +419,7 @@ void plotTruth(TString reg)
 		c->SetLogy();
 		gPad->RedrawAxis();
 		c->Update();
-		if(isLast) c->SaveAs("plots/truth_mT.pdf");
+		if(isLast) c->SaveAs("plots/"+reg+"/truth_mT.pdf");
 	}
 
 	leg->Clear();
@@ -361,7 +436,7 @@ void plotTruth(TString reg)
 		Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
 
 		//effective mass
-		v_truth_mTb.at(iTree)->SetMaximum(v_truth_mTb.at(iTree)->GetMaximum()*1.2);
+		v_truth_mTb.at(iTree)->SetMaximum(v_truth_mTb.at(iTree)->GetMaximum()*10);
 		v_truth_mTb.at(iTree)->GetXaxis()->SetRangeUser(0,600);
 		v_truth_mTb.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
 		leg->AddEntry(v_truth_mTb.at(iTree),dsid,"l");
@@ -375,7 +450,7 @@ void plotTruth(TString reg)
 		c->SetLogy();
 		gPad->RedrawAxis();
 		c->Update();
-		if(isLast) c->SaveAs("plots/truth_mTb.pdf");
+		if(isLast) c->SaveAs("plots/"+reg+"/truth_mTb.pdf");
 	}
 
 	leg->Clear();

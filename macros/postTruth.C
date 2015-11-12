@@ -52,6 +52,7 @@ void postTruth(void)
 	// v_trees.push_back(std::make_pair(t_410003,410003));
 	// v_trees.push_back(std::make_pair(t_410004,410004));
 	// v_trees.push_back(std::make_pair(t_410006,410006));
+	
 	v_trees.push_back(std::make_pair(t_407012,407012));
 	v_trees.push_back(std::make_pair(t_407032,407032));
 	v_trees.push_back(std::make_pair(t_407036,407036));
@@ -102,7 +103,7 @@ void postTruth(void)
         if(reg=="407044") weight /= 2.85515e+09; 
 
 		weight*=1.e3; // pb to fb
-		weight*=3.5; // 2015 lumi
+		weight*=3.3; // 2015 lumi
 
 		// for each tree, load the branches.
 		Float_t mc_weight; v_trees.at(iTree).first->SetBranchAddress("mc_weight",&mc_weight);

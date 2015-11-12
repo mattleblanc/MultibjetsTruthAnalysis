@@ -26,12 +26,11 @@ void dumpYields(void)
 	}
 	std::cout << std::endl;
 
-	for(unsigned int iVar=1; iVar<h_yields->GetYaxis()->GetNbins(); iVar++)
+	for(unsigned int iVar=0; iVar<h_yields->GetYaxis()->GetNbins(); iVar++)
 	{
 		std::cout << std::setw(12) << h_yields->GetYaxis()->GetBinLabel(iVar);
-		for(unsigned int iDSID=1; iDSID<h_yields->GetXaxis()->GetNbins(); iDSID++)
+		for(unsigned int iDSID=0; iDSID<h_yields->GetXaxis()->GetNbins()+1; iDSID++)
 		{
-			//std::cout << setiosflags(ios::fixed) << std::setw(13) << setprecision(0) << h_yields->GetBinContent(iDSID,iVar);
 			std::cout << std::setw(12) << setprecision(3) << h_yields->GetBinContent(iDSID,iVar) << " ";
 		}
 
