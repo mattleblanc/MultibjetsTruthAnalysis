@@ -20,19 +20,19 @@ void dumpYields(void)
 
 	std::cout << "Yields obtained. Dumping systematics ..." << std::endl;
 
-	for(unsigned int iReg=0; iReg<h_yields->GetXaxis()->GetNbins(); iReg++)
+	for(unsigned int iDSID=0; iDSID<h_yields->GetXaxis()->GetNbins(); iDSID++)
 	{
-		std::cout << std::setw(12) << h_yields->GetXaxis()->GetBinLabel(iReg) << " ";
+		std::cout << std::setw(12) << h_yields->GetXaxis()->GetBinLabel(iDSID) << " ";
 	}
 	std::cout << std::endl;
 
-	for(unsigned int iDSID=1; iDSID<h_yields->GetYaxis()->GetNbins(); iDSID++)
+	for(unsigned int iVar=1; iVar<h_yields->GetYaxis()->GetNbins(); iVar++)
 	{
-		std::cout << std::setw(12) << h_yields->GetYaxis()->GetBinLabel(iDSID);
-		for(unsigned int iReg=1; iReg<h_yields->GetXaxis()->GetNbins(); iReg++)
+		std::cout << std::setw(12) << h_yields->GetYaxis()->GetBinLabel(iVar);
+		for(unsigned int iDSID=1; iDSID<h_yields->GetXaxis()->GetNbins(); iDSID++)
 		{
-			//std::cout << setiosflags(ios::fixed) << std::setw(13) << setprecision(0) << h_yields->GetBinContent(iReg,iDSID);
-			std::cout << std::setw(12) << setprecision(3) << h_yields->GetBinContent(iReg,iDSID) << " ";
+			//std::cout << setiosflags(ios::fixed) << std::setw(13) << setprecision(0) << h_yields->GetBinContent(iDSID,iVar);
+			std::cout << std::setw(12) << setprecision(3) << h_yields->GetBinContent(iDSID,iVar) << " ";
 		}
 
 		std::cout << std::endl;
@@ -47,30 +47,29 @@ void dumpYields(void)
 	// systs.push_back("Gen.");
 	// systs.push_back("Had. / PS");
 	// systs.push_back("nom/5");
-	systs.push_back("F Nominal");
-	systs.push_back("F Rad. Up");
-	systs.push_back("F Rad. Down");
-	systs.push_back("F Had. / PS");
-	systs.push_back("F Tune");
+	systs.push_back("Nominal");
+	systs.push_back("Rad. Up");
+	systs.push_back("Rad. Down");
+	systs.push_back("Had. / PS");
+	systs.push_back("Tune");
+
+	// Print out variation names ...
 	for(unsigned int iSyst=0; iSyst<systs.size(); iSyst++)
 	{
 		std::cout << std::setw(12) << systs.at(iSyst) << " ";
 	}
 	std::cout << std::endl;
 
-	for(unsigned int iDSID=1; iDSID<h_yields->GetYaxis()->GetNbins(); iDSID++)
+	// Get the systematics.
+	for(unsigned int iVar=0; iVar<h_yields->GetYaxis()->GetNbins(); iVar++)
 	{
-		std::cout << std::setw(12) << h_yields->GetYaxis()->GetBinLabel(iDSID);
-		for(unsigned int iReg=1; iReg<h_yields->GetXaxis()->GetNbins(); iReg++)
-		{
-			if(iReg<7) continue;
-			//std::cout << setiosflags(ios::fixed) << std::setw(13) << setprecision(0) << h_yields->GetBinContent(iReg,iDSID);
-			if(iReg < 7) std::cout << std::setw(12) << setprecision(5) << fabs((h_yields->GetBinContent(1,iDSID) - h_yields->GetBinContent(iReg,iDSID)))/(h_yields->GetBinContent(1,iDSID))*100 << " ";
-			else if(iReg >= 7) 
-				{
-					std::cout << std::setw(12) << setprecision(5) << fabs((h_yields->GetBinContent(7,iDSID) - h_yields->GetBinContent(iReg,iDSID)))/(h_yields->GetBinContent(7,iDSID))*100 << " ";
-				}
+		// Which region?
+		std::cout << std::setw(12) << h_yields->GetYaxis()->GetBinLabel(iVar);
 
+		// Then, loop over the variation samples.
+		for(unsigned int iDSID=1; iDSID<h_yields->GetXaxis()->GetNbins()+1; iDSID++)
+		{
+					std::cout << std::setw(12) << setprecision(5) << fabs((h_yields->GetBinContent(1,iVar) - h_yields->GetBinContent(iDSID,iVar)))/(h_yields->GetBinContent(1,iVar))*100 << " ";
 		}
 
 		std::cout << std::endl;
@@ -83,19 +82,12 @@ void dumpYields(void)
 	}
 	std::cout << std::endl;
 
-	for(unsigned int iDSID=6; iDSID<h_yields->GetYaxis()->GetNbins()-17; iDSID++)
+	for(unsigned int iVar=0; iVar<h_yields->GetYaxis()->GetNbins()-15; iVar++) // We just want to loop over the signal regions here.
 	{
-		std::cout << std::setw(12) << h_yields->GetYaxis()->GetBinLabel(iDSID);
-		for(unsigned int iReg=1; iReg<h_yields->GetXaxis()->GetNbins(); iReg++)
+		std::cout << std::setw(12) << h_yields->GetYaxis()->GetBinLabel(iVar);
+		for(unsigned int iDSID=1; iDSID<h_yields->GetXaxis()->GetNbins()+1; iDSID++)
 		{
-			if(iReg<7) continue;
-			//std::cout << setiosflags(ios::fixed) << std::setw(13) << setprecision(0) << h_yields->GetBinContent(iReg,iDSID);
-			//if(iReg < 7) std::cout << std::setw(12) << setprecision(5) << fabs((h_yields->GetBinContent(1,iDSID) - h_yields->GetBinContent(iReg,iDSID)))/(h_yields->GetBinContent(1,iDSID)) / fabs((h_yields->GetBinContent(7,iDSID) - h_yields->GetBinContent(iReg,iDSID+15)))/(h_yields->GetBinContent(7,iDSID+15)) << " ";
-			else if(iReg >= 7) 
-				{
-					std::cout << std::setw(12) << setprecision(5) << (fabs((h_yields->GetBinContent(7,iDSID) - h_yields->GetBinContent(iReg,iDSID)))/(h_yields->GetBinContent(7,iDSID))) /  (fabs((h_yields->GetBinContent(7,iDSID+15) - h_yields->GetBinContent(iReg,iDSID+15)))/(h_yields->GetBinContent(7,iDSID+15))) << " ";
-				}
-
+					std::cout << std::setw(12) << setprecision(5) << (fabs((h_yields->GetBinContent(1,iVar) - h_yields->GetBinContent(iDSID,iVar)))/(h_yields->GetBinContent(1,iVar))) /  (fabs((h_yields->GetBinContent(1,iVar+15) - h_yields->GetBinContent(iDSID,iVar+15)))/(h_yields->GetBinContent(1,iVar+15))) << " ";
 		}
 
 		std::cout << std::endl;

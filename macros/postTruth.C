@@ -21,24 +21,24 @@ void postTruth(void)
 	TString inDir = "/Users/mleblanc/susyGtt/20151101_truth/truthOut/";
 	TString inDir2 = "/fetch/data-outTree/";
 
-	TFile* f_410000; f_410000 = new TFile(inDir+"410000"+inDir2+"410000.merge.root");
-	TFile* f_410001; f_410001 = new TFile(inDir+"410001"+inDir2+"410001.merge.root");
-	TFile* f_410002; f_410002 = new TFile(inDir+"410002"+inDir2+"410002.merge.root");
-	TFile* f_410003; f_410003 = new TFile(inDir+"410003"+inDir2+"410003.merge.root");
-	TFile* f_410004; f_410004 = new TFile(inDir+"410004"+inDir2+"410004.merge.root");
-	TFile* f_410006; f_410006 = new TFile(inDir+"410006"+inDir2+"410006.merge.root");
+	// TFile* f_410000; f_410000 = new TFile(inDir+"410000"+inDir2+"410000.merge.root");
+	// TFile* f_410001; f_410001 = new TFile(inDir+"410001"+inDir2+"410001.merge.root");
+	// TFile* f_410002; f_410002 = new TFile(inDir+"410002"+inDir2+"410002.merge.root");
+	// TFile* f_410003; f_410003 = new TFile(inDir+"410003"+inDir2+"410003.merge.root");
+	// TFile* f_410004; f_410004 = new TFile(inDir+"410004"+inDir2+"410004.merge.root");
+	// TFile* f_410006; f_410006 = new TFile(inDir+"410006"+inDir2+"410006.merge.root");
 	TFile* f_407012; f_407012 = new TFile(inDir+"407012"+inDir2+"407012.merge.root");
 	TFile* f_407032; f_407032 = new TFile(inDir+"407032"+inDir2+"407032.merge.root");
 	TFile* f_407036; f_407036 = new TFile(inDir+"407036"+inDir2+"407036.merge.root");
 	TFile* f_407040; f_407040 = new TFile(inDir+"407040"+inDir2+"407040.merge.root");
 	TFile* f_407044; f_407044 = new TFile(inDir+"407044"+inDir2+"407044.merge.root");
 
-	TTree* t_410000; t_410000 = (TTree*)f_410000->Get("out_tree");
-	TTree* t_410001; t_410001 = (TTree*)f_410001->Get("out_tree");
-	TTree* t_410002; t_410002 = (TTree*)f_410002->Get("out_tree");
-	TTree* t_410003; t_410003 = (TTree*)f_410003->Get("out_tree");
-	TTree* t_410004; t_410004 = (TTree*)f_410004->Get("out_tree");
-	TTree* t_410006; t_410006 = (TTree*)f_410006->Get("out_tree");
+	// TTree* t_410000; t_410000 = (TTree*)f_410000->Get("out_tree");
+	// TTree* t_410001; t_410001 = (TTree*)f_410001->Get("out_tree");
+	// TTree* t_410002; t_410002 = (TTree*)f_410002->Get("out_tree");
+	// TTree* t_410003; t_410003 = (TTree*)f_410003->Get("out_tree");
+	// TTree* t_410004; t_410004 = (TTree*)f_410004->Get("out_tree");
+	// TTree* t_410006; t_410006 = (TTree*)f_410006->Get("out_tree");
 	TTree* t_407012; t_407012 = (TTree*)f_407012->Get("out_tree");
 	TTree* t_407032; t_407032 = (TTree*)f_407032->Get("out_tree");
 	TTree* t_407036; t_407036 = (TTree*)f_407036->Get("out_tree");
@@ -46,19 +46,19 @@ void postTruth(void)
 	TTree* t_407044; t_407044 = (TTree*)f_407044->Get("out_tree");
 
 	std::vector<pair<TTree*, Int_t>> v_trees;
-	v_trees.push_back(std::make_pair(t_410000,410000));
-	v_trees.push_back(std::make_pair(t_410001,410001));
-	v_trees.push_back(std::make_pair(t_410002,410002));
-	v_trees.push_back(std::make_pair(t_410003,410003));
-	v_trees.push_back(std::make_pair(t_410004,410004));
-	v_trees.push_back(std::make_pair(t_410006,410006));
+	// v_trees.push_back(std::make_pair(t_410000,410000));
+	// v_trees.push_back(std::make_pair(t_410001,410001));
+	// v_trees.push_back(std::make_pair(t_410002,410002));
+	// v_trees.push_back(std::make_pair(t_410003,410003));
+	// v_trees.push_back(std::make_pair(t_410004,410004));
+	// v_trees.push_back(std::make_pair(t_410006,410006));
 	v_trees.push_back(std::make_pair(t_407012,407012));
 	v_trees.push_back(std::make_pair(t_407032,407032));
 	v_trees.push_back(std::make_pair(t_407036,407036));
 	v_trees.push_back(std::make_pair(t_407040,407040));
 	v_trees.push_back(std::make_pair(t_407044,407044));
 
-	TH2D* h_yields; h_yields = new TH2D("yields","yields",12,1,13,38,1,39); // x=DSID, y=SR
+	TH2D* h_yields; h_yields = new TH2D("yields","yields",5,1,6,36,1,37); // x=DSID, y=SR
 
 	for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
 	{
@@ -88,12 +88,12 @@ void postTruth(void)
 				root > std::cout << histo_temp->Integral() << std::endl
 		*/
 
-        if(reg=="410000") weight /= 20099000.0;
-        if(reg=="410001") weight /= 19995000.0;
-        if(reg=="410002") weight /= 20000000.0;
-        if(reg=="410003") weight /= 4910000.0;
-        if(reg=="410004") weight /= 9820000.0;
-		if(reg=="410006") weight /= 10000000.0;
+        // if(reg=="410000") weight /= 20099000.0;
+        // if(reg=="410001") weight /= 19995000.0;
+        // if(reg=="410002") weight /= 20000000.0;
+        // if(reg=="410003") weight /= 4910000.0;
+        // if(reg=="410004") weight /= 9820000.0;
+        // if(reg=="410006") weight /= 10000000.0;
 
         if(reg=="407012") weight /= 2.74497;
 		if(reg=="407032") weight /= 2.95191;
