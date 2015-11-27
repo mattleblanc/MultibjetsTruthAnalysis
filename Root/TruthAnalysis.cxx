@@ -174,6 +174,13 @@ EL::StatusCode TruthAnalysis :: initialize ()
   var_Met = 0;
   var_MetSig = 0;
 
+  var_el_pt = 0;
+  var_mu_pt = 0;
+
+  var_rcjet_mass_1 = 0;
+  var_rcjet_mass_2 = 0;
+  var_rcjet_mass_3 = 0;
+  var_rcjet_mass_4 = 0;
 
   NSignalElectrons = 0;
   NSignalMuons = 0;
@@ -242,6 +249,14 @@ EL::StatusCode TruthAnalysis :: initialize ()
   out_tree->Branch("var_HT",&var_HT, "var_HT/F");
   out_tree->Branch("var_Met",&var_Met, "var_Met/F");
   out_tree->Branch("var_MetSig",&var_MetSig, "var_MetSig/F");
+
+  out_tree->Branch("var_rcjet_mass_1", &var_rcjet_mass_1, "var_rcjet_mass_1/F");
+  out_tree->Branch("var_rcjet_mass_2", &var_rcjet_mass_2, "var_rcjet_mass_2/F");
+  out_tree->Branch("var_rcjet_mass_3", &var_rcjet_mass_3, "var_rcjet_mass_3/F");
+  out_tree->Branch("var_rcjet_mass_4", &var_rcjet_mass_4, "var_rcjet_mass_4/F");
+
+  out_tree->Branch("var_el_pt", &var_el_pt);
+  out_tree->Branch("var_mu_pt", &var_mu_pt);
 
   out_tree->Branch("NSignalElectrons",&NSignalElectrons, "NSignalElectrons/I");
   out_tree->Branch("NSignalMuons",&NSignalMuons, "NSignalMuons/I");
@@ -456,7 +471,15 @@ EL::StatusCode TruthAnalysis :: execute ()
   
   NSignalLeptons   = NSignalElectrons + NSignalMuons;
   NBaseLeptons     = NBaseElectrons + NBaseMuons;
+
+  if(SelectedRCJets->size()>0) var_rcjet_mass_1 = SelectedRCJets->at(0)->m() / MEV;
+  if(SelectedRCJets->size()>1) var_rcjet_mass_2 = SelectedRCJets->at(1)->m() / MEV;
+  if(SelectedRCJets->size()>2) var_rcjet_mass_3 = SelectedRCJets->at(2)->m() / MEV;
+  if(SelectedRCJets->size()>3) var_rcjet_mass_4 = SelectedRCJets->at(3)->m() / MEV;
   
+  if(SignalMuons->size()>0) var_mu_pt = SignalMuons->at(0)->pt();
+  if(SignalElectrons->size()>0) var_el_pt =    SignalElectrons->at(0)->pt();
+
   Bool_t isOneLepton=false; isOneLepton = (NSignalLeptons == 1);
   Bool_t isZeroLepton=false; isZeroLepton = (NBaseLeptons == 0);
   

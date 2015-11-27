@@ -136,6 +136,13 @@ public:
   float var_Met;
   float var_MetSig;
 
+  float var_mu_pt;
+  float var_el_pt;
+
+  float var_rcjet_mass_1;
+  float var_rcjet_mass_2;
+  float var_rcjet_mass_3;
+  float var_rcjet_mass_4;
 
   int NSignalElectrons;
   int NSignalMuons;
