@@ -165,6 +165,44 @@ EL::StatusCode TruthAnalysis :: initialize ()
   isGtt0LCRC = 0;
   isGtt0LCRD = 0;
 
+  isGbbVRI2 = 0;
+  isGbbVRII2 = 0;
+  isGbbVRIII2 = 0;
+  isGbbVRI4 = 0;
+  isGbbVRII4 = 0;
+  isVR1LGtt0LI = 0;
+  isVR1LGtt0LII = 0;
+  isVR1LGtt0LIII = 0;
+  isVR1LGtt0LIV = 0;
+  isVR0LGtt0LI = 0;
+  isVR0LGtt0LII = 0;
+  isVR0LGtt0LIII = 0;
+  isVR0LGtt0LIV = 0;
+  isVRGtt1LI2mT2b = 0;
+  isVRGtt1LII2mT2b = 0;
+  isVRGtt1LI4mT2b = 0;
+  isVRGtt1LII4mT2b = 0;
+  isVRGtt1LI2mT3b = 0;
+  isVRGtt1LII2mT3b = 0;
+  isVRGtt1LI4mT3b = 0; 
+  isVRGtt1LII4mT3b = 0;
+  isVRGtt1LI2mTb2b = 0;
+  isVRGtt1LII2mTb2b = 0;
+  isVRGtt1LI4mTb2b = 0;
+  isVRGtt1LII4mTb2b = 0;
+  isVRGtt1LI2mTb3b = 0;
+  isVRGtt1LII2mTb3b = 0;
+  isVRGtt1LI4mTb3b = 0;
+  isVRGtt1LII4mTb3b = 0;
+  isVRGtt1LI2mT4b = 0;
+  isVRGtt1LII2mT4b = 0;
+  isVRGtt1LIII22b = 0;
+  isVRGtt1LIII42b = 0;
+  isVRGtt1LIII23b = 0;
+  isVRGtt1LIII43b = 0;
+  isVRGtt1LIII24b = 0;
+  isVRGtt1LIII44b = 0;
+
   var_dPhiMin = 0;
   var_Meff = 0;
   var_Meff_4j = 0;
@@ -228,18 +266,54 @@ EL::StatusCode TruthAnalysis :: initialize ()
   out_tree->Branch("isGbbCRC2",&isGbbCRC2,"isGbbCRC2/I");
   out_tree->Branch("isGbbCRA4",&isGbbCRA4,"isGbbCRA4/I");
   out_tree->Branch("isGbbCRB4",&isGbbCRB4,"isGbbCRB4/I");
-  
   out_tree->Branch("isGtt1LCRA2",&isGtt1LCRA2,"isGtt1LCRA2/I");
   out_tree->Branch("isGtt1LCRB2",&isGtt1LCRB2,"isGtt1LCRB2/I");
   out_tree->Branch("isGtt1LCRC2",&isGtt1LCRC2,"isGtt1LCRC2/I");
   out_tree->Branch("isGtt1LCRA4",&isGtt1LCRA4,"isGtt1LCRA4/I");
   out_tree->Branch("isGtt1LCRB4",&isGtt1LCRB4,"isGtt1LCRB4/I");
   out_tree->Branch("isGtt1LCRC4",&isGtt1LCRC4,"isGtt1LCRC4/I");
-
   out_tree->Branch("isGtt0LCRA",&isGtt0LCRA,"isGtt0LCRA/I");
   out_tree->Branch("isGtt0LCRB",&isGtt0LCRB,"isGtt0LCRB/I");
   out_tree->Branch("isGtt0LCRC",&isGtt0LCRC,"isGtt0LCRC/I");
   out_tree->Branch("isGtt0LCRD",&isGtt0LCRD,"isGtt0LCRD/I");
+
+  out_tree->Branch("isGbbVRI2",&isGbbVRI2,"isGbbVRI2/I");
+  out_tree->Branch("isGbbVRII2",&isGbbVRII2,"isGbbVRII2/I");
+  out_tree->Branch("isGbbVRIII2",&isGbbVRIII2,"isGbbVRIII2/I");
+  out_tree->Branch("isGbbVRI4",&isGbbVRI4,"isGbbVRI4/I");
+  out_tree->Branch("isGbbVRII4",&isGbbVRII4,"isGbbVRII4/I");
+  out_tree->Branch("isVR1LGtt0LI",&isVR1LGtt0LI,"isVR1LGtt0LI/I");
+  out_tree->Branch("isVR1LGtt0LII",&isVR1LGtt0LII,"isVR1LGtt0LII/I");
+  out_tree->Branch("isVR1LGtt0LIII",&isVR1LGtt0LIII,"isVR1LGtt0LIII/I");
+  out_tree->Branch("isVR1LGtt0LIV",&isVR1LGtt0LIV,"isVR1LGtt0LIV/I");
+  out_tree->Branch("isVR0LGtt0LI",&isVR0LGtt0LI,"isVR0LGtt0LI/I");
+  out_tree->Branch("isVR0LGtt0LII",&isVR0LGtt0LII,"isVR0LGtt0LII/I");
+  out_tree->Branch("isVR0LGtt0LIII",&isVR0LGtt0LIII,"isVR0LGtt0LIII/I");
+  out_tree->Branch("isVR0LGtt0LIV",&isVR0LGtt0LIV,"isVR0LGtt0LIV/I");
+  out_tree->Branch("isVRGtt1LI2mT2b",&isVRGtt1LI2mT2b,"isVRGtt1LI2mT2b/I");
+  out_tree->Branch("isVRGtt1LII2mT2b",&isVRGtt1LII2mT2b,"isVRGtt1LII2mT2b/I");
+  out_tree->Branch("isVRGtt1LI4mT2b",&isVRGtt1LI4mT2b,"isVRGtt1LI4mT2b/I");
+  out_tree->Branch("isVRGtt1LII4mT2b",&isVRGtt1LII4mT2b,"isVRGtt1LII4mT2b/I");
+  out_tree->Branch("isVRGtt1LI2mT3b",&isVRGtt1LI2mT3b,"isVRGtt1LI2mT3b/I");
+  out_tree->Branch("isVRGtt1LII2mT3b",&isVRGtt1LII2mT3b,"isVRGtt1LII2mT3b/I");
+  out_tree->Branch("isVRGtt1LI4mT3b",&isVRGtt1LI4mT3b,"isVRGtt1LI4mT3b/I"); 
+  out_tree->Branch("isVRGtt1LII4mT3b",&isVRGtt1LII4mT3b,"isVRGtt1LII4mT3b/I");
+  out_tree->Branch("isVRGtt1LI2mTb2b",&isVRGtt1LI2mTb2b,"isVRGtt1LI2mTb2b/I");
+  out_tree->Branch("isVRGtt1LII2mTb2b",&isVRGtt1LII2mTb2b,"isVRGtt1LII2mTb2b/I");
+  out_tree->Branch("isVRGtt1LI4mTb2b",&isVRGtt1LI4mTb2b,"isVRGtt1LI4mTb2b/I");
+  out_tree->Branch("isVRGtt1LII4mTb2b",&isVRGtt1LII4mTb2b,"isVRGtt1LII4mTb2b/I");
+  out_tree->Branch("isVRGtt1LI2mTb3b",&isVRGtt1LI2mTb3b,"isVRGtt1LI2mTb3b/I");
+  out_tree->Branch("isVRGtt1LII2mTb3b",&isVRGtt1LII2mTb3b,"isVRGtt1LII2mTb3b/I");
+  out_tree->Branch("isVRGtt1LI4mTb3b",&isVRGtt1LI4mTb3b,"isVRGtt1LI4mTb3b/I");
+  out_tree->Branch("isVRGtt1LII4mTb3b",&isVRGtt1LII4mTb3b,"isVRGtt1LII4mTb3b/I");
+  out_tree->Branch("isVRGtt1LI2mT4b",&isVRGtt1LI2mT4b,"isVRGtt1LI2mT4b/I");
+  out_tree->Branch("isVRGtt1LII2mT4b",&isVRGtt1LII2mT4b,"isVRGtt1LII2mT4b/I");
+  out_tree->Branch("isVRGtt1LIII22b",&isVRGtt1LIII22b,"isVRGtt1LIII22b/I");
+  out_tree->Branch("isVRGtt1LIII42b",&isVRGtt1LIII42b,"isVRGtt1LIII42b/I");
+  out_tree->Branch("isVRGtt1LIII23b",&isVRGtt1LIII23b,"isVRGtt1LIII23b/I");
+  out_tree->Branch("isVRGtt1LIII43b",&isVRGtt1LIII43b,"isVRGtt1LIII43b/I");
+  out_tree->Branch("isVRGtt1LIII24b",&isVRGtt1LIII24b,"isVRGtt1LIII24b/I");
+  out_tree->Branch("isVRGtt1LIII44b",&isVRGtt1LIII44b,"isVRGtt1LIII44b/I");
 
   out_tree->Branch("var_dPhiMin",&var_dPhiMin, "var_dPhiMin/F");
   out_tree->Branch("var_Meff",&var_Meff, "var_Meff/F");
@@ -431,7 +505,7 @@ EL::StatusCode TruthAnalysis :: execute ()
     if(fabs(muon->eta()) < 2.5 && muon->pt() / MEV > 20.){
       SignalMuons->push_back(muon);
     }
-    if(fabs(muon->eta()) < 2.5 && muon->pt() / MEV > 10.){
+    if(fabs(muon->eta()) < 2.5 && muon->pt() / MEV > 20.){
       BaselineMuons->push_back(muon);
     }
   }
@@ -541,7 +615,48 @@ EL::StatusCode TruthAnalysis :: execute ()
   isGtt0LCRB = 0;
   isGtt0LCRC = 0;
   isGtt0LCRD = 0;
+  isGbbVRI2 = 0;
+  isGbbVRII2 = 0;
+  isGbbVRIII2 = 0;
+  isGbbVRI4 = 0;
+  isGbbVRII4 = 0;
+  isVR1LGtt0LI = 0;
+  isVR1LGtt0LII = 0;
+  isVR1LGtt0LIII = 0;
+  isVR1LGtt0LIV = 0;
+  isVR0LGtt0LI = 0;
+  isVR0LGtt0LII = 0;
+  isVR0LGtt0LIII = 0;
+  isVR0LGtt0LIV = 0;
+  isVRGtt1LI2mT2b = 0;
+  isVRGtt1LII2mT2b = 0;
+  isVRGtt1LI4mT2b = 0;
+  isVRGtt1LII4mT2b = 0;
+  isVRGtt1LI2mT3b = 0;
+  isVRGtt1LII2mT3b = 0;
+  isVRGtt1LI4mT3b = 0; 
+  isVRGtt1LII4mT3b = 0;
+  isVRGtt1LI2mTb2b = 0;
+  isVRGtt1LII2mTb2b = 0;
+  isVRGtt1LI4mTb2b = 0;
+  isVRGtt1LII4mTb2b = 0;
+  isVRGtt1LI2mTb3b = 0;
+  isVRGtt1LII2mTb3b = 0;
+  isVRGtt1LI4mTb3b = 0;
+  isVRGtt1LII4mTb3b = 0;
+  isVRGtt1LI2mT4b = 0;
+  isVRGtt1LII2mT4b = 0;
+  isVRGtt1LIII22b = 0;
+  isVRGtt1LIII42b = 0;
+  isVRGtt1LIII23b = 0;
+  isVRGtt1LIII43b = 0;
+  isVRGtt1LIII24b = 0;
+  isVRGtt1LIII44b = 0;
 
+  bool doMCNLO=false;
+
+  if(!doMCNLO)
+{
   // Gtt 1 lepton region
   //configMgr.cutsDict["Presel_Gtt_1l"] = "(signal_electrons_n + signal_muons_n)>=1 && jets_n>=6 && bjets_n>=3 && met>200 && meff_incl<1000."
   
@@ -970,7 +1085,7 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isGtt1LCRC4=false;
   
-  // Gtt 0L signal regions
+  // Gtt 0L control regions
   if((NSignalElectrons+NSignalMuons)==1
      && NJets >= 7
      && NBJets >= 4
@@ -997,7 +1112,7 @@ EL::StatusCode TruthAnalysis :: execute ()
   
   if((NSignalElectrons+NSignalMuons)==1
      && NJets >= 7
-     && NBJets >= 4
+     && NBJets >= 3
      && NTopJets >=1
      && var_mT < 150
      && var_Met >= 250
@@ -1009,7 +1124,7 @@ EL::StatusCode TruthAnalysis :: execute ()
   
   if((NSignalElectrons+NSignalMuons)==1
      && NJets >= 7
-     && NBJets >= 4
+     && NBJets >= 3
      && NTopJets >=2
      && var_mT < 150
      && var_Met >= 200
@@ -1019,6 +1134,1450 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isGtt0LCRD=false;
   
+  // gbb 0l vrs
+  if(NBaseLeptons == 0
+     && var_dPhiMin > 0.4
+     && NJets >= 4
+     && NBJets >= 3
+     && var_mTb < 160.0
+     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && var_Met > 200.0
+     && var_Meff_4j < 1200.0)
+    {
+      isGbbVRI2=true;
+    }
+  else isGbbVRI2 = false;
+
+  if(NBaseLeptons == 0
+     && var_dPhiMin > 0.4
+     && NJets >= 4
+     && NBJets >= 3
+     && var_mTb < 160.0
+     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && var_Met > 250.0
+     && var_Meff_4j < 1200.0)
+    {
+      isGbbVRII2=true;
+    }
+  else isGbbVRII2 = false;
+
+  if(NBaseLeptons == 0
+     && var_dPhiMin > 0.4
+     && NJets >= 4
+     && NBJets >= 3
+     && var_mTb < 160.0
+     && SelectedJets->at(3)->pt()/MEV > 30.0
+     && var_Met > 400.0
+     && var_Meff_4j < 1400.0)
+    {
+      isGbbVRIII2=true;
+    }
+  else isGbbVRIII2 = false;
+
+  if(NBaseLeptons == 0
+     && var_dPhiMin > 0.4
+     && NJets >= 4
+     && NBJets >= 3
+     && var_mTb < 160.0
+     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && var_Met > 250.0
+     && var_Meff_4j < 1400.0)
+    {
+      isGbbVRI4=true;
+    }
+  else isGbbVRI4 = false;
+
+  if(NBaseLeptons == 0
+     && var_dPhiMin > 0.4
+     && NJets >= 4
+     && NBJets >= 3
+     && var_mTb < 160.0
+     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && var_Met > 300.0
+     && var_Meff_4j < 1400.0)
+    {
+      isGbbVRII4=true;
+    }
+  else isGbbVRII4 = false;
+
+  // gtt 0l vrs
+  if(NSignalLeptons == 1
+    && var_Meff >= 1000
+    && var_Met >= 200
+    && NJets >= 7
+    && NBJets >= 3
+    && NTopJets >= 2
+    && var_mT <= 150
+    && var_mTb >= 80)
+    {
+      isVR1LGtt0LI=true;
+    }
+  else isVR1LGtt0LI = false;
+
+  if(NSignalLeptons == 1
+    && var_Meff >= 1350
+    && var_Met >= 250
+    && NJets >= 7
+    && NBJets >= 3
+    && NTopJets >= 1
+    && var_mT <= 150
+    && var_mTb >= 80)
+    {
+      isVR1LGtt0LII=true;
+    }
+  else isVR1LGtt0LII = false;
+
+  if(NSignalLeptons == 1
+    && var_Meff >= 1000
+    && var_Met >= 200
+    && NJets >= 7
+    && NBJets >= 4
+    && NTopJets >= 1
+    && var_mT <= 150
+    && var_mTb >= 80)
+    {
+      isVR1LGtt0LIII=true;
+    }
+  else isVR1LGtt0LIII = false;
+
+  if(NSignalLeptons == 1
+    && var_Meff >= 1000
+    && var_Met >= 200
+    && NJets >= 7
+    && NBJets >= 4
+    && NTopJets >= 0
+    && var_mT <= 125
+    && var_mTb >= 80)
+    {
+      isVR1LGtt0LIV=true;
+    }
+  else isVR1LGtt0LIV = false;
+
+  if(NSignalLeptons == 0
+    && var_Meff >= 1100
+    && var_Met >= 200
+    && NJets >= 8
+    && NBJets >= 2
+    && NTopJets >= 2
+    && var_mTb < 80)
+    {
+      isVR0LGtt0LI=true;
+    }
+  else isVR0LGtt0LI = false;
+
+  if(NSignalLeptons == 0
+    && var_Meff >= 1400
+    && var_Met >= 200
+    && NJets >= 8
+    && NBJets >= 2
+    && NTopJets >= 1
+    && var_mTb < 80)
+    {
+      isVR0LGtt0LII=true;
+    }
+  else isVR0LGtt0LII = false;
+
+  if(NSignalLeptons == 0
+    && var_Meff >= 1100
+    && var_Met >= 200
+    && NJets >= 8
+    && NBJets >= 3
+    && NTopJets >= 1
+    && var_mTb < 80)
+    {
+      isVR0LGtt0LIII=true;
+    }
+  else isVR0LGtt0LIII = false;
+
+  if(NSignalLeptons == 0
+    && var_Meff >= 1250
+    && var_Met >= 200
+    && NJets >= 8
+    && NBJets >= 3
+    && NTopJets >= 0
+    && var_mTb < 80)
+    {
+      isVR0LGtt0LIV=true;
+    }
+  else isVR0LGtt0LIV = false;
+
+  // gtt 1L vrs
+  if((NSignalElectrons+NSignalMuons)>=1
+     && NJets >= 6
+     && NBJets == 2
+     && NTopJets >=1
+     && var_Met >= 200
+     && var_Meff >= 1100
+     && var_mT > 150
+     && var_mTb < 160)
+    {
+      isVRGtt1LI2mT2b=true;
+    }
+    else isVRGtt1LI2mT2b=false;
+
+  if((NSignalElectrons+NSignalMuons)>=1
+     && NJets >= 6
+     && NBJets == 2
+     && NTopJets >=0
+     && var_Met >= 300
+     && var_Meff >= 900
+     && var_mT > 150
+     && var_mTb < 160)
+    {
+      isVRGtt1LII2mT2b=true;
+    }
+  else isVRGtt1LII2mT2b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+     && NJets >= 6
+     && NBJets == 2
+     && NTopJets >=1
+     && var_Met >= 250
+     && var_Meff >= 1500
+     && var_mT > 150
+     && var_mTb < 160)
+    {
+      isVRGtt1LI4mT2b=true;
+    }
+  else isVRGtt1LI4mT2b = false;
+  
+   if((NSignalElectrons+NSignalMuons)>=1
+     && NJets >= 5
+     && NBJets == 2
+     && NTopJets >= 0
+     && var_Met >= 350
+     && var_Meff >= 1100
+     && var_mT > 150
+     && var_mTb < 160)
+    {
+      isVRGtt1LII4mT2b=true;
+    }
+  else isVRGtt1LII4mT2b = false;
+
+   if((NSignalElectrons+NSignalMuons)>=1
+     && NJets >= 5
+     && NBJets == 3
+     && NTopJets >= 1
+     && var_Met >= 200
+     && var_Meff >= 600
+     && var_mT > 150
+     && var_mTb < 160)
+    {
+      isVRGtt1LI2mT3b=true;
+    }
+  else isVRGtt1LI2mT3b = false;
+   
+   if((NSignalElectrons+NSignalMuons)>=1
+     && NJets >= 5
+     && NBJets == 3
+     && NTopJets >= 0
+     && var_Met >= 200
+     && var_Meff >= 600
+     && var_mT > 150
+     && var_mTb < 160)
+    {
+      isVRGtt1LII2mT3b=true;
+    }
+  else isVRGtt1LII2mT3b = false;
+  
+   if((NSignalElectrons+NSignalMuons)>=1
+     && NJets >= 5
+     && NBJets == 3
+     && NTopJets >= 1
+     && var_Met >= 200
+     && var_Meff >= 700
+     && var_Meff <= 1500
+     && var_mT > 150
+     && var_mTb < 160)
+    {
+      isVRGtt1LI4mT3b=true;
+    }
+  else isVRGtt1LI4mT3b = false; 
+
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 5
+    && NBJets == 3
+    && NTopJets >= 0
+    && var_Met >= 200
+    && var_Meff >= 800
+    && var_mT > 150
+    && var_mTb < 160)
+   {
+     isVRGtt1LII4mT3b=true;
+   } 
+  else isVRGtt1LII4mT3b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 2
+    && NTopJets >= 1
+    && var_Met >= 200
+    && var_Meff >= 1100
+    && var_mT < 150
+    && var_mTb > 160)
+    {
+      isVRGtt1LI2mTb2b=true;
+    }
+  else isVRGtt1LI2mTb2b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 2
+    && NTopJets >= 0
+    && var_Met >= 300
+    && var_Meff >= 900
+    && var_mT < 150
+    && var_mTb > 160)
+    {
+      isVRGtt1LII2mTb2b=true;
+    }
+  else isVRGtt1LII2mTb2b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 2
+    && NTopJets >= 1
+    && var_Met >= 250
+    && var_Meff >= 1500
+    && var_mT < 150
+    && var_mTb > 160)
+    {
+      isVRGtt1LI4mTb2b=true;
+    }
+  else isVRGtt1LI4mTb2b = false;
+       
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 2
+    && NTopJets >= 0
+    && var_Met >= 350
+    && var_Meff >= 1100
+    && var_mT < 150
+    && var_mTb > 160)
+    {
+      isVRGtt1LII4mTb2b=true;
+    }
+  else isVRGtt1LII4mTb2b = false;
+      
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 3
+    && NTopJets >= 1
+    && var_Met >= 200
+    && var_Meff >= 600
+    && var_mT < 150
+    && var_mTb > 140)
+    {
+     isVRGtt1LI2mTb3b =true;
+    }
+  else isVRGtt1LI2mTb3b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 3
+    && NTopJets >= 0
+    && var_Met >= 200
+    && var_Meff >= 600
+    && var_mT < 150
+    && var_mTb > 160)
+    {
+      isVRGtt1LII2mTb3b=true;
+    }
+  else isVRGtt1LII2mTb3b = false;
+   
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 3
+    && NTopJets >= 1
+    && var_Met >= 200
+    && var_Meff >= 700
+    && var_Meff <= 1500
+    && var_mT < 150
+    && var_mTb > 140)
+    {
+      isVRGtt1LI4mTb3b=true;
+    }
+  else isVRGtt1LI4mTb3b = false;
+   
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 3
+    && NTopJets >= 0
+    && var_Met >= 250
+    && var_Meff >= 800
+    && var_mT < 150
+    && var_mTb > 160)
+    {
+      isVRGtt1LII4mTb3b=true;
+    }
+  else isVRGtt1LII4mTb3b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 5
+    && NBJets == 4
+    && NTopJets >= 1
+    && var_Met >= 200
+    && var_Meff >= 600
+    && var_mT < 150
+    && var_mTb > 140)
+    {
+      isVRGtt1LI2mT4b=true;
+    }
+  else isVRGtt1LI2mT4b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 4
+    && NTopJets >= 0
+    && var_Met >= 200
+    && var_Meff >= 600
+    && var_mT < 150
+    && var_mTb > 140)
+    {
+      isVRGtt1LII2mT4b=true;
+    }
+  else isVRGtt1LII2mT4b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 2
+    && NTopJets >= 0
+    && var_Met >= 200
+    && var_Meff >= 600
+    && var_mT > 80
+    && var_mT < 110)
+    {
+      isVRGtt1LIII22b=true;
+    }
+  else isVRGtt1LIII22b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 2
+    && NTopJets >= 0
+    && var_Met >= 250
+    && var_Meff >= 700
+    && var_mT > 80
+    && var_mT < 110)
+    {
+      isVRGtt1LIII42b=true;
+    }
+  else isVRGtt1LIII42b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 3
+    && NTopJets >= 0
+    && var_Met >= 200
+    && var_Meff >= 600
+    && var_mT > 80
+    && var_mT < 110)
+    {
+      isVRGtt1LIII23b=true;
+    }
+  else isVRGtt1LIII23b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 3
+    && NTopJets >= 0
+    && var_Met >= 250
+    && var_Meff >= 700
+    && var_mT > 80
+    && var_mT < 110)
+    {
+      isVRGtt1LIII43b=true;
+    }
+  else isVRGtt1LIII43b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 5
+    && NBJets == 4
+    && NTopJets >= 0
+    && var_Met >= 200
+    && var_Meff >= 700
+    && var_mT > 80
+    && var_mT < 110)
+    {
+      isVRGtt1LIII24b=true;
+    }
+  else isVRGtt1LIII24b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 5
+    && NBJets == 4
+    && NTopJets >= 0
+    && var_Met >= 250
+    && var_Meff >= 700
+    && var_mT > 80
+    && var_mT < 110)
+    {
+      isVRGtt1LIII44b=true;
+    }
+  else isVRGtt1LIII44b = false;
+}
+else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
+{
+  // Gtt 1 lepton region
+  //configMgr.cutsDict["Presel_Gtt_1l"] = "(signal_electrons_n + signal_muons_n)>=1 && jets_n>=6 && bjets_n>=3 && met>200 && meff_incl<1000."
+  
+  if(NSignalLeptons >= 1
+     && NJets >= 4
+     && NBJets >= 3
+     && var_Met > 0.0) // Gtt 1L preselection
+    {
+      isPreselect_Gtt_1l = true;
+      if(debug) std::cout << "DEBUG::PRESEL\tisGtt1L" << std::endl;
+    }
+  else isPreselect_Gtt_1l = false;
+
+
+  // Gbb preselection and Gtt 0 lepton preselection regions
+  //configMgr.cutsDict["Presel_Gbb"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && jets_n>=4 && bjets_n>=3 && met>200 && meff_4j < 1000."
+  if(NBaseLeptons == 0
+     && var_dPhiMin > 0.4
+     && NJets >= 4
+     && NBJets >= 3
+     && var_Met > 0.0) // Gbb 0L preselection
+    {
+      isPreselect_Gbb = true;
+      if(debug) std::cout << "DEBUG::PRESEL\tisGbb" << std::endl;
+    }
+  else isPreselect_Gbb = false;
+  
+  //configMgr.cutsDict["Presel_Gtt_0l"] = "(signal_electrons_n + signal_muons_n)==0 && jets_n>=6 && bjets_n>=3 && met>200 && meff_incl<1000."
+  if(NSignalLeptons == 0
+     && NJets >= 4
+     && NBJets >= 3
+     && var_Met > 0.0) // Gtt 0L Preselection
+    {
+      isPreselect_Gtt_0l = true;
+      if(debug) std::cout << "DEBUG::PRESEL\tisGtt0L" << std::endl;
+    }
+  else isPreselect_Gtt_0l = false;
+  
+  isPreselect = (isPreselect_Gbb || isPreselect_Gtt_0l || isPreselect_Gtt_1l);
+  
+  // Gbb SR flags
+  //configMgr.cutsDict["SR_Gbb_A_1"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>50 && pt_bjet_3>50 && met>300 && meff_4j>1600"
+  if(isPreselect_Gbb
+     &&var_dPhiMin > 0.4
+     && SelectedJets->size() >= 4
+     && SelectedJets->at(3)->pt()/MEV > 50.0
+     && SelectedBJets->at(2)->pt()/MEV > 50.0
+     && var_Met > 0.0
+     && var_Meff_4j > 1300.0)
+    {
+      isGbbSRA1=true;
+      if(debug) std::cout << "DEBUG::SR\tisGbbSRA1" << std::endl;
+    }
+  else isGbbSRA1=false;
+
+  //configMgr.cutsDict["SR_Gbb_B_1"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>70 && pt_bjet_3>70 && met>400 && meff_4j>800"
+  if(isPreselect_Gbb
+     && var_dPhiMin > 0.4
+     && SelectedJets->size() >= 4
+     && SelectedJets->at(3)->pt()/MEV > 70.0
+     && SelectedBJets->at(2)->pt()/MEV > 70.0
+     && var_Met > 0.0
+     && var_Meff_4j > 400.0)
+    {
+      isGbbSRB1=true;
+      if(debug) std::cout << "DEBUG::SR\tisGbbSRB1" << std::endl;
+    }
+  else isGbbSRB1=false;
+
+  //configMgr.cutsDict["SR_Gbb_A_2"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>350 && meff_4j>1400"
+  if(isPreselect_Gbb
+     && var_dPhiMin > 0.4
+     && SelectedJets->size() >= 4
+     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && SelectedBJets->at(2)->pt()/MEV > 90.0
+     && var_Met > 0.0
+     && var_Meff_4j > 1050.0)
+    {
+      isGbbSRA2=true;
+      if(debug) std::cout << "DEBUG::SR\tisGbbSRA2" << std::endl;
+    }
+  else isGbbSRA2=false;
+  
+  //configMgr.cutsDict["SR_Gbb_B_2"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>400 && meff_4j>1200"
+  if(isPreselect_Gbb
+     &&var_dPhiMin > 0.4
+     && SelectedJets->size() >= 4
+     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && SelectedBJets->at(2)->pt()/MEV > 90.0
+     && var_Met > 0.0
+     && var_Meff_4j > 800.0)
+    {
+      isGbbSRB2=true;
+      if(debug) std::cout << "DEBUG::SR\tisGbbSRB2" << std::endl;
+    }
+  else isGbbSRB2=false;
+  
+  //configMgr.cutsDict["SR_Gbb_C_2"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>30 && pt_bjet_3>30 && met>500 && meff_4j>1400"
+  if(isPreselect_Gbb
+     &&var_dPhiMin > 0.4
+     && SelectedJets->size() >= 4
+     && SelectedJets->at(3)->pt()/MEV > 30.0
+     && SelectedBJets->at(2)->pt()/MEV > 30.0
+     && var_Met > 0.0
+     && var_Meff_4j > 900.0)
+    {
+      isGbbSRC2=true;
+      if(debug) std::cout << "DEBUG::SR\tisGbbSRC2" << std::endl;
+    }
+  else isGbbSRC2=false;
+
+  //configMgr.cutsDict["SR_Gbb_A_4"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>350 && meff_4j>1600"
+  if(isPreselect_Gbb
+     && var_dPhiMin > 0.4
+     && SelectedJets->size() >= 4
+     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && SelectedBJets->at(2)->pt()/MEV > 90.0
+     && var_Met > 0.0
+     && var_Meff_4j > 1250.0)
+    {
+      isGbbSRA4=true;
+      if(debug) std::cout << "DEBUG::SR\tisGbbSRA4" << std::endl;
+    }
+  else isGbbSRA4=false;
+  
+  //configMgr.cutsDict["SR_Gbb_B_4"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>450 && meff_4j>1400"
+  if(isPreselect_Gbb
+     && var_dPhiMin > 0.4
+     && SelectedJets->size() >= 4
+     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && SelectedBJets->at(2)->pt()/MEV > 90.0
+     && var_Met > 0.0
+     && var_Meff_4j > 950.0)
+    {
+      isGbbSRB4=true;
+      if(debug) std::cout << "DEBUG::SR\tisGbbSRB4" << std::endl;
+    }
+  else isGbbSRB4=false;
+
+
+  // Gtt 1L SR flags
+  // And here, the various one-lepton signal regions ...
+  
+  //configMgr.cutsDict["SR_Gtt_1l_A_2"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=1 && met>200 && meff_incl>1100"
+  if(isPreselect_Gtt_1l
+     && var_mT > 150
+     && var_mTb > 160
+     && NJets >= 6
+     && NBJets >= 3
+     && NTopJets >= 1
+     && var_Met > 0.0
+     && var_Meff > 900.0)
+    {
+      isGtt1LSRA2=true;
+      if(debug) std::cout << "DEBUG::SR\tisGtt1LSRA2" << std::endl;
+    }
+  else isGtt1LSRA2=false;
+  
+  //configMgr.cutsDict["SR_Gtt_1l_B_2"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=0 && met>300 && meff_incl>900"
+  if(isPreselect_Gtt_1l
+     && var_mT > 150
+     && var_mTb > 160
+     && NJets >= 6
+     && NBJets >= 3
+     && NTopJets >= 0
+     && var_Met > 0.0
+     && var_Meff > 600.0)
+    {
+      isGtt1LSRB2=true;
+      if(debug) std::cout << "DEBUG::SR\tisGtt1LSRB2" << std::endl;
+    }
+  else isGtt1LSRB2=false;
+  
+  //configMgr.cutsDict["SR_Gtt_1l_C_2"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>0   && jets_n>=6 && bjets_n>=4 && top_n>=0 && met>200 && meff_incl>600"
+  if(isPreselect_Gtt_1l
+     && var_mT > 150
+     && NJets >= 6
+     && NBJets >= 4
+     && NTopJets >= 0
+     && var_Met > 0.0
+     && var_Meff > 400.0)
+    {
+      isGtt1LSRC2=true;
+      if(debug) std::cout << "DEBUG::SR\tisGtt1LSRC2" << std::endl;
+    }
+  else isGtt1LSRC2=false;
+  
+  //configMgr.cutsDict["SR_Gtt_1l_A_4"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=1 && met>250 && meff_incl>1600"
+  if(isPreselect_Gtt_1l
+     && var_mT > 150
+     && var_mTb > 160
+     && NJets >= 6
+     && NBJets >= 3
+     && NTopJets >= 1
+     && var_Met > 0.0
+     && var_Meff > 1350.0)
+    {
+      isGtt1LSRA4=true;
+      if(debug) std::cout << "DEBUG::SR\tisGtt1LSRA4" << std::endl;
+    }
+  else isGtt1LSRA4=false;
+  
+  //configMgr.cutsDict["SR_Gtt_1l_B_4"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=0 && met>350 && meff_incl>1100"
+  if(isPreselect_Gtt_1l
+     && var_mT > 150
+     && var_mTb > 160
+     && NJets >= 6
+     && NBJets >= 3
+     && NTopJets >= 0
+     && var_Met > 0.0
+     && var_Meff > 750.0)
+    {
+      isGtt1LSRB4=true;
+      if(debug) std::cout << "DEBUG::SR\tisGtt1LSRB4" << std::endl;
+    }
+  else isGtt1LSRB4=false;
+  
+  //configMgr.cutsDict["SR_Gtt_1l_C_4"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>0   && jets_n>=6 && bjets_n>=4 && top_n>=0 && met>250 && meff_incl>700"
+  if(isPreselect_Gtt_1l
+     && var_mT > 150
+     && NJets >= 6
+     && NBJets >= 4
+     && NTopJets >= 0
+     && var_Met > 0.0
+     && var_Meff > 450.0)
+   {
+     isGtt1LSRC4=true;
+     if(debug) std::cout << "DEBUG::SR\tisGtt1LSRC4" << std::endl;
+   }
+  else isGtt1LSRC4=false;
+ 
+  // Gtt 0L signal region flags
+  // And here, the various zero-lepton signal regions ...
+  
+  //configMgr.cutsDict["SR_Gtt_0l_A"] = "(signal_electrons_n + signal_muons_n)==0 && dphi_min>0.4 && mTb_min>80 && jets_n>=8 && bjets_n>=4 && top_n>=0 && met>350 && meff_incl>1250
+  if(isPreselect_Gtt_0l
+     && var_dPhiMin > 0.4
+     && var_mTb > 80
+     && NJets >= 8
+     && NBJets >= 4
+     && NTopJets >= 0
+     && var_Met > 0.0
+     && var_Meff > 900.0)
+    {
+      isGtt0LSRA=true;
+      if(debug) std::cout << "DEBUG::SR\tisGtt0LSRA" << std::endl;
+    }
+  else isGtt0LSRA=false;
+  
+  //configMgr.cutsDict["SR_Gtt_0l_B"] = "(signal_electrons_n + signal_muons_n)==0 && dphi_min>0.4 && mTb_min>80 && jets_n>=8 && bjets_n>=4 && top_n>=1 && met>350 && meff_incl>1250"
+  if(isPreselect_Gtt_0l
+     && var_dPhiMin > 0.4
+     && var_mTb > 80
+     && NJets >= 8
+     && NBJets >= 4
+     && NTopJets >= 1
+     && var_Met > 0.0
+     && var_Meff > 900.0)
+    {
+      isGtt0LSRB=true;
+      if(debug) std::cout << "DEBUG::SR\tisGtt0LSRB" << std::endl;
+    }
+  else isGtt0LSRB=false;
+  
+  //configMgr.cutsDict["SR_Gtt_0l_C"] = "(signal_electrons_n + signal_muons_n)==0 && dphi_min>0.4 && mTb_min>80 && jets_n>=8 && bjets_n>=3 && top_n>=1 && met>400 && meff_incl>1700"
+  if(isPreselect_Gtt_0l
+     && var_dPhiMin > 0.4
+     && var_mTb > 80
+     && NJets >= 8
+     && NBJets >= 3
+     && NTopJets >= 1
+     && var_Met > 0.0
+     && var_Meff > 1300.0)
+    {
+      isGtt0LSRC=true;
+      if(debug) std::cout << "DEBUG::SR\tisGtt0LSRC" << std::endl;
+    }
+  else isGtt0LSRC=false;
+  
+  //configMgr.cutsDict["SR_Gtt_0l_D"] = "(signal_electrons_n + signal_muons_n)==0 && dphi_min>0.4 && mTb_min>80 && jets_n>=8 && bjets_n>=3 && top_n>=2 && met>400 && meff_incl>1700"
+  if(isPreselect_Gtt_0l
+     && var_dPhiMin > 0.4
+     && var_mTb > 80
+     && NJets >= 8
+     && NBJets >= 3
+     && NTopJets >= 2
+     && var_Met > 0.0
+     && var_Meff > 1300.0)
+    {
+      isGtt0LSRD=true;
+      if(debug) std::cout << "DEBUG::SR\tisGtt0LSRD" << std::endl;
+    }
+  else isGtt0LSRD=false;
+
+  // Gbb CRs
+  if((NSignalElectrons+NSignalMuons)==1
+     && NJets >= 4
+     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && NBJets >= 3
+     && var_mT < 150
+     && var_Met > 0.0
+     && var_Meff_4j > 850)
+    {
+      isGbbCRA2=true;
+    }
+  else isGbbCRA2=false;
+
+  if((NSignalElectrons+NSignalMuons)==1
+     &&    NJets >= 4
+     &&    SelectedJets->at(3)->pt()/MEV > 90.0
+     &&    NBJets >= 3
+     &&    var_mT < 150
+     && var_Met > 0.0
+     && var_Meff_4j > 650.0)
+    {
+      isGbbCRB2=true;
+    }
+  else isGbbCRB2=false;
+
+  if((NSignalElectrons+NSignalMuons)==1
+     &&    NJets >= 4     
+     &&    SelectedJets->at(3)->pt()/MEV > 30.0
+     &&    NBJets >= 3
+     &&    var_mT < 150
+     && var_Met > 0.0
+     && var_Meff_4j > 650.0)
+    {
+      isGbbCRC2=true;
+    }
+  else isGbbCRC2=false;
+  
+  if((NSignalElectrons+NSignalMuons)==1
+     &&    NJets >= 4
+     &&    SelectedJets->at(3)->pt()/MEV > 90.0
+     &&    NBJets >= 3
+     &&    var_mT < 150 
+     && var_Met > 0.0
+     && var_Meff_4j > 950.0)
+    {
+      isGbbCRA4=true;
+    }
+  else isGbbCRA4=false;
+  
+  if((NSignalElectrons+NSignalMuons)==1
+     &&    NJets >= 4
+     &&    SelectedJets->at(3)->pt()/MEV > 90.0
+     &&    NBJets >= 3
+     &&    var_mT < 150
+     && var_Met > 0.0
+     && var_Meff_4j > 800.0)
+    {
+      isGbbCRB4=true;
+    }
+  else isGbbCRB4=false;
+  
+  // Gtt 1L signal regions
+  if((NSignalElectrons+NSignalMuons)==1
+     && NJets >= 6
+     && NBJets >= 3
+     && NTopJets >= 1
+     && var_mT < 150
+     && var_Met >= 0.0
+     && var_Meff >= 900.0)
+    {
+      isGtt1LCRA2=true;
+    }
+  else isGtt1LCRA2=false;
+
+  if((NSignalElectrons+NSignalMuons)==1
+     && NJets >= 6
+     && NBJets >= 3
+     && NTopJets >= 0
+     && var_mT < 150
+     && var_Met >= 0.0
+     && var_Meff >= 600.0)
+    {
+      isGtt1LCRB2=true;
+    }
+  else isGtt1LCRB2=false;
+
+  if((NSignalElectrons+NSignalMuons)==1
+     && NJets >= 6
+     && NBJets >= 4
+     && NTopJets >= 0
+     && var_mT < 80
+     && var_Met >= 0.0
+     && var_Meff >= 700.0)
+    {
+      isGtt1LCRC2=true;
+    }
+  else isGtt1LCRC2=false;
+
+  if((NSignalElectrons+NSignalMuons)==1
+     && NJets >= 6
+     && NBJets >= 3
+     && NTopJets >= 1
+     && var_mT < 150
+     && var_Met >= 0.0
+     && var_Meff >= 1250.0)
+    {
+      isGtt1LCRA4=true;
+    }
+  else isGtt1LCRA4=false;
+
+  if((NSignalElectrons+NSignalMuons)==1
+     && NJets >= 6
+     && NBJets >= 3
+     && NTopJets >= 0
+     && var_mT < 150
+     && var_Met >= 0.0
+     && var_Meff >= 750.0)
+    {
+      isGtt1LCRB4=true;
+    }
+  else isGtt1LCRB4=false;
+
+  if((NSignalElectrons+NSignalMuons)==1
+     && NJets >= 6
+     && NBJets >= 4
+     && NTopJets >= 0
+     && var_mT < 80
+     && var_Met >= 0.0
+     && var_Meff >= 450.0)
+    {
+      isGtt1LCRC4=true;
+    }
+  else isGtt1LCRC4=false;
+  
+  // Gtt 0L control regions
+  if((NSignalElectrons+NSignalMuons)==1
+     && NJets >= 7
+     && NBJets >= 4
+     && NTopJets >= 0
+     && var_mT < 150
+     && var_Met >= 0.0
+     && var_Meff >= 800.0)
+    {
+      isGtt0LCRA=true;
+    }
+  else isGtt0LCRA=false;
+  
+  if((NSignalElectrons+NSignalMuons)==1
+     && NJets >= 7
+     && NBJets >= 4
+     && NTopJets >=1
+     && var_mT < 150
+     && var_Met >= 0.0
+     && var_Meff >= 800.0)
+    {
+      isGtt0LCRB=true;
+    }
+  else isGtt0LCRB=false;
+  
+  if((NSignalElectrons+NSignalMuons)==1
+     && NJets >= 7
+     && NBJets >= 3
+     && NTopJets >=1
+     && var_mT < 150
+     && var_Met >= 0.0
+     && var_Meff >= 1100.0)
+    {
+      isGtt0LCRC=true;
+    }
+  else isGtt0LCRC=false;
+  
+  if((NSignalElectrons+NSignalMuons)==1
+     && NJets >= 7
+     && NBJets >= 3
+     && NTopJets >=2
+     && var_mT < 150
+     && var_Met >= 0.0
+     && var_Meff >= 1000.0)
+    {
+      isGtt0LCRD=true;
+    }
+  else isGtt0LCRD=false;
+  
+  // gbb 0l vrs
+  if(NBaseLeptons == 0
+     && var_dPhiMin > 0.4
+     && NJets >= 4
+     && NBJets >= 3
+     && var_mTb < 160.0
+     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && var_Met > 0.0
+     && var_Meff_4j < 1000.0)
+    {
+      isGbbVRI2=true;
+    }
+  else isGbbVRI2 = false;
+
+  if(NBaseLeptons == 0
+     && var_dPhiMin > 0.4
+     && NJets >= 4
+     && NBJets >= 3
+     && var_mTb < 160.0
+     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && var_Met > 0.0
+     && var_Meff_4j < 950.0)
+    {
+      isGbbVRII2=true;
+    }
+  else isGbbVRII2 = false;
+
+  if(NBaseLeptons == 0
+     && var_dPhiMin > 0.4
+     && NJets >= 4
+     && NBJets >= 3
+     && var_mTb < 160.0
+     && SelectedJets->at(3)->pt()/MEV > 30.0
+     && var_Met > 0.0
+     && var_Meff_4j < 1000.0)
+    {
+      isGbbVRIII2=true;
+    }
+  else isGbbVRIII2 = false;
+
+  if(NBaseLeptons == 0
+     && var_dPhiMin > 0.4
+     && NJets >= 4
+     && NBJets >= 3
+     && var_mTb < 160.0
+     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && var_Met > 0.0
+     && var_Meff_4j < 1150.0)
+    {
+      isGbbVRI4=true;
+    }
+  else isGbbVRI4 = false;
+
+  if(NBaseLeptons == 0
+     && var_dPhiMin > 0.4
+     && NJets >= 4
+     && NBJets >= 3
+     && var_mTb < 160.0
+     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && var_Met > 0.0
+     && var_Meff_4j < 1100.0)
+    {
+      isGbbVRII4=true;
+    }
+  else isGbbVRII4 = false;
+
+  // gtt 0l vrs
+  if(NSignalLeptons == 1
+    && var_Meff >= 800.0
+    && var_Met >= 0.0
+    && NJets >= 7
+    && NBJets >= 3
+    && NTopJets >= 2
+    && var_mT <= 150
+    && var_mTb >= 80)
+    {
+      isVR1LGtt0LI=true;
+    }
+  else isVR1LGtt0LI = false;
+
+  if(NSignalLeptons == 1
+    && var_Meff >= 1150.0
+    && var_Met >= 0.0
+    && NJets >= 7
+    && NBJets >= 3
+    && NTopJets >= 1
+    && var_mT <= 150
+    && var_mTb >= 80)
+    {
+      isVR1LGtt0LII=true;
+    }
+  else isVR1LGtt0LII = false;
+
+  if(NSignalLeptons == 1
+    && var_Meff >= 800.0
+    && var_Met >= 0.0
+    && NJets >= 7
+    && NBJets >= 4
+    && NTopJets >= 1
+    && var_mT <= 150
+    && var_mTb >= 80)
+    {
+      isVR1LGtt0LIII=true;
+    }
+  else isVR1LGtt0LIII = false;
+
+  if(NSignalLeptons == 1
+    && var_Meff >= 800.0
+    && var_Met >= 0.0
+    && NJets >= 7
+    && NBJets >= 4
+    && NTopJets >= 0
+    && var_mT <= 125
+    && var_mTb >= 80)
+    {
+      isVR1LGtt0LIV=true;
+    }
+  else isVR1LGtt0LIV = false;
+
+  if(NSignalLeptons == 0
+    && var_Meff >= 900.0
+    && var_Met >= 0.0
+    && NJets >= 8
+    && NBJets >= 2
+    && NTopJets >= 2
+    && var_mTb < 80)
+    {
+      isVR0LGtt0LI=true;
+    }
+  else isVR0LGtt0LI = false;
+
+  if(NSignalLeptons == 0
+    && var_Meff >= 1200.0
+    && var_Met >= 0.0
+    && NJets >= 8
+    && NBJets >= 2
+    && NTopJets >= 1
+    && var_mTb < 80)
+    {
+      isVR0LGtt0LII=true;
+    }
+  else isVR0LGtt0LII = false;
+
+  if(NSignalLeptons == 0
+    && var_Meff >= 900.0
+    && var_Met >= 0.0
+    && NJets >= 8
+    && NBJets >= 3
+    && NTopJets >= 1
+    && var_mTb < 80)
+    {
+      isVR0LGtt0LIII=true;
+    }
+  else isVR0LGtt0LIII = false;
+
+  if(NSignalLeptons == 0
+    && var_Meff >= 1050.0
+    && var_Met >= 0.0
+    && NJets >= 8
+    && NBJets >= 3
+    && NTopJets >= 0
+    && var_mTb < 80)
+    {
+      isVR0LGtt0LIV=true;
+    }
+  else isVR0LGtt0LIV = false;
+
+  // gtt 1L vrs
+  if((NSignalElectrons+NSignalMuons)>=1
+     && NJets >= 6
+     && NBJets == 2
+     && NTopJets >=1
+     && var_Met >= 0.0
+     && var_Meff >= 900.0
+     && var_mT > 150
+     && var_mTb < 160)
+    {
+      isVRGtt1LI2mT2b=true;
+    }
+    else isVRGtt1LI2mT2b=false;
+
+  if((NSignalElectrons+NSignalMuons)>=1
+     && NJets >= 6
+     && NBJets == 2
+     && NTopJets >=0
+     && var_Met >= 0.0
+     && var_Meff >= 600.0
+     && var_mT > 150
+     && var_mTb < 160)
+    {
+      isVRGtt1LII2mT2b=true;
+    }
+  else isVRGtt1LII2mT2b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+     && NJets >= 6
+     && NBJets == 2
+     && NTopJets >=1
+     && var_Met >= 0.0
+     && var_Meff >= 1250.0
+     && var_mT > 150
+     && var_mTb < 160)
+    {
+      isVRGtt1LI4mT2b=true;
+    }
+  else isVRGtt1LI4mT2b = false;
+  
+   if((NSignalElectrons+NSignalMuons)>=1
+     && NJets >= 5
+     && NBJets == 2
+     && NTopJets >= 0
+     && var_Met >= 0.0
+     && var_Meff >= 750.0
+     && var_mT > 150
+     && var_mTb < 160)
+    {
+      isVRGtt1LII4mT2b=true;
+    }
+  else isVRGtt1LII4mT2b = false;
+
+   if((NSignalElectrons+NSignalMuons)>=1
+     && NJets >= 5
+     && NBJets == 3
+     && NTopJets >= 1
+     && var_Met >= 0.0
+     && var_Meff >= 400.0
+     && var_mT > 150
+     && var_mTb < 160)
+    {
+      isVRGtt1LI2mT3b=true;
+    }
+  else isVRGtt1LI2mT3b = false;
+   
+   if((NSignalElectrons+NSignalMuons)>=1
+     && NJets >= 5
+     && NBJets == 3
+     && NTopJets >= 0
+     && var_Met >= 0.0
+     && var_Meff >= 400.0
+     && var_mT > 150
+     && var_mTb < 160)
+    {
+      isVRGtt1LII2mT3b=true;
+    }
+  else isVRGtt1LII2mT3b = false;
+  
+   if((NSignalElectrons+NSignalMuons)>=1
+     && NJets >= 5
+     && NBJets == 3
+     && NTopJets >= 1
+     && var_Met >= 0.0
+     && var_Meff >= 500
+     && var_Meff <= 1300
+     && var_mT > 150
+     && var_mTb < 160)
+    {
+      isVRGtt1LI4mT3b=true;
+    }
+  else isVRGtt1LI4mT3b = false; 
+
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 5
+    && NBJets == 3
+    && NTopJets >= 0
+    && var_Met >= 0.0
+    && var_Meff >= 600.0
+    && var_mT > 150
+    && var_mTb < 160)
+   {
+     isVRGtt1LII4mT3b=true;
+   } 
+  else isVRGtt1LII4mT3b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 2
+    && NTopJets >= 1
+    && var_Met >= 0.0
+    && var_Meff >= 900.
+    && var_mT < 150
+    && var_mTb > 160)
+    {
+      isVRGtt1LI2mTb2b=true;
+    }
+  else isVRGtt1LI2mTb2b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 2
+    && NTopJets >= 0
+    && var_Met >= 0.0
+    && var_Meff >= 600.0
+    && var_mT < 150
+    && var_mTb > 160)
+    {
+      isVRGtt1LII2mTb2b=true;
+    }
+  else isVRGtt1LII2mTb2b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 2
+    && NTopJets >= 1
+    && var_Met >= 0.0
+    && var_Meff >= 1250.0
+    && var_mT < 150
+    && var_mTb > 160)
+    {
+      isVRGtt1LI4mTb2b=true;
+    }
+  else isVRGtt1LI4mTb2b = false;
+       
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 2
+    && NTopJets >= 0
+    && var_Met >= 0.0
+    && var_Meff >= 750.0
+    && var_mT < 150
+    && var_mTb > 160)
+    {
+      isVRGtt1LII4mTb2b=true;
+    }
+  else isVRGtt1LII4mTb2b = false;
+      
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 3
+    && NTopJets >= 1
+    && var_Met >= 0.0
+    && var_Meff >= 400.0
+    && var_mT < 150
+    && var_mTb > 140)
+    {
+     isVRGtt1LI2mTb3b =true;
+    }
+  else isVRGtt1LI2mTb3b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 3
+    && NTopJets >= 0
+    && var_Met >= 0.0
+    && var_Meff >= 400.0
+    && var_mT < 150
+    && var_mTb > 160)
+    {
+      isVRGtt1LII2mTb3b=true;
+    }
+  else isVRGtt1LII2mTb3b = false;
+   
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 3
+    && NTopJets >= 1
+    && var_Met >= 0.0
+    && var_Meff >= 500.0
+    && var_Meff <= 1300.0
+    && var_mT < 150
+    && var_mTb > 140)
+    {
+      isVRGtt1LI4mTb3b=true;
+    }
+  else isVRGtt1LI4mTb3b = false;
+   
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 3
+    && NTopJets >= 0
+    && var_Met >= 0.0
+    && var_Meff >= 550.0
+    && var_mT < 150
+    && var_mTb > 160)
+    {
+      isVRGtt1LII4mTb3b=true;
+    }
+  else isVRGtt1LII4mTb3b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 5
+    && NBJets == 4
+    && NTopJets >= 1
+    && var_Met >= 0.0
+    && var_Meff >= 400.0
+    && var_mT < 150
+    && var_mTb > 140)
+    {
+      isVRGtt1LI2mT4b=true;
+    }
+  else isVRGtt1LI2mT4b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 4
+    && NTopJets >= 0
+    && var_Met >= 0.0
+    && var_Meff >= 400.0
+    && var_mT < 150
+    && var_mTb > 140)
+    {
+      isVRGtt1LII2mT4b=true;
+    }
+  else isVRGtt1LII2mT4b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 2
+    && NTopJets >= 0
+    && var_Met >= 0.0
+    && var_Meff >= 400.0
+    && var_mT > 80
+    && var_mT < 110)
+    {
+      isVRGtt1LIII22b=true;
+    }
+  else isVRGtt1LIII22b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 2
+    && NTopJets >= 0
+    && var_Met >= 0.0
+    && var_Meff >= 450.0
+    && var_mT > 80
+    && var_mT < 110)
+    {
+      isVRGtt1LIII42b=true;
+    }
+  else isVRGtt1LIII42b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 3
+    && NTopJets >= 0
+    && var_Met >= 0.0
+    && var_Meff >= 400.0
+    && var_mT > 80
+    && var_mT < 110)
+    {
+      isVRGtt1LIII23b=true;
+    }
+  else isVRGtt1LIII23b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 6
+    && NBJets == 3
+    && NTopJets >= 0
+    && var_Met >= 0.0
+    && var_Meff >= 450.0
+    && var_mT > 80
+    && var_mT < 110)
+    {
+      isVRGtt1LIII43b=true;
+    }
+  else isVRGtt1LIII43b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 5
+    && NBJets == 4
+    && NTopJets >= 0
+    && var_Met >= 0.0
+    && var_Meff >= 500.0
+    && var_mT > 80
+    && var_mT < 110)
+    {
+      isVRGtt1LIII24b=true;
+    }
+  else isVRGtt1LIII24b = false;
+  
+  if((NSignalElectrons+NSignalMuons)>=1
+    && NJets >= 5
+    && NBJets == 4
+    && NTopJets >= 0
+    && var_Met >= 0.0
+    && var_Meff >= 450.0
+    && var_mT > 80
+    && var_mT < 110)
+    {
+      isVRGtt1LIII44b=true;
+    }
+  else isVRGtt1LIII44b = false;
+}
+
   const xAOD::EventInfo* EventInfo = 0;
   m_event->retrieve(EventInfo, "EventInfo");
   

@@ -87,6 +87,7 @@ public:
   Int_t isPreselect_Gtt_0l; //!
   Int_t isPreselect; //!
 
+  // SRs
   Int_t isGbbSRA1; //!
   Int_t isGbbSRB1; //!
   Int_t isGbbSRA2; //!
@@ -125,6 +126,45 @@ public:
   Int_t isGtt0LCRB; //!
   Int_t isGtt0LCRC; //!
   Int_t isGtt0LCRD; //!
+
+  // VRs
+  Int_t isGbbVRI2; //!
+  Int_t isGbbVRII2; //!
+  Int_t isGbbVRIII2; //!
+  Int_t isGbbVRI4; //!
+  Int_t isGbbVRII4; //!
+  Int_t isVR1LGtt0LI; //!
+  Int_t isVR1LGtt0LII; //!
+  Int_t isVR1LGtt0LIII; //!
+  Int_t isVR1LGtt0LIV; //!
+  Int_t isVR0LGtt0LI; //!
+  Int_t isVR0LGtt0LII; //!
+  Int_t isVR0LGtt0LIII; //!
+  Int_t isVR0LGtt0LIV; //!
+  Int_t isVRGtt1LI2mT2b; //!
+  Int_t isVRGtt1LII2mT2b; //!
+  Int_t isVRGtt1LI4mT2b; //!
+  Int_t isVRGtt1LII4mT2b; //!
+  Int_t isVRGtt1LI2mT3b; //!
+  Int_t isVRGtt1LII2mT3b; //!
+  Int_t isVRGtt1LI4mT3b; //! 
+  Int_t isVRGtt1LII4mT3b; //!
+  Int_t isVRGtt1LI2mTb2b; //!
+  Int_t isVRGtt1LII2mTb2b; //!
+  Int_t isVRGtt1LI4mTb2b; //!
+  Int_t isVRGtt1LII4mTb2b; //!
+  Int_t isVRGtt1LI2mTb3b; //!
+  Int_t isVRGtt1LII2mTb3b; //!
+  Int_t isVRGtt1LI4mTb3b; //!
+  Int_t isVRGtt1LII4mTb3b; //!
+  Int_t isVRGtt1LI2mT4b; //!
+  Int_t isVRGtt1LII2mT4b; //!
+  Int_t isVRGtt1LIII22b; //!
+  Int_t isVRGtt1LIII42b; //!
+  Int_t isVRGtt1LIII23b; //!
+  Int_t isVRGtt1LIII43b; //!
+  Int_t isVRGtt1LIII24b; //!
+  Int_t isVRGtt1LIII44b; //!
 
   // Observables
   float var_dPhiMin;
