@@ -212,13 +212,66 @@ EL::StatusCode TruthAnalysis :: initialize ()
   var_Met = 0;
   var_MetSig = 0;
 
-  var_el_pt = 0;
-  var_mu_pt = 0;
-
+  var_rcjet_pt_1 = 0;
+  var_rcjet_pt_2 = 0;
+  var_rcjet_pt_3 = 0;
+  var_rcjet_pt_4 = 0;
+  var_rcjet_eta_1 = 0;
+  var_rcjet_eta_2 = 0;
+  var_rcjet_eta_3 = 0;
+  var_rcjet_eta_4 = 0;
+  var_rcjet_phi_1 = 0;
+  var_rcjet_phi_2 = 0;
+  var_rcjet_phi_3 = 0;
+  var_rcjet_phi_4 = 0;
   var_rcjet_mass_1 = 0;
   var_rcjet_mass_2 = 0;
   var_rcjet_mass_3 = 0;
   var_rcjet_mass_4 = 0;
+
+  var_bjet_pt_1 = 0;
+  var_bjet_pt_2 = 0;
+  var_bjet_pt_3 = 0;
+  var_bjet_pt_4 = 0;
+  var_bjet_eta_1 = 0;
+  var_bjet_eta_2 = 0;
+  var_bjet_eta_3 = 0;
+  var_bjet_eta_4 = 0;
+  var_bjet_phi_1 = 0;
+  var_bjet_phi_2 = 0;
+  var_bjet_phi_3 = 0;
+  var_bjet_phi_4 = 0;
+  var_bjet_e_1 = 0;
+  var_bjet_e_2 = 0;
+  var_bjet_e_3 = 0;
+  var_bjet_e_4 = 0;
+
+  var_jet_pt_1 = 0;
+  var_jet_pt_2 = 0;
+  var_jet_pt_3 = 0;
+  var_jet_pt_4 = 0;
+  var_jet_eta_1 = 0;
+  var_jet_eta_2 = 0;
+  var_jet_eta_3 = 0;
+  var_jet_eta_4 = 0;
+  var_jet_phi_1 = 0;
+  var_jet_phi_2 = 0;
+  var_jet_phi_3 = 0;
+  var_jet_phi_4 = 0;
+  var_jet_e_1 = 0;
+  var_jet_e_2 = 0;
+  var_jet_e_3 = 0;
+  var_jet_e_4 = 0;
+
+  var_mu_pt = 0;
+  var_mu_eta = 0;
+  var_mu_phi = 0;
+  var_mu_e = 0;
+
+  var_el_pt = 0;
+  var_el_eta = 0;
+  var_el_phi = 0;
+  var_el_e = 0;
 
   NSignalElectrons = 0;
   NSignalMuons = 0;
@@ -324,13 +377,66 @@ EL::StatusCode TruthAnalysis :: initialize ()
   out_tree->Branch("var_Met",&var_Met, "var_Met/F");
   out_tree->Branch("var_MetSig",&var_MetSig, "var_MetSig/F");
 
-  out_tree->Branch("var_rcjet_mass_1", &var_rcjet_mass_1, "var_rcjet_mass_1/F");
-  out_tree->Branch("var_rcjet_mass_2", &var_rcjet_mass_2, "var_rcjet_mass_2/F");
-  out_tree->Branch("var_rcjet_mass_3", &var_rcjet_mass_3, "var_rcjet_mass_3/F");
-  out_tree->Branch("var_rcjet_mass_4", &var_rcjet_mass_4, "var_rcjet_mass_4/F");
+  out_tree->Branch("var_rcjet_pt_1",&var_rcjet_pt_1,"var_rcjet_pt_1/F");
+  out_tree->Branch("var_rcjet_pt_2",&var_rcjet_pt_2,"var_rcjet_pt_2/F");
+  out_tree->Branch("var_rcjet_pt_3",&var_rcjet_pt_3,"var_rcjet_pt_3/F");
+  out_tree->Branch("var_rcjet_pt_4",&var_rcjet_pt_4,"var_rcjet_pt_4/F");
+  out_tree->Branch("var_rcjet_eta_1",&var_rcjet_eta_1,"var_rcjet_eta_1/F");
+  out_tree->Branch("var_rcjet_eta_2",&var_rcjet_eta_2,"var_rcjet_eta_2/F");
+  out_tree->Branch("var_rcjet_eta_3",&var_rcjet_eta_3,"var_rcjet_eta_3/F");
+  out_tree->Branch("var_rcjet_eta_4",&var_rcjet_eta_4,"var_rcjet_eta_4/F");
+  out_tree->Branch("var_rcjet_phi_1",&var_rcjet_phi_1,"var_rcjet_phi_1/F");
+  out_tree->Branch("var_rcjet_phi_2",&var_rcjet_phi_2,"var_rcjet_phi_2/F");
+  out_tree->Branch("var_rcjet_phi_3",&var_rcjet_phi_3,"var_rcjet_phi_3/F");
+  out_tree->Branch("var_rcjet_phi_4",&var_rcjet_phi_4,"var_rcjet_phi_4/F");
+  out_tree->Branch("var_rcjet_mass_1",&var_rcjet_mass_1,"var_rcjet_mass_1/F");
+  out_tree->Branch("var_rcjet_mass_2",&var_rcjet_mass_2,"var_rcjet_mass_2/F");
+  out_tree->Branch("var_rcjet_mass_3",&var_rcjet_mass_3,"var_rcjet_mass_3/F");
+  out_tree->Branch("var_rcjet_mass_4",&var_rcjet_mass_4,"var_rcjet_mass_4/F");
 
-  out_tree->Branch("var_el_pt", &var_el_pt);
-  out_tree->Branch("var_mu_pt", &var_mu_pt);
+  out_tree->Branch("var_bjet_pt_1",&var_bjet_pt_1,"var_bjet_pt_1/F");
+  out_tree->Branch("var_bjet_pt_2",&var_bjet_pt_2,"var_bjet_pt_2/F");
+  out_tree->Branch("var_bjet_pt_3",&var_bjet_pt_3,"var_bjet_pt_3/F");
+  out_tree->Branch("var_bjet_pt_4",&var_bjet_pt_4,"var_bjet_pt_4/F");
+  out_tree->Branch("var_bjet_eta_1",&var_bjet_eta_1,"var_bjet_eta_1/F");
+  out_tree->Branch("var_bjet_eta_2",&var_bjet_eta_2,"var_bjet_eta_2/F");
+  out_tree->Branch("var_bjet_eta_3",&var_bjet_eta_3,"var_bjet_eta_3/F");
+  out_tree->Branch("var_bjet_eta_4",&var_bjet_eta_4,"var_bjet_eta_4/F");
+  out_tree->Branch("var_bjet_phi_1",&var_bjet_phi_1,"var_bjet_phi_1/F");
+  out_tree->Branch("var_bjet_phi_2",&var_bjet_phi_2,"var_bjet_phi_2/F");
+  out_tree->Branch("var_bjet_phi_3",&var_bjet_phi_3,"var_bjet_phi_3/F");
+  out_tree->Branch("var_bjet_phi_4",&var_bjet_phi_4,"var_bjet_phi_4/F");
+  out_tree->Branch("var_bjet_e_1",&var_bjet_e_1,"var_bjet_e_1/F");
+  out_tree->Branch("var_bjet_e_2",&var_bjet_e_2,"var_bjet_e_2/F");
+  out_tree->Branch("var_bjet_e_3",&var_bjet_e_3,"var_bjet_e_3/F");
+  out_tree->Branch("var_bjet_e_4",&var_bjet_e_4,"var_bjet_e_4/F");
+
+  out_tree->Branch("var_jet_pt_1",&var_jet_pt_1,"var_jet_pt_1/F");
+  out_tree->Branch("var_jet_pt_2",&var_jet_pt_2,"var_jet_pt_2/F");
+  out_tree->Branch("var_jet_pt_3",&var_jet_pt_3,"var_jet_pt_3/F");
+  out_tree->Branch("var_jet_pt_4",&var_jet_pt_4,"var_jet_pt_4/F");
+  out_tree->Branch("var_jet_eta_1",&var_jet_eta_1,"var_jet_eta_1/F");
+  out_tree->Branch("var_jet_eta_2",&var_jet_eta_2,"var_jet_eta_2/F");
+  out_tree->Branch("var_jet_eta_3",&var_jet_eta_3,"var_jet_eta_3/F");
+  out_tree->Branch("var_jet_eta_4",&var_jet_eta_4,"var_jet_eta_4/F");
+  out_tree->Branch("var_jet_phi_1",&var_jet_phi_1,"var_jet_phi_1/F");
+  out_tree->Branch("var_jet_phi_2",&var_jet_phi_2,"var_jet_phi_2/F");
+  out_tree->Branch("var_jet_phi_3",&var_jet_phi_3,"var_jet_phi_3/F");
+  out_tree->Branch("var_jet_phi_4",&var_jet_phi_4,"var_jet_phi_4/F");
+  out_tree->Branch("var_jet_e_1",&var_jet_e_1,"var_jet_e_1/F");
+  out_tree->Branch("var_jet_e_2",&var_jet_e_2,"var_jet_e_2/F");
+  out_tree->Branch("var_jet_e_3",&var_jet_e_3,"var_jet_e_3/F");
+  out_tree->Branch("var_jet_e_4",&var_jet_e_4,"var_jet_e_4/F");
+
+  out_tree->Branch("var_mu_pt",&var_mu_pt,"var_mu_pt/F");
+  out_tree->Branch("var_mu_eta",&var_mu_eta,"var_mu_eta/F");
+  out_tree->Branch("var_mu_phi",&var_mu_phi,"var_mu_phi/F");
+  out_tree->Branch("var_mu_e",&var_mu_e,"var_mu_e/F");
+
+  out_tree->Branch("var_el_pt",&var_el_pt,"var_el_pt/F");
+  out_tree->Branch("var_el_eta",&var_el_eta,"var_el_eta/F");
+  out_tree->Branch("var_el_phi",&var_el_phi,"var_el_phi/F");
+  out_tree->Branch("var_el_e",&var_el_e,"var_el_e/F");
 
   out_tree->Branch("NSignalElectrons",&NSignalElectrons, "NSignalElectrons/I");
   out_tree->Branch("NSignalMuons",&NSignalMuons, "NSignalMuons/I");
@@ -539,21 +645,74 @@ EL::StatusCode TruthAnalysis :: execute ()
   NSignalMuons     = SignalMuons->size();
   NBaseElectrons   = BaselineElectrons->size();
   NBaseMuons       = BaselineMuons->size();
-  NJets	  	   = SelectedJets->size();
+  NJets	  	       = SelectedJets->size();
   NBJets           = SelectedBJets->size();
-  NTopJets	   = SelectedTopJets->size();
+  NTopJets	       = SelectedTopJets->size();
   
   NSignalLeptons   = NSignalElectrons + NSignalMuons;
   NBaseLeptons     = NBaseElectrons + NBaseMuons;
 
+  if(SignalMuons->size()>0) var_mu_pt = SignalMuons->at(0)->pt() / MEV;
+  if(SignalMuons->size()>0) var_mu_eta = SignalMuons->at(0)->eta();
+  if(SignalMuons->size()>0) var_mu_phi = SignalMuons->at(0)->phi();
+  if(SignalMuons->size()>0) var_mu_e = SignalMuons->at(0)->e() / MEV;
+
+  if(SignalElectrons->size()>0) var_el_pt = SignalElectrons->at(0)->pt() / MEV;
+  if(SignalElectrons->size()>0) var_el_eta = SignalElectrons->at(0)->eta();
+  if(SignalElectrons->size()>0) var_el_phi = SignalElectrons->at(0)->phi();
+  if(SignalElectrons->size()>0) var_el_e = SignalElectrons->at(0)->e() / MEV;
+
+  if(SelectedJets->size()>0) var_jet_pt_1 = SelectedJets->at(0)->pt() / MEV;
+  if(SelectedJets->size()>1) var_jet_pt_2 = SelectedJets->at(1)->pt() / MEV;
+  if(SelectedJets->size()>2) var_jet_pt_3 = SelectedJets->at(2)->pt() / MEV;
+  if(SelectedJets->size()>3) var_jet_pt_4 = SelectedJets->at(3)->pt() / MEV;
+  if(SelectedJets->size()>0) var_jet_eta_1 = SelectedJets->at(0)->eta();
+  if(SelectedJets->size()>1) var_jet_eta_2 = SelectedJets->at(1)->eta();
+  if(SelectedJets->size()>2) var_jet_eta_3 = SelectedJets->at(2)->eta();
+  if(SelectedJets->size()>3) var_jet_eta_4 = SelectedJets->at(3)->eta();
+  if(SelectedJets->size()>0) var_jet_phi_1 = SelectedJets->at(0)->phi();
+  if(SelectedJets->size()>1) var_jet_phi_2 = SelectedJets->at(1)->phi();
+  if(SelectedJets->size()>2) var_jet_phi_3 = SelectedJets->at(2)->phi();
+  if(SelectedJets->size()>3) var_jet_phi_4 = SelectedJets->at(3)->phi();
+  if(SelectedJets->size()>0) var_jet_e_1 = SelectedJets->at(0)->e() / MEV;
+  if(SelectedJets->size()>1) var_jet_e_2 = SelectedJets->at(1)->e() / MEV;
+  if(SelectedJets->size()>2) var_jet_e_3 = SelectedJets->at(2)->e() / MEV;
+  if(SelectedJets->size()>3) var_jet_e_4 = SelectedJets->at(3)->e() / MEV;
+
+  if(SelectedBJets->size()>0) var_bjet_pt_1 = SelectedBJets->at(0)->pt() / MEV;
+  if(SelectedBJets->size()>1) var_bjet_pt_2 = SelectedBJets->at(1)->pt() / MEV;
+  if(SelectedBJets->size()>2) var_bjet_pt_3 = SelectedBJets->at(2)->pt() / MEV;
+  if(SelectedBJets->size()>3) var_bjet_pt_4 = SelectedBJets->at(3)->pt() / MEV;
+  if(SelectedBJets->size()>0) var_bjet_eta_1 = SelectedBJets->at(0)->eta();
+  if(SelectedBJets->size()>1) var_bjet_eta_2 = SelectedBJets->at(1)->eta();
+  if(SelectedBJets->size()>2) var_bjet_eta_3 = SelectedBJets->at(2)->eta();
+  if(SelectedBJets->size()>3) var_bjet_eta_4 = SelectedBJets->at(3)->eta();
+  if(SelectedBJets->size()>0) var_bjet_phi_1 = SelectedBJets->at(0)->phi();
+  if(SelectedBJets->size()>1) var_bjet_phi_2 = SelectedBJets->at(1)->phi();
+  if(SelectedBJets->size()>2) var_bjet_phi_3 = SelectedBJets->at(2)->phi();
+  if(SelectedBJets->size()>3) var_bjet_phi_4 = SelectedBJets->at(3)->phi();
+  if(SelectedBJets->size()>0) var_bjet_e_1 = SelectedBJets->at(0)->e() / MEV;
+  if(SelectedBJets->size()>1) var_bjet_e_2 = SelectedBJets->at(1)->e() / MEV;
+  if(SelectedBJets->size()>2) var_bjet_e_3 = SelectedBJets->at(2)->e() / MEV;
+  if(SelectedBJets->size()>3) var_bjet_e_4 = SelectedBJets->at(3)->e() / MEV;
+
+  if(SelectedRCJets->size()>0) var_rcjet_pt_1 = SelectedRCJets->at(0)->pt() / MEV;
+  if(SelectedRCJets->size()>1) var_rcjet_pt_2 = SelectedRCJets->at(1)->pt() / MEV;
+  if(SelectedRCJets->size()>2) var_rcjet_pt_3 = SelectedRCJets->at(2)->pt() / MEV;
+  if(SelectedRCJets->size()>3) var_rcjet_pt_4 = SelectedRCJets->at(3)->pt() / MEV;
+  if(SelectedRCJets->size()>0) var_rcjet_eta_1 = SelectedRCJets->at(0)->eta();
+  if(SelectedRCJets->size()>1) var_rcjet_eta_2 = SelectedRCJets->at(1)->eta();
+  if(SelectedRCJets->size()>2) var_rcjet_eta_3 = SelectedRCJets->at(2)->eta();
+  if(SelectedRCJets->size()>3) var_rcjet_eta_4 = SelectedRCJets->at(3)->eta();
+  if(SelectedRCJets->size()>0) var_rcjet_phi_1 = SelectedRCJets->at(0)->phi();
+  if(SelectedRCJets->size()>1) var_rcjet_phi_2 = SelectedRCJets->at(1)->phi();
+  if(SelectedRCJets->size()>2) var_rcjet_phi_3 = SelectedRCJets->at(2)->phi();
+  if(SelectedRCJets->size()>3) var_rcjet_phi_4 = SelectedRCJets->at(3)->phi();
   if(SelectedRCJets->size()>0) var_rcjet_mass_1 = SelectedRCJets->at(0)->m() / MEV;
   if(SelectedRCJets->size()>1) var_rcjet_mass_2 = SelectedRCJets->at(1)->m() / MEV;
   if(SelectedRCJets->size()>2) var_rcjet_mass_3 = SelectedRCJets->at(2)->m() / MEV;
   if(SelectedRCJets->size()>3) var_rcjet_mass_4 = SelectedRCJets->at(3)->m() / MEV;
   
-  if(SignalMuons->size()>0) var_mu_pt = SignalMuons->at(0)->pt();
-  if(SignalElectrons->size()>0) var_el_pt =    SignalElectrons->at(0)->pt();
-
   Bool_t isOneLepton=false; isOneLepton = (NSignalLeptons == 1);
   Bool_t isZeroLepton=false; isZeroLepton = (NBaseLeptons == 0);
   

@@ -177,12 +177,64 @@ public:
   float var_MetSig;
 
   float var_mu_pt;
+  float var_mu_eta;
+  float var_mu_phi;
+  float var_mu_e;
   float var_el_pt;
+  float var_el_eta;
+  float var_el_phi;
+  float var_el_e;
 
+  float var_rcjet_pt_1;
+  float var_rcjet_pt_2;
+  float var_rcjet_pt_3;
+  float var_rcjet_pt_4;
+  float var_rcjet_eta_1;
+  float var_rcjet_eta_2;
+  float var_rcjet_eta_3;
+  float var_rcjet_eta_4;
+  float var_rcjet_phi_1;
+  float var_rcjet_phi_2;
+  float var_rcjet_phi_3;
+  float var_rcjet_phi_4;
   float var_rcjet_mass_1;
   float var_rcjet_mass_2;
   float var_rcjet_mass_3;
   float var_rcjet_mass_4;
+
+  float var_bjet_pt_1;
+  float var_bjet_pt_2;
+  float var_bjet_pt_3;
+  float var_bjet_pt_4;
+  float var_bjet_eta_1;
+  float var_bjet_eta_2;
+  float var_bjet_eta_3;
+  float var_bjet_eta_4;
+  float var_bjet_phi_1;
+  float var_bjet_phi_2;
+  float var_bjet_phi_3;
+  float var_bjet_phi_4;
+  float var_bjet_e_1;
+  float var_bjet_e_2;
+  float var_bjet_e_3;
+  float var_bjet_e_4;
+
+  float var_jet_pt_1;
+  float var_jet_pt_2;
+  float var_jet_pt_3;
+  float var_jet_pt_4;
+  float var_jet_eta_1;
+  float var_jet_eta_2;
+  float var_jet_eta_3;
+  float var_jet_eta_4;
+  float var_jet_phi_1;
+  float var_jet_phi_2;
+  float var_jet_phi_3;
+  float var_jet_phi_4;
+  float var_jet_e_1;
+  float var_jet_e_2;
+  float var_jet_e_3;
+  float var_jet_e_4;
 
   int NSignalElectrons;
   int NSignalMuons;
