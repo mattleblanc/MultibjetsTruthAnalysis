@@ -24,10 +24,10 @@
 rm -rf /home/mleblanc/out/testOut/*
 
 python MultibjetsTruthAnalysis/scripts/Run.py \
-    --submitDir=/home/mleblanc/out/testOut/407012/ \
-    --inputDS="mc15_13TeV:mc15_13TeV.407012.PowhegPythiaEvtGen_P2012CT10_ttbarMET200_hdamp172p5_nonAH.merge.DAOD_TRUTH1.e4023_p2440/" \
+    --submitDir=/home/mleblanc/out/testOut/400003/ \
+    --inputDS="mc15_13TeV.410000.PowhegPythiaEvtGen_P2012_ttbar_hdamp172p5_nonallhad.merge.DAOD_TRUTH1.e3698_p2375/" \
     --driver=direct \
-    --nevents=50000 \
+    --nevents=10000 \
     --doRcJets=1 \
     --doAK10Jets=0 \
     --debug=1 \
