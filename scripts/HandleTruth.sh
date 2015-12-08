@@ -83,7 +83,7 @@
 
 #407032
 python MultibjetsTruthAnalysis/scripts/Run.py \
-    --submitDir=/home/mleblanc/out/filtVRs/407032/ \
+    --submitDir=/home/mleblanc/out/trf/407032/ \
     --inputDS="mc15_13TeV:mc15_13TeV.407032.PhPyEG_CT10_P2012radHiC6L1_ttbarMET200_hdamp345_down_nonAH.merge.DAOD_TRUTH1.e4505_p2436/" \
     --driver=condor \
     --doRcJets=1 \
@@ -94,7 +94,7 @@ python MultibjetsTruthAnalysis/scripts/Run.py \
 
 #407036    
 python MultibjetsTruthAnalysis/scripts/Run.py \
-    --submitDir=/home/mleblanc/out/filtVRs/407036/ \
+    --submitDir=/home/mleblanc/out/trf/407036/ \
     --inputDS="mc15_13TeV:mc15_13TeV.407036.PhPyEG_CT10_P2012radLoC6L1_ttbarMET200_hdamp172_up_nonAH.merge.DAOD_TRUTH1.e4505_p2436/" \
     --driver=condor \
     --doRcJets=1 \
@@ -105,7 +105,7 @@ python MultibjetsTruthAnalysis/scripts/Run.py \
 
 #407012
 python MultibjetsTruthAnalysis/scripts/Run.py \
-    --submitDir=/home/mleblanc/out/filtVRs/407012/ \
+    --submitDir=/home/mleblanc/out/trf/407012/ \
     --inputDS="mc15_13TeV:mc15_13TeV.407012.PowhegPythiaEvtGen_P2012CT10_ttbarMET200_hdamp172p5_nonAH.merge.DAOD_TRUTH1.e4023_p2436/" \
     --driver=condor \
     --doRcJets=1 \
@@ -114,8 +114,9 @@ python MultibjetsTruthAnalysis/scripts/Run.py \
     --doTRF=0 \
     --process="testMLB00"
 
+#407040
 python MultibjetsTruthAnalysis/scripts/Run.py \
-    --submitDir=/home/mleblanc/out/filtVRs/407040/ \
+    --submitDir=/home/mleblanc/out/trf/407040/ \
     --inputDS="mc15_13TeV:mc15_13TeV.407040.PhHppEG_CT10_UE5C6L1_ttbarMET200_hdamp172p5_nonAH.merge.DAOD_TRUTH1.e4497_p2436/" \
     --driver=condor \
     --doRcJets=1 \
@@ -124,8 +125,9 @@ python MultibjetsTruthAnalysis/scripts/Run.py \
     --doTRF=0 \
     --process="testMLB00"
 
+#407044
 python MultibjetsTruthAnalysis/scripts/Run.py \
-    --submitDir=/home/mleblanc/out/filtVRs/407044/ \
+    --submitDir=/home/mleblanc/out/trf/407044/ \
     --inputDS="mc15_13TeV:mc15_13TeV.407044.PhPy8EG_CT10_A14N23LO_ttbarMET200_hdamp172p5_nonAH.merge.DAOD_TRUTH1.e4497_p2436/" \
     --driver=condor \
     --doRcJets=1 \

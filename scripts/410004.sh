@@ -24,7 +24,7 @@
 
 # 410004
 python MultibjetsTruthAnalysis/scripts/Run.py \
-    --submitDir=/home/mleblanc/out/unfilt/410004/ \
+    --submitDir=/home/mleblanc/out/trfUnfilt/410004/ \
     --inputDS="mc15_13TeV:mc15_13TeV.410004.PowhegHerwigppEvtGen_UEEE5_ttbar_hdamp172p5_nonallhad.merge.DAOD_TRUTH1.e3836_p2425/" \
     --driver=condor \
     --doRcJets=1 \
@@ -35,7 +35,7 @@ python MultibjetsTruthAnalysis/scripts/Run.py \
 
 #410003
 python MultibjetsTruthAnalysis/scripts/Run.py \
-    --submitDir=/home/mleblanc/out/unfilt/410003/ \
+    --submitDir=/home/mleblanc/out/trfUnfilt/410003/ \
     --inputDS="mc15_13TeV:mc15_13TeV.410003.aMcAtNloHerwigppEvtGen_ttbar_nonallhad.merge.DAOD_TRUTH1.e3964_p2425/" \
     --driver=condor \
     --doRcJets=1 \
