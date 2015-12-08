@@ -1,7 +1,6 @@
 #include <EventLoop/Job.h>
 #include <EventLoop/StatusCode.h>
 #include <EventLoop/Worker.h>
-#include <MultibjetsTruthAnalysis/TruthAnalysis.h>
 
 #include "xAODRootAccess/tools/Message.h"
 
@@ -20,14 +19,19 @@
 #include "xAODTruth/TruthParticleContainer.h"
 #include "xAODTruth/TruthParticleAuxContainer.h"
 
-
 #include "xAODBase/IParticleHelpers.h"
 #include "AthContainers/ConstDataVector.h"
 
 #include <xAODJetReclustering/JetReclusteringTool.h>
 
+#include <MultibjetsTruthAnalysis/TruthAnalysis.h>
+
 #include "TRandom3.h"
 #include "TFile.h"
+#include "TSystem.h"
+
+// chiara: including the TRF package
+#include <BtaggingTRFandRW/TRFinterface.h>
 
 /// Helper macro for checking xAOD::TReturnCode return values
 #define EL_RETURN_CHECK( CONTEXT, EXP )                     \
@@ -47,6 +51,9 @@ ClassImp(TruthAnalysis)
 
 
 
+
+
+
 TruthAnalysis :: TruthAnalysis ()
 {
   // Here you put any code for the base initialization of variables,
@@ -58,6 +65,13 @@ TruthAnalysis :: TruthAnalysis ()
 
   out_tree = new TTree("out_tree", "output tree");
   out_cutflow = new TH1F("out_cutflow", "output cutflow",20,1,21);
+  // chiara: initialize TRF tool
+  const std::string pathToConf = gSystem->Getenv("ROOTCOREBIN");
+  m_TRF = new TRFinterface(pathToConf+"/data/BtaggingTRFandRW/calibConfig_MultiBTrurh_MV2c20_v1.txt",-0.7887,"AntiKt4EMTopoJets");
+  m_probTag = true;
+  m_myRand = new TRandom3();
+
+
 }
 
 EL::StatusCode TruthAnalysis :: setupJob (EL::Job& job)
@@ -279,10 +293,34 @@ EL::StatusCode TruthAnalysis :: initialize ()
   NBaseMuons = 0;
   NJets = 0;
   NBJets = 0;
+  NBJets_TRF = 0;
   NTopJets = 0;
 
   NSignalLeptons = 0;
   NBaseLeptons = 0;
+
+  m_isTRF = false;
+  m_isTRF_incl = false;
+
+  m_TRF_wgt = 0;
+
+  m_TRFweight_2excl = 0.;              
+  m_TRFweight_2incl = 0.; 
+  m_TRFweight_3excl = 0.; 
+  m_TRFweight_3incl = 0.; 
+  m_TRFweight_4incl = 0.; 
+
+  // chiara: clear TRF verctors (these are the ones taken as input )
+  m_TRFweight_in.clear();
+  m_TRFweight_ex.clear();
+  m_TRFPerm_in.clear();
+  m_TRFPerm_ex.clear();
+  m_jets_isb_85_TRF_2excl.clear();
+  m_jets_isb_85_TRF_2incl.clear();
+  m_jets_isb_85_TRF_3excl.clear();
+  m_jets_isb_85_TRF_3incl.clear();
+  m_jets_isb_85_TRF_4incl.clear();
+
 
   //TTree* out_tree; out_tree = new TTree("out_tree","output tree");
   TFile *file = wk()->getOutputFile ("outTree");
@@ -449,6 +487,34 @@ EL::StatusCode TruthAnalysis :: initialize ()
   out_tree->Branch("NSignalLeptons",&NSignalLeptons, "NSignalLeptons/I");
   out_tree->Branch("NBaseLeptons",&NBaseLeptons, "NBaseLeptons/I");
 
+  if(m_probTag){
+
+    out_tree->Branch("NBJets_TRF",&NBJets_TRF, "NBJets_TRF/I");
+    out_tree->Branch("isTRF", &m_isTRF, "isTRF/O");
+    out_tree->Branch("isTRF_incl", &m_isTRF_incl, "isTRF/O");
+    out_tree->Branch("TRF_wgt", &m_TRF_wgt, "TRF_wgt/D");
+
+
+    // chiara: this part can be removed if the variables are built all at this stage and not offline
+    // chiara: it is useful to keep oit for offline caclulations only if all the elements of SelectedBJets_TRF are stored as well (keeping the ordering)
+    // chiara: adding branches permutation (for each jet, is is b-tagged or not)
+
+    out_tree->Branch("jets_isb_85_TRF_2excl", &m_out_jets_isb_85_TRF_2excl);
+    out_tree->Branch("jets_isb_85_TRF_2incl", &m_out_jets_isb_85_TRF_2incl);
+    out_tree->Branch("jets_isb_85_TRF_3excl", &m_out_jets_isb_85_TRF_3excl);
+    out_tree->Branch("jets_isb_85_TRF_3incl", &m_out_jets_isb_85_TRF_3incl);
+    out_tree->Branch("jets_isb_85_TRF_4incl", &m_out_jets_isb_85_TRF_4incl);
+    // chiara: adding branches for TRFweights
+    out_tree->Branch("TRFweight_2excl", &m_TRFweight_2excl);
+    out_tree->Branch("TRFweight_2incl", &m_TRFweight_2incl);
+    out_tree->Branch("TRFweight_3excl", &m_TRFweight_3excl);
+    out_tree->Branch("TRFweight_3incl", &m_TRFweight_3incl);
+    out_tree->Branch("TRFweight_4incl", &m_TRFweight_4incl);
+    out_tree->Branch("TRFjets_pt", &m_out_sel_jets_pt);
+    out_tree->Branch("TRFjets_eta", &m_out_sel_jets_eta);
+    out_tree->Branch("TRFjets_phi", &m_out_sel_jets_phi);
+
+  }
   /*
   if(TruthJets->empty()){
     Error("initialize()", "Cannot do reclustering if the input jet container is empty");
@@ -470,215 +536,55 @@ EL::StatusCode TruthAnalysis :: initialize ()
 
 
 
-EL::StatusCode TruthAnalysis :: execute ()
-{
-  // Here you do everything that needs to be done on every single
-  // events, e.g. read input variables, apply cuts, and fill
-  // histograms and trees.  This is where most of your actual analysis
-  // code will go.
+void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContainer> * SelectedBJets, ConstDataVector<xAOD::JetContainer> * SelectedJets
+						 , xAOD::MissingET* TruthMET_NonInt, bool isTRF, bool isTRF_incl, int nbjets_TRF){
 
-  static int count = 0;
-  if(count==0) std::cout << "TruthAnalysis::execute() BEGIN" << std::endl;
-  count++;
-  if(count % 1000 == 0) std::cout << "TruthAnalysis::execute()\tProcessed " << count << " events."  << std::endl;;
-  
   Bool_t debug = false;
 
-  // TODO: Seed this properly
-  TRandom3* myRand = new TRandom3();
+  m_isTRF = isTRF;
+  m_isTRF_incl = isTRF_incl;
 
-  const xAOD::JetContainer* TruthJets = 0;
-  EL_RETURN_CHECK("Get jets", m_event->retrieve( TruthJets, "AntiKt4TruthJets" ) );
+  // Trisha: Final variables to be stored in the tree
+  m_out_jets_isb_85_TRF_2excl.clear();
+  m_out_jets_isb_85_TRF_2incl.clear();
+  m_out_jets_isb_85_TRF_3excl.clear();
+  m_out_jets_isb_85_TRF_3incl.clear();
+  m_out_jets_isb_85_TRF_4incl.clear();
 
-  static SG::AuxElement::ConstAccessor< int > GhostTaus("GhostTausFinalCount");
-  static SG::AuxElement::ConstAccessor< int > GhostBHadrons("GhostBHadronsFinalCount");
-  static SG::AuxElement::ConstAccessor< int > GhostCHadrons("GhostCHadronsFinalCount");
 
-  static SG::AuxElement::ConstAccessor< float > Tau2("Tau2_wta");
-  static SG::AuxElement::ConstAccessor< float > Tau3("Tau3_wta");
+  m_out_sel_jets_pt.clear();
+  m_out_sel_jets_eta.clear();
+  m_out_sel_jets_phi.clear();
 
-  ConstDataVector<xAOD::JetContainer> * SelectedJets   =  new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
-  ConstDataVector<xAOD::JetContainer> * SelectedBJets  =  new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
+  //copying everything by value - horrible technique!
+  if(!isTRF){
+    m_out_jets_isb_85_TRF_2excl = m_jets_isb_85_TRF_2excl;
+    m_out_jets_isb_85_TRF_2incl = m_jets_isb_85_TRF_2incl;
+    m_out_jets_isb_85_TRF_3excl = m_jets_isb_85_TRF_3excl;
+    m_out_jets_isb_85_TRF_3incl = m_jets_isb_85_TRF_3incl;
+    m_out_jets_isb_85_TRF_4incl = m_jets_isb_85_TRF_4incl;
 
-  int TruthBNum = 0;
-  int TruthCNum = 0;
-  int TruthTauNum = 0;
-  for(const auto jet : *TruthJets){
-    if(fabs(jet->eta()) < 2.8 && jet->pt() / MEV > 30.){
-      SelectedJets->push_back(jet);
-    }
-
-    // handle b-jets now
-
-    if(fabs(jet->eta()) > 2.5 || jet->pt() / MEV < 30.){
-      continue;
-    }
-    bool HasB = (GhostBHadrons(*jet) >= 1);
-    bool HasC = (GhostCHadrons(*jet) >= 1);
-    bool HasTau = (GhostTaus(*jet) >= 1);
-    // Should we look at taus as well?
-
-    if(HasB)
-      TruthBNum++;
-
-    if(HasC)
-      TruthCNum++;
-
-    if(HasTau)
-      TruthTauNum++;
-
-    if(HasB){
-      double randB = myRand->Rndm();
-      if(randB <= 0.85){
-        // then it counts as a B
-        SelectedBJets->push_back(jet);
-      }
-    }
-    else if(HasC){
-      double randC = myRand->Rndm();
-      if(randC < 0.38){
-        // then it counts as a B still
-        SelectedBJets->push_back(jet);
-      }
-    }
-    else if(HasTau){
-      double randTau = myRand->Rndm();
-      if(randTau < 0.26){
-	// it's  b, even so
-	SelectedBJets->push_back(jet);
-	}
-    }
-    else{ // it's a light jet in truth
-      double randL = myRand->Rndm();
-      if(randL < 0.036){
-        SelectedBJets->push_back(jet);
-      }
-    }
+    m_out_sel_jets_pt = m_sel_jets_pt;
+    m_out_sel_jets_eta = m_sel_jets_eta;
+    m_out_sel_jets_phi = m_sel_jets_phi;
   }
 
-  /*
-  std::cout << " Measured " << SelectedBJets->size() << " truth number b's " << TruthBNum 
-  	    << " truth number c's " << TruthCNum << " truth number tau's " << TruthTauNum 
-	    << " out of total jets, " << SelectedJets->size() << std::endl;
-  */
 
-  // Jet Reclustering!
-  ConstDataVector<xAOD::JetContainer> * SelectedRCJets   =  new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
-  ConstDataVector<xAOD::JetContainer> * SelectedTopJets   =  new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
 
-  m_reclusteringTool->execute();
-  const xAOD::JetContainer* RC10TruthJets = 0;
-  m_event->retrieve( RC10TruthJets, "RC10TruthJets");
-  for(const auto jet : *RC10TruthJets)
-    {
-      if(fabs(jet->eta()) < 2.0 && (jet->pt() / MEV) > 300.0)
-	{
-	  SelectedRCJets->push_back(jet);
-	  	 
-	  if((jet->m() / MEV) > 100.0)
-	    {
-	      SelectedTopJets->push_back(jet);
-	    }
-	}
-    }
+  m_TRF_wgt = 1.;
+  if( isTRF && (nbjets_TRF == 2) && isTRF_incl ){ m_TRF_wgt = m_TRFweight_2incl;}
+  else if( isTRF && (nbjets_TRF == 2) && !isTRF_incl ){ m_TRF_wgt = m_TRFweight_2excl;}
 
-  const xAOD::TruthParticleContainer* TruthElectrons = 0;
-  EL_RETURN_CHECK("Get electrons", m_event->retrieve( TruthElectrons, "TruthElectrons" ) );
+  else if( isTRF && (nbjets_TRF == 3) && isTRF_incl ){ m_TRF_wgt = m_TRFweight_3incl;}
+  else if( isTRF && (nbjets_TRF == 3) && !isTRF_incl ){ m_TRF_wgt = m_TRFweight_3excl;}
 
-  // check pt cut on leptons; susytools defaults to 10.
-  ConstDataVector<xAOD::TruthParticleContainer> * SignalElectrons    =  new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
-  ConstDataVector<xAOD::TruthParticleContainer> * BaselineElectrons  =  new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
+  else if( isTRF && (nbjets_TRF == 4) && isTRF_incl ){ m_TRF_wgt = m_TRFweight_4incl;}
 
-  for(const auto electron : *TruthElectrons)
-    {
-     if(fabs(electron->eta()) < 2.47 && electron->pt() / MEV > 20.)
-	{
-	  SignalElectrons->push_back(electron);
-	}
-      if(fabs(electron->eta()) < 2.47 && electron->pt() / MEV > 20.)
-	{
-	  BaselineElectrons->push_back(electron);
-	}
-    }
 
-  const xAOD::TruthParticleContainer* TruthMuons = 0;
-  EL_RETURN_CHECK("Get muons", m_event->retrieve( TruthMuons, "TruthMuons" ) );
+  NBJets = SelectedBJets->size();
+  NBJets_TRF = nbjets_TRF;
 
-  // check pt cut on leptons; susytools defaults to 10.
-  ConstDataVector<xAOD::TruthParticleContainer> * SignalMuons    =  new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
-  ConstDataVector<xAOD::TruthParticleContainer> * BaselineMuons  =  new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
-  for(const auto muon : *TruthMuons){
-    if(fabs(muon->eta()) < 2.5 && muon->pt() / MEV > 20.){
-      SignalMuons->push_back(muon);
-    }
-    if(fabs(muon->eta()) < 2.5 && muon->pt() / MEV > 20.){
-      BaselineMuons->push_back(muon);
-    }
-  }
-
-  const xAOD::MissingETContainer* TruthMET = 0;
-  EL_RETURN_CHECK("Get MET", m_event->retrieve( TruthMET, "MET_Truth" ) );
-  
-  xAOD::MissingETContainer::const_iterator TruthMET_it = TruthMET->find("NonInt");
-  if (TruthMET_it == TruthMET->end()) std::cout << "No NonINT inside MET container" << std::endl;  
-  xAOD::MissingET* TruthMET_NonInt = *TruthMET_it;
-
-  TruthMET_it = TruthMET->find("Int");
-  if (TruthMET_it == TruthMET->end()) std::cout << "No INT inside MET container" << std::endl;
-  xAOD::MissingET* TruthMET_Int = *TruthMET_it;
-
-  //std::cout << "MET " << TruthMET_NonInt->met()/1000.0 << "\t" << TruthMET_Int->met()/1000.0 << std::endl;
-
-  var_dPhiMin = Variables::delta_phi_nj(TruthMET_NonInt, SelectedJets->asDataVector(), SelectedJets->size()); // Should it be this MET?
-  var_Meff = Variables::Meff_incl(TruthMET_NonInt, SelectedJets->asDataVector(), SignalMuons->asDataVector(), SignalElectrons->asDataVector());
-  var_Meff_4j = Variables::Meff_4j(TruthMET_NonInt, SelectedJets->asDataVector(), 4 /* How many jets to use? */);
-  var_mT = Variables::mT(TruthMET_NonInt, SignalMuons->asDataVector(), SignalElectrons->asDataVector());
-  var_mTb = Variables::mT_min_bjets(TruthMET_NonInt, SelectedBJets->asDataVector(), false /* set_mw? */);
-  var_HT = Variables::Ht(SelectedJets->asDataVector(), SignalMuons->asDataVector(), SignalElectrons->asDataVector());
-  var_Met = TruthMET_NonInt->met()/1000.0;
-  //var_Met = TruthMET_Int->met()/1000.0;
-  var_MetSig = Variables::Met_significance(TruthMET_NonInt, SelectedJets->asDataVector(), 4 /* How many jets to use in HT? */);
-
-  var_dPhiMin = 1.0; // REMOVED TO TEST, MLB ON 11-11-15
-
-  NSignalElectrons = SignalElectrons->size();
-  NSignalMuons     = SignalMuons->size();
-  NBaseElectrons   = BaselineElectrons->size();
-  NBaseMuons       = BaselineMuons->size();
-  NJets	  	       = SelectedJets->size();
-  NBJets           = SelectedBJets->size();
-  NTopJets	       = SelectedTopJets->size();
-  
-  NSignalLeptons   = NSignalElectrons + NSignalMuons;
-  NBaseLeptons     = NBaseElectrons + NBaseMuons;
-
-  if(SignalMuons->size()>0) var_mu_pt = SignalMuons->at(0)->pt() / MEV;
-  if(SignalMuons->size()>0) var_mu_eta = SignalMuons->at(0)->eta();
-  if(SignalMuons->size()>0) var_mu_phi = SignalMuons->at(0)->phi();
-  if(SignalMuons->size()>0) var_mu_e = SignalMuons->at(0)->e() / MEV;
-
-  if(SignalElectrons->size()>0) var_el_pt = SignalElectrons->at(0)->pt() / MEV;
-  if(SignalElectrons->size()>0) var_el_eta = SignalElectrons->at(0)->eta();
-  if(SignalElectrons->size()>0) var_el_phi = SignalElectrons->at(0)->phi();
-  if(SignalElectrons->size()>0) var_el_e = SignalElectrons->at(0)->e() / MEV;
-
-  if(SelectedJets->size()>0) var_jet_pt_1 = SelectedJets->at(0)->pt() / MEV;
-  if(SelectedJets->size()>1) var_jet_pt_2 = SelectedJets->at(1)->pt() / MEV;
-  if(SelectedJets->size()>2) var_jet_pt_3 = SelectedJets->at(2)->pt() / MEV;
-  if(SelectedJets->size()>3) var_jet_pt_4 = SelectedJets->at(3)->pt() / MEV;
-  if(SelectedJets->size()>0) var_jet_eta_1 = SelectedJets->at(0)->eta();
-  if(SelectedJets->size()>1) var_jet_eta_2 = SelectedJets->at(1)->eta();
-  if(SelectedJets->size()>2) var_jet_eta_3 = SelectedJets->at(2)->eta();
-  if(SelectedJets->size()>3) var_jet_eta_4 = SelectedJets->at(3)->eta();
-  if(SelectedJets->size()>0) var_jet_phi_1 = SelectedJets->at(0)->phi();
-  if(SelectedJets->size()>1) var_jet_phi_2 = SelectedJets->at(1)->phi();
-  if(SelectedJets->size()>2) var_jet_phi_3 = SelectedJets->at(2)->phi();
-  if(SelectedJets->size()>3) var_jet_phi_4 = SelectedJets->at(3)->phi();
-  if(SelectedJets->size()>0) var_jet_e_1 = SelectedJets->at(0)->e() / MEV;
-  if(SelectedJets->size()>1) var_jet_e_2 = SelectedJets->at(1)->e() / MEV;
-  if(SelectedJets->size()>2) var_jet_e_3 = SelectedJets->at(2)->e() / MEV;
-  if(SelectedJets->size()>3) var_jet_e_4 = SelectedJets->at(3)->e() / MEV;
-
+  //std::cout<<" isTRF = "<<isTRF<<" isTRF_incl = "<<isTRF_incl<<" NBJets = "<<NBJets<<" NBJets_TRF = "<<NBJets_TRF<<" NJets = "<<NJets<<std::endl;
   if(SelectedBJets->size()>0) var_bjet_pt_1 = SelectedBJets->at(0)->pt() / MEV;
   if(SelectedBJets->size()>1) var_bjet_pt_2 = SelectedBJets->at(1)->pt() / MEV;
   if(SelectedBJets->size()>2) var_bjet_pt_3 = SelectedBJets->at(2)->pt() / MEV;
@@ -696,26 +602,8 @@ EL::StatusCode TruthAnalysis :: execute ()
   if(SelectedBJets->size()>2) var_bjet_e_3 = SelectedBJets->at(2)->e() / MEV;
   if(SelectedBJets->size()>3) var_bjet_e_4 = SelectedBJets->at(3)->e() / MEV;
 
-  if(SelectedRCJets->size()>0) var_rcjet_pt_1 = SelectedRCJets->at(0)->pt() / MEV;
-  if(SelectedRCJets->size()>1) var_rcjet_pt_2 = SelectedRCJets->at(1)->pt() / MEV;
-  if(SelectedRCJets->size()>2) var_rcjet_pt_3 = SelectedRCJets->at(2)->pt() / MEV;
-  if(SelectedRCJets->size()>3) var_rcjet_pt_4 = SelectedRCJets->at(3)->pt() / MEV;
-  if(SelectedRCJets->size()>0) var_rcjet_eta_1 = SelectedRCJets->at(0)->eta();
-  if(SelectedRCJets->size()>1) var_rcjet_eta_2 = SelectedRCJets->at(1)->eta();
-  if(SelectedRCJets->size()>2) var_rcjet_eta_3 = SelectedRCJets->at(2)->eta();
-  if(SelectedRCJets->size()>3) var_rcjet_eta_4 = SelectedRCJets->at(3)->eta();
-  if(SelectedRCJets->size()>0) var_rcjet_phi_1 = SelectedRCJets->at(0)->phi();
-  if(SelectedRCJets->size()>1) var_rcjet_phi_2 = SelectedRCJets->at(1)->phi();
-  if(SelectedRCJets->size()>2) var_rcjet_phi_3 = SelectedRCJets->at(2)->phi();
-  if(SelectedRCJets->size()>3) var_rcjet_phi_4 = SelectedRCJets->at(3)->phi();
-  if(SelectedRCJets->size()>0) var_rcjet_mass_1 = SelectedRCJets->at(0)->m() / MEV;
-  if(SelectedRCJets->size()>1) var_rcjet_mass_2 = SelectedRCJets->at(1)->m() / MEV;
-  if(SelectedRCJets->size()>2) var_rcjet_mass_3 = SelectedRCJets->at(2)->m() / MEV;
-  if(SelectedRCJets->size()>3) var_rcjet_mass_4 = SelectedRCJets->at(3)->m() / MEV;
-  
-  Bool_t isOneLepton=false; isOneLepton = (NSignalLeptons == 1);
-  Bool_t isZeroLepton=false; isZeroLepton = (NBaseLeptons == 0);
-  
+  var_mTb = Variables::mT_min_bjets(TruthMET_NonInt, SelectedBJets->asDataVector(), false );
+
   // debug variables
   if(debug)
     {
@@ -812,7 +700,13 @@ EL::StatusCode TruthAnalysis :: execute ()
   isVRGtt1LIII24b = 0;
   isVRGtt1LIII44b = 0;
 
-  bool doMCNLO=false;
+  bool doMCNLO=true;
+
+  bool pass2bexcl = (NBJets == 2) && (!isTRF || ( isTRF &&  (nbjets_TRF == 2) && !isTRF_incl) );
+  bool pass2bincl = (NBJets >= 2) && (!isTRF || ( isTRF &&  (nbjets_TRF == 2) && isTRF_incl) );
+  bool pass3bexcl = (NBJets == 3) && (!isTRF || ( isTRF &&  (nbjets_TRF == 3) && !isTRF_incl) );
+  bool pass3bincl = (NBJets >= 3) && (!isTRF || ( isTRF &&  (nbjets_TRF == 3) && isTRF_incl) );
+  bool pass4bincl = (NBJets >= 4) && (!isTRF || ( isTRF &&  (nbjets_TRF == 4) && isTRF_incl) );
 
   if(!doMCNLO)
 {
@@ -821,7 +715,7 @@ EL::StatusCode TruthAnalysis :: execute ()
   
   if(NSignalLeptons >= 1
      && NJets >= 4
-     && NBJets >= 3
+     && pass3bincl
      && var_Met > 200.0) // Gtt 1L preselection
     {
       isPreselect_Gtt_1l = true;
@@ -835,7 +729,7 @@ EL::StatusCode TruthAnalysis :: execute ()
   if(NBaseLeptons == 0
      && var_dPhiMin > 0.4
      && NJets >= 4
-     && NBJets >= 3
+     && pass3bincl
      && var_Met > 200.0) // Gbb 0L preselection
     {
       isPreselect_Gbb = true;
@@ -846,7 +740,7 @@ EL::StatusCode TruthAnalysis :: execute ()
   //configMgr.cutsDict["Presel_Gtt_0l"] = "(signal_electrons_n + signal_muons_n)==0 && jets_n>=6 && bjets_n>=3 && met>200 && meff_incl<1000."
   if(NSignalLeptons == 0
      && NJets >= 4
-     && NBJets >= 3
+     && pass3bincl
      && var_Met > 200.0) // Gtt 0L Preselection
     {
       isPreselect_Gtt_0l = true;
@@ -855,10 +749,11 @@ EL::StatusCode TruthAnalysis :: execute ()
   else isPreselect_Gtt_0l = false;
   
   isPreselect = (isPreselect_Gbb || isPreselect_Gtt_0l || isPreselect_Gtt_1l);
-  
+
   // Gbb SR flags
   //configMgr.cutsDict["SR_Gbb_A_1"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>50 && pt_bjet_3>50 && met>300 && meff_4j>1600"
-  if(isPreselect_Gbb
+  if(NBaseLeptons == 0
+     && pass3bincl
      &&var_dPhiMin > 0.4
      && SelectedJets->size() >= 4
      && SelectedJets->at(3)->pt()/MEV > 50.0
@@ -872,7 +767,8 @@ EL::StatusCode TruthAnalysis :: execute ()
   else isGbbSRA1=false;
 
   //configMgr.cutsDict["SR_Gbb_B_1"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>70 && pt_bjet_3>70 && met>400 && meff_4j>800"
-  if(isPreselect_Gbb
+  if(NBaseLeptons == 0
+     && pass3bincl
      && var_dPhiMin > 0.4
      && SelectedJets->size() >= 4
      && SelectedJets->at(3)->pt()/MEV > 70.0
@@ -886,7 +782,8 @@ EL::StatusCode TruthAnalysis :: execute ()
   else isGbbSRB1=false;
 
   //configMgr.cutsDict["SR_Gbb_A_2"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>350 && meff_4j>1400"
-  if(isPreselect_Gbb
+  if(NBaseLeptons == 0
+     && pass3bincl
      && var_dPhiMin > 0.4
      && SelectedJets->size() >= 4
      && SelectedJets->at(3)->pt()/MEV > 90.0
@@ -900,8 +797,9 @@ EL::StatusCode TruthAnalysis :: execute ()
   else isGbbSRA2=false;
   
   //configMgr.cutsDict["SR_Gbb_B_2"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>400 && meff_4j>1200"
-  if(isPreselect_Gbb
-     &&var_dPhiMin > 0.4
+  if(NBaseLeptons == 0
+     && pass3bincl
+     && var_dPhiMin > 0.4
      && SelectedJets->size() >= 4
      && SelectedJets->at(3)->pt()/MEV > 90.0
      && SelectedBJets->at(2)->pt()/MEV > 90.0
@@ -914,8 +812,9 @@ EL::StatusCode TruthAnalysis :: execute ()
   else isGbbSRB2=false;
   
   //configMgr.cutsDict["SR_Gbb_C_2"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>30 && pt_bjet_3>30 && met>500 && meff_4j>1400"
-  if(isPreselect_Gbb
-     &&var_dPhiMin > 0.4
+  if(NBaseLeptons == 0
+     && pass3bincl
+     && var_dPhiMin > 0.4
      && SelectedJets->size() >= 4
      && SelectedJets->at(3)->pt()/MEV > 30.0
      && SelectedBJets->at(2)->pt()/MEV > 30.0
@@ -928,7 +827,8 @@ EL::StatusCode TruthAnalysis :: execute ()
   else isGbbSRC2=false;
 
   //configMgr.cutsDict["SR_Gbb_A_4"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>350 && meff_4j>1600"
-  if(isPreselect_Gbb
+  if(NBaseLeptons == 0
+     && pass3bincl
      && var_dPhiMin > 0.4
      && SelectedJets->size() >= 4
      && SelectedJets->at(3)->pt()/MEV > 90.0
@@ -942,7 +842,7 @@ EL::StatusCode TruthAnalysis :: execute ()
   else isGbbSRA4=false;
   
   //configMgr.cutsDict["SR_Gbb_B_4"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>450 && meff_4j>1400"
-  if(isPreselect_Gbb
+  if(NBaseLeptons == 0
      && var_dPhiMin > 0.4
      && SelectedJets->size() >= 4
      && SelectedJets->at(3)->pt()/MEV > 90.0
@@ -960,11 +860,12 @@ EL::StatusCode TruthAnalysis :: execute ()
   // And here, the various one-lepton signal regions ...
   
   //configMgr.cutsDict["SR_Gtt_1l_A_2"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=1 && met>200 && meff_incl>1100"
-  if(isPreselect_Gtt_1l
+  if(NSignalLeptons >= 1
      && var_mT > 150
      && var_mTb > 160
      && NJets >= 6
-     && NBJets >= 3
+     && pass3bincl
+     //NBJets >= 3
      && NTopJets >= 1
      && var_Met > 200.0
      && var_Meff > 1100.0)
@@ -975,11 +876,12 @@ EL::StatusCode TruthAnalysis :: execute ()
   else isGtt1LSRA2=false;
   
   //configMgr.cutsDict["SR_Gtt_1l_B_2"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=0 && met>300 && meff_incl>900"
-  if(isPreselect_Gtt_1l
+  if(NSignalLeptons >= 1
      && var_mT > 150
      && var_mTb > 160
      && NJets >= 6
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && NTopJets >= 0
      && var_Met > 300.0
      && var_Meff > 900.0)
@@ -990,10 +892,11 @@ EL::StatusCode TruthAnalysis :: execute ()
   else isGtt1LSRB2=false;
   
   //configMgr.cutsDict["SR_Gtt_1l_C_2"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>0   && jets_n>=6 && bjets_n>=4 && top_n>=0 && met>200 && meff_incl>600"
-  if(isPreselect_Gtt_1l
+  if(NSignalLeptons >= 1
      && var_mT > 150
      && NJets >= 6
-     && NBJets >= 4
+     && pass4bincl
+     //&& NBJets >= 4
      && NTopJets >= 0
      && var_Met > 200.0
      && var_Meff > 600.0)
@@ -1004,11 +907,12 @@ EL::StatusCode TruthAnalysis :: execute ()
   else isGtt1LSRC2=false;
   
   //configMgr.cutsDict["SR_Gtt_1l_A_4"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=1 && met>250 && meff_incl>1600"
-  if(isPreselect_Gtt_1l
+  if(NSignalLeptons >= 1
      && var_mT > 150
      && var_mTb > 160
      && NJets >= 6
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && NTopJets >= 1
      && var_Met > 250.0
      && var_Meff > 1600.0)
@@ -1019,11 +923,12 @@ EL::StatusCode TruthAnalysis :: execute ()
   else isGtt1LSRA4=false;
   
   //configMgr.cutsDict["SR_Gtt_1l_B_4"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=0 && met>350 && meff_incl>1100"
-  if(isPreselect_Gtt_1l
+  if(NSignalLeptons >= 1
      && var_mT > 150
      && var_mTb > 160
      && NJets >= 6
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && NTopJets >= 0
      && var_Met > 350.0
      && var_Meff > 1100.0)
@@ -1034,10 +939,11 @@ EL::StatusCode TruthAnalysis :: execute ()
   else isGtt1LSRB4=false;
   
   //configMgr.cutsDict["SR_Gtt_1l_C_4"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>0   && jets_n>=6 && bjets_n>=4 && top_n>=0 && met>250 && meff_incl>700"
-  if(isPreselect_Gtt_1l
+  if(NSignalLeptons >= 1
      && var_mT > 150
      && NJets >= 6
-     && NBJets >= 4
+     && pass4bincl
+     //&& NBJets >= 4
      && NTopJets >= 0
      && var_Met > 250.0
      && var_Meff > 700.0)
@@ -1051,11 +957,12 @@ EL::StatusCode TruthAnalysis :: execute ()
   // And here, the various zero-lepton signal regions ...
   
   //configMgr.cutsDict["SR_Gtt_0l_A"] = "(signal_electrons_n + signal_muons_n)==0 && dphi_min>0.4 && mTb_min>80 && jets_n>=8 && bjets_n>=4 && top_n>=0 && met>350 && meff_incl>1250
-  if(isPreselect_Gtt_0l
+  if(NSignalLeptons == 0
      && var_dPhiMin > 0.4
      && var_mTb > 80
      && NJets >= 8
-     && NBJets >= 4
+     && pass4bincl
+     //&& NBJets >= 4
      && NTopJets >= 0
      && var_Met > 350.0
      && var_Meff > 1250.0)
@@ -1066,11 +973,12 @@ EL::StatusCode TruthAnalysis :: execute ()
   else isGtt0LSRA=false;
   
   //configMgr.cutsDict["SR_Gtt_0l_B"] = "(signal_electrons_n + signal_muons_n)==0 && dphi_min>0.4 && mTb_min>80 && jets_n>=8 && bjets_n>=4 && top_n>=1 && met>350 && meff_incl>1250"
-  if(isPreselect_Gtt_0l
+  if(NSignalLeptons == 0
      && var_dPhiMin > 0.4
      && var_mTb > 80
      && NJets >= 8
-     && NBJets >= 4
+     && pass4bincl
+     //&& NBJets >= 4
      && NTopJets >= 1
      && var_Met > 350.0
      && var_Meff > 1250.0)
@@ -1081,11 +989,12 @@ EL::StatusCode TruthAnalysis :: execute ()
   else isGtt0LSRB=false;
   
   //configMgr.cutsDict["SR_Gtt_0l_C"] = "(signal_electrons_n + signal_muons_n)==0 && dphi_min>0.4 && mTb_min>80 && jets_n>=8 && bjets_n>=3 && top_n>=1 && met>400 && meff_incl>1700"
-  if(isPreselect_Gtt_0l
+  if(NSignalLeptons == 0
      && var_dPhiMin > 0.4
      && var_mTb > 80
      && NJets >= 8
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && NTopJets >= 1
      && var_Met > 400.0
      && var_Meff > 1700.0)
@@ -1096,11 +1005,12 @@ EL::StatusCode TruthAnalysis :: execute ()
   else isGtt0LSRC=false;
   
   //configMgr.cutsDict["SR_Gtt_0l_D"] = "(signal_electrons_n + signal_muons_n)==0 && dphi_min>0.4 && mTb_min>80 && jets_n>=8 && bjets_n>=3 && top_n>=2 && met>400 && meff_incl>1700"
-  if(isPreselect_Gtt_0l
+  if(NSignalLeptons == 0
      && var_dPhiMin > 0.4
      && var_mTb > 80
      && NJets >= 8
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && NTopJets >= 2
      && var_Met > 400.0
      && var_Meff > 1700.0)
@@ -1111,10 +1021,11 @@ EL::StatusCode TruthAnalysis :: execute ()
   else isGtt0LSRD=false;
 
   // Gbb CRs
-  if((NSignalElectrons+NSignalMuons)==1
+  if( NSignalLeptons == 1
      && NJets >= 4
      && SelectedJets->at(3)->pt()/MEV > 90.0
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && var_mT < 150
      && var_Met > 250
      && var_Meff_4j > 1100)
@@ -1123,10 +1034,11 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isGbbCRA2=false;
 
-  if((NSignalElectrons+NSignalMuons)==1
+  if(NSignalLeptons==1
      &&    NJets >= 4
      &&    SelectedJets->at(3)->pt()/MEV > 90.0
-     &&    NBJets >= 3
+     && pass3bincl
+     //&&    NBJets >= 3
      &&    var_mT < 150
      && var_Met > 250
      && var_Meff_4j > 900)
@@ -1135,22 +1047,26 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isGbbCRB2=false;
 
-  if((NSignalElectrons+NSignalMuons)==1
+  if(NSignalLeptons==1
      &&    NJets >= 4     
      &&    SelectedJets->at(3)->pt()/MEV > 30.0
-     &&    NBJets >= 3
+     && pass3bincl
+     //&&    NBJets >= 3
      &&    var_mT < 150
-     && var_Met > 250
-     && var_Meff_4j > 900)
+     && var_Met > 400
+     && var_Meff_4j > 1200)
+    //&& var_Met > 250
+    //&& var_Meff_4j > 900)
     {
       isGbbCRC2=true;
     }
   else isGbbCRC2=false;
   
-  if((NSignalElectrons+NSignalMuons)==1
+  if( NSignalLeptons==1
      &&    NJets >= 4
      &&    SelectedJets->at(3)->pt()/MEV > 90.0
-     &&    NBJets >= 3
+     && pass3bincl
+     //&&    NBJets >= 3
      &&    var_mT < 150 
      && var_Met > 250
      && var_Meff_4j > 1200)
@@ -1159,10 +1075,11 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isGbbCRA4=false;
   
-  if((NSignalElectrons+NSignalMuons)==1
+  if(NSignalLeptons==1
      &&    NJets >= 4
      &&    SelectedJets->at(3)->pt()/MEV > 90.0
-     &&    NBJets >= 3
+     && pass3bincl
+     //&&    NBJets >= 3
      &&    var_mT < 150
      && var_Met > 300
      && var_Meff_4j > 1100)
@@ -1171,10 +1088,11 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isGbbCRB4=false;
   
-  // Gtt 1L signal regions
-  if((NSignalElectrons+NSignalMuons)==1
+  // Gtt 1L control regions
+  if(NSignalLeptons>=1
      && NJets >= 6
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && NTopJets >= 1
      && var_mT < 150
      && var_Met >= 200
@@ -1184,9 +1102,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isGtt1LCRA2=false;
 
-  if((NSignalElectrons+NSignalMuons)==1
+  if( NSignalLeptons >=1
      && NJets >= 6
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && NTopJets >= 0
      && var_mT < 150
      && var_Met >= 300
@@ -1196,21 +1115,24 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isGtt1LCRB2=false;
 
-  if((NSignalElectrons+NSignalMuons)==1
+  if( NSignalLeptons >= 1
      && NJets >= 6
-     && NBJets >= 4
+     && pass4bincl
+     //&& NBJets >= 4
      && NTopJets >= 0
      && var_mT < 80
      && var_Met >= 200
-     && var_Meff >= 900)
+     //&& var_Meff >= 900)
+     && var_Meff >= 600)
     {
       isGtt1LCRC2=true;
     }
   else isGtt1LCRC2=false;
 
-  if((NSignalElectrons+NSignalMuons)==1
+  if( NSignalLeptons >= 1
      && NJets >= 6
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && NTopJets >= 1
      && var_mT < 150
      && var_Met >= 250
@@ -1220,9 +1142,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isGtt1LCRA4=false;
 
-  if((NSignalElectrons+NSignalMuons)==1
+  if( NSignalLeptons >=1
      && NJets >= 6
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && NTopJets >= 0
      && var_mT < 150
      && var_Met >= 350
@@ -1232,9 +1155,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isGtt1LCRB4=false;
 
-  if((NSignalElectrons+NSignalMuons)==1
+  if( NSignalLeptons >= 1
      && NJets >= 6
-     && NBJets >= 4
+     && pass4bincl
+     //&& NBJets >= 4
      && NTopJets >= 0
      && var_mT < 80
      && var_Met >= 250
@@ -1245,9 +1169,10 @@ EL::StatusCode TruthAnalysis :: execute ()
   else isGtt1LCRC4=false;
   
   // Gtt 0L control regions
-  if((NSignalElectrons+NSignalMuons)==1
+  if( NSignalLeptons == 1
      && NJets >= 7
-     && NBJets >= 4
+     && pass4bincl
+     //&& NBJets >= 4
      &&	NTopJets >= 0
      && var_mT < 150
      && var_Met >= 200
@@ -1257,9 +1182,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isGtt0LCRA=false;
   
-  if((NSignalElectrons+NSignalMuons)==1
+  if( NSignalLeptons == 1
      && NJets >= 7
-     && NBJets >= 4
+     && pass4bincl
+     //&& NBJets >= 4
      && NTopJets >=1
      && var_mT < 150
      && var_Met >= 200
@@ -1269,9 +1195,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isGtt0LCRB=false;
   
-  if((NSignalElectrons+NSignalMuons)==1
+  if( NSignalLeptons == 1
      && NJets >= 7
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && NTopJets >=1
      && var_mT < 150
      && var_Met >= 250
@@ -1281,9 +1208,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isGtt0LCRC=false;
   
-  if((NSignalElectrons+NSignalMuons)==1
+  if( NSignalLeptons == 1
      && NJets >= 7
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && NTopJets >=2
      && var_mT < 150
      && var_Met >= 200
@@ -1297,7 +1225,8 @@ EL::StatusCode TruthAnalysis :: execute ()
   if(NBaseLeptons == 0
      && var_dPhiMin > 0.4
      && NJets >= 4
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && var_mTb < 160.0
      && SelectedJets->at(3)->pt()/MEV > 90.0
      && var_Met > 200.0
@@ -1310,7 +1239,8 @@ EL::StatusCode TruthAnalysis :: execute ()
   if(NBaseLeptons == 0
      && var_dPhiMin > 0.4
      && NJets >= 4
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && var_mTb < 160.0
      && SelectedJets->at(3)->pt()/MEV > 90.0
      && var_Met > 250.0
@@ -1323,7 +1253,8 @@ EL::StatusCode TruthAnalysis :: execute ()
   if(NBaseLeptons == 0
      && var_dPhiMin > 0.4
      && NJets >= 4
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && var_mTb < 160.0
      && SelectedJets->at(3)->pt()/MEV > 30.0
      && var_Met > 400.0
@@ -1336,7 +1267,8 @@ EL::StatusCode TruthAnalysis :: execute ()
   if(NBaseLeptons == 0
      && var_dPhiMin > 0.4
      && NJets >= 4
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && var_mTb < 160.0
      && SelectedJets->at(3)->pt()/MEV > 90.0
      && var_Met > 250.0
@@ -1349,7 +1281,8 @@ EL::StatusCode TruthAnalysis :: execute ()
   if(NBaseLeptons == 0
      && var_dPhiMin > 0.4
      && NJets >= 4
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && var_mTb < 160.0
      && SelectedJets->at(3)->pt()/MEV > 90.0
      && var_Met > 300.0
@@ -1364,7 +1297,8 @@ EL::StatusCode TruthAnalysis :: execute ()
     && var_Meff >= 1000
     && var_Met >= 200
     && NJets >= 7
-    && NBJets >= 3
+    & pass3bincl
+     //&& NBJets >= 3
     && NTopJets >= 2
     && var_mT <= 150
     && var_mTb >= 80)
@@ -1377,7 +1311,8 @@ EL::StatusCode TruthAnalysis :: execute ()
     && var_Meff >= 1350
     && var_Met >= 250
     && NJets >= 7
-    && NBJets >= 3
+    & pass3bincl
+     //&& NBJets >= 3
     && NTopJets >= 1
     && var_mT <= 150
     && var_mTb >= 80)
@@ -1390,7 +1325,8 @@ EL::StatusCode TruthAnalysis :: execute ()
     && var_Meff >= 1000
     && var_Met >= 200
     && NJets >= 7
-    && NBJets >= 4
+    && pass4bincl
+     //&& NBJets >= 4
     && NTopJets >= 1
     && var_mT <= 150
     && var_mTb >= 80)
@@ -1403,7 +1339,8 @@ EL::StatusCode TruthAnalysis :: execute ()
     && var_Meff >= 1000
     && var_Met >= 200
     && NJets >= 7
-    && NBJets >= 4
+    && pass4bincl
+     //&& NBJets >= 4
     && NTopJets >= 0
     && var_mT <= 125
     && var_mTb >= 80)
@@ -1416,7 +1353,8 @@ EL::StatusCode TruthAnalysis :: execute ()
     && var_Meff >= 1100
     && var_Met >= 200
     && NJets >= 8
-    && NBJets >= 2
+    && pass2bincl
+     //&& NBJets >= 2
     && NTopJets >= 2
     && var_mTb < 80)
     {
@@ -1428,7 +1366,8 @@ EL::StatusCode TruthAnalysis :: execute ()
     && var_Meff >= 1400
     && var_Met >= 200
     && NJets >= 8
-    && NBJets >= 2
+    && pass2bincl
+     //&& NBJets >= 2
     && NTopJets >= 1
     && var_mTb < 80)
     {
@@ -1440,7 +1379,8 @@ EL::StatusCode TruthAnalysis :: execute ()
     && var_Meff >= 1100
     && var_Met >= 200
     && NJets >= 8
-    && NBJets >= 3
+    & pass3bincl
+     //&& NBJets >= 3
     && NTopJets >= 1
     && var_mTb < 80)
     {
@@ -1452,7 +1392,8 @@ EL::StatusCode TruthAnalysis :: execute ()
     && var_Meff >= 1250
     && var_Met >= 200
     && NJets >= 8
-    && NBJets >= 3
+    & pass3bincl
+     //&& NBJets >= 3
     && NTopJets >= 0
     && var_mTb < 80)
     {
@@ -1461,9 +1402,10 @@ EL::StatusCode TruthAnalysis :: execute ()
   else isVR0LGtt0LIV = false;
 
   // gtt 1L vrs
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >= 1
      && NJets >= 6
-     && NBJets == 2
+     && pass2bexcl
+     //&& NBJets == 2
      && NTopJets >=1
      && var_Met >= 200
      && var_Meff >= 1100
@@ -1474,9 +1416,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
     else isVRGtt1LI2mT2b=false;
 
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >= 1
      && NJets >= 6
-     && NBJets == 2
+     && pass2bexcl
+     //&& NBJets == 2
      && NTopJets >=0
      && var_Met >= 300
      && var_Meff >= 900
@@ -1487,9 +1430,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isVRGtt1LII2mT2b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >= 1
      && NJets >= 6
-     && NBJets == 2
+     && pass2bexcl
+     //&& NBJets == 2
      && NTopJets >=1
      && var_Met >= 250
      && var_Meff >= 1500
@@ -1500,9 +1444,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isVRGtt1LI4mT2b = false;
   
-   if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >= 1
      && NJets >= 5
-     && NBJets == 2
+     && pass2bexcl
+      //&& NBJets == 2
      && NTopJets >= 0
      && var_Met >= 350
      && var_Meff >= 1100
@@ -1513,9 +1458,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isVRGtt1LII4mT2b = false;
 
-   if((NSignalElectrons+NSignalMuons)>=1
+   if( NSignalLeptons >= 1
      && NJets >= 5
-     && NBJets == 3
+     && pass3bexcl
+      //&& NBJets == 3
      && NTopJets >= 1
      && var_Met >= 200
      && var_Meff >= 600
@@ -1526,9 +1472,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isVRGtt1LI2mT3b = false;
    
-   if((NSignalElectrons+NSignalMuons)>=1
+   if( NSignalLeptons >= 1
      && NJets >= 5
-     && NBJets == 3
+     && pass3bexcl
+      //&& NBJets == 3
      && NTopJets >= 0
      && var_Met >= 200
      && var_Meff >= 600
@@ -1539,9 +1486,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isVRGtt1LII2mT3b = false;
   
-   if((NSignalElectrons+NSignalMuons)>=1
+   if( NSignalLeptons >= 1
      && NJets >= 5
-     && NBJets == 3
+     && pass3bexcl
+      //&& NBJets == 3
      && NTopJets >= 1
      && var_Met >= 200
      && var_Meff >= 700
@@ -1553,9 +1501,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isVRGtt1LI4mT3b = false; 
 
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >= 1
     && NJets >= 5
-    && NBJets == 3
+     && pass3bexcl
+     //&& NBJets == 3
     && NTopJets >= 0
     && var_Met >= 200
     && var_Meff >= 800
@@ -1566,9 +1515,10 @@ EL::StatusCode TruthAnalysis :: execute ()
    } 
   else isVRGtt1LII4mT3b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
     && NJets >= 6
-    && NBJets == 2
+    && pass2bexcl
+     //&& NBJets == 2
     && NTopJets >= 1
     && var_Met >= 200
     && var_Meff >= 1100
@@ -1579,9 +1529,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isVRGtt1LI2mTb2b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
     && NJets >= 6
-    && NBJets == 2
+    && pass2bexcl
+     //&& NBJets == 2
     && NTopJets >= 0
     && var_Met >= 300
     && var_Meff >= 900
@@ -1592,9 +1543,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isVRGtt1LII2mTb2b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >= 1
     && NJets >= 6
-    && NBJets == 2
+    && pass2bexcl
+     //&& NBJets == 2
     && NTopJets >= 1
     && var_Met >= 250
     && var_Meff >= 1500
@@ -1605,9 +1557,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isVRGtt1LI4mTb2b = false;
        
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >= 1 
     && NJets >= 6
-    && NBJets == 2
+    && pass2bexcl
+     //&& NBJets == 2
     && NTopJets >= 0
     && var_Met >= 350
     && var_Meff >= 1100
@@ -1618,9 +1571,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isVRGtt1LII4mTb2b = false;
       
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >= 1
     && NJets >= 6
-    && NBJets == 3
+    && pass3bexcl
+     //&& NBJets == 3
     && NTopJets >= 1
     && var_Met >= 200
     && var_Meff >= 600
@@ -1631,9 +1585,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isVRGtt1LI2mTb3b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >= 1
     && NJets >= 6
-    && NBJets == 3
+    && pass3bexcl
+     //&& NBJets == 3
     && NTopJets >= 0
     && var_Met >= 200
     && var_Meff >= 600
@@ -1644,9 +1599,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isVRGtt1LII2mTb3b = false;
    
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >= 1
     && NJets >= 6
-    && NBJets == 3
+    && pass3bexcl
+     //&& NBJets == 3
     && NTopJets >= 1
     && var_Met >= 200
     && var_Meff >= 700
@@ -1658,9 +1614,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isVRGtt1LI4mTb3b = false;
    
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >= 1
     && NJets >= 6
-    && NBJets == 3
+    && pass3bexcl
+     //&& NBJets == 3
     && NTopJets >= 0
     && var_Met >= 250
     && var_Meff >= 800
@@ -1671,9 +1628,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isVRGtt1LII4mTb3b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >= 1
     && NJets >= 5
-    && NBJets == 4
+    && pass4bincl
+     //&& NBJets == 4
     && NTopJets >= 1
     && var_Met >= 200
     && var_Meff >= 600
@@ -1684,9 +1642,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isVRGtt1LI2mT4b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >= 1
     && NJets >= 6
-    && NBJets == 4
+    && pass4bincl
+     //&& NBJets == 4
     && NTopJets >= 0
     && var_Met >= 200
     && var_Meff >= 600
@@ -1697,9 +1656,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isVRGtt1LII2mT4b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >= 1
     && NJets >= 6
-    && NBJets == 2
+    && pass2bexcl
+     //&& NBJets == 2
     && NTopJets >= 0
     && var_Met >= 200
     && var_Meff >= 600
@@ -1710,9 +1670,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isVRGtt1LIII22b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >= 1
     && NJets >= 6
-    && NBJets == 2
+    && pass2bexcl
+     //&& NBJets == 2
     && NTopJets >= 0
     && var_Met >= 250
     && var_Meff >= 700
@@ -1723,9 +1684,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isVRGtt1LIII42b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
     && NJets >= 6
-    && NBJets == 3
+    && pass3bexcl
+     //&& NBJets == 3
     && NTopJets >= 0
     && var_Met >= 200
     && var_Meff >= 600
@@ -1736,9 +1698,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isVRGtt1LIII23b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
     && NJets >= 6
-    && NBJets == 3
+    && pass3bexcl
+     //&& NBJets == 3
     && NTopJets >= 0
     && var_Met >= 250
     && var_Meff >= 700
@@ -1749,12 +1712,13 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isVRGtt1LIII43b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
     && NJets >= 5
-    && NBJets == 4
+    && pass4bincl
+     //&& NBJets == 4
     && NTopJets >= 0
     && var_Met >= 200
-    && var_Meff >= 700
+    && var_Meff >= 600
     && var_mT > 80
     && var_mT < 110)
     {
@@ -1762,9 +1726,10 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   else isVRGtt1LIII24b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
     && NJets >= 5
-    && NBJets == 4
+    && pass4bincl
+     //&& NBJets == 4
     && NTopJets >= 0
     && var_Met >= 250
     && var_Meff >= 700
@@ -1782,7 +1747,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   
   if(NSignalLeptons >= 1
      && NJets >= 4
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && var_Met > 0.0) // Gtt 1L preselection
     {
       isPreselect_Gtt_1l = true;
@@ -1796,7 +1762,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   if(NBaseLeptons == 0
      && var_dPhiMin > 0.4
      && NJets >= 4
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && var_Met > 0.0) // Gbb 0L preselection
     {
       isPreselect_Gbb = true;
@@ -1807,7 +1774,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   //configMgr.cutsDict["Presel_Gtt_0l"] = "(signal_electrons_n + signal_muons_n)==0 && jets_n>=6 && bjets_n>=3 && met>200 && meff_incl<1000."
   if(NSignalLeptons == 0
      && NJets >= 4
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && var_Met > 0.0) // Gtt 0L Preselection
     {
       isPreselect_Gtt_0l = true;
@@ -1819,7 +1787,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   
   // Gbb SR flags
   //configMgr.cutsDict["SR_Gbb_A_1"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>50 && pt_bjet_3>50 && met>300 && meff_4j>1600"
-  if(isPreselect_Gbb
+  if(NSignalLeptons == 0
+     && pass3bincl
      &&var_dPhiMin > 0.4
      && SelectedJets->size() >= 4
      && SelectedJets->at(3)->pt()/MEV > 50.0
@@ -1833,7 +1802,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   else isGbbSRA1=false;
 
   //configMgr.cutsDict["SR_Gbb_B_1"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>70 && pt_bjet_3>70 && met>400 && meff_4j>800"
-  if(isPreselect_Gbb
+  if(NSignalLeptons == 0
+     && pass3bincl
      && var_dPhiMin > 0.4
      && SelectedJets->size() >= 4
      && SelectedJets->at(3)->pt()/MEV > 70.0
@@ -1847,7 +1817,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   else isGbbSRB1=false;
 
   //configMgr.cutsDict["SR_Gbb_A_2"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>350 && meff_4j>1400"
-  if(isPreselect_Gbb
+  if(NSignalLeptons == 0
+     && pass3bincl
      && var_dPhiMin > 0.4
      && SelectedJets->size() >= 4
      && SelectedJets->at(3)->pt()/MEV > 90.0
@@ -1861,7 +1832,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   else isGbbSRA2=false;
   
   //configMgr.cutsDict["SR_Gbb_B_2"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>400 && meff_4j>1200"
-  if(isPreselect_Gbb
+  if(NSignalLeptons == 0
+     && pass3bincl
      &&var_dPhiMin > 0.4
      && SelectedJets->size() >= 4
      && SelectedJets->at(3)->pt()/MEV > 90.0
@@ -1875,7 +1847,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   else isGbbSRB2=false;
   
   //configMgr.cutsDict["SR_Gbb_C_2"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>30 && pt_bjet_3>30 && met>500 && meff_4j>1400"
-  if(isPreselect_Gbb
+  if(NSignalLeptons == 0
+     && pass3bincl
      &&var_dPhiMin > 0.4
      && SelectedJets->size() >= 4
      && SelectedJets->at(3)->pt()/MEV > 30.0
@@ -1889,7 +1862,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   else isGbbSRC2=false;
 
   //configMgr.cutsDict["SR_Gbb_A_4"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>350 && meff_4j>1600"
-  if(isPreselect_Gbb
+  if(NSignalLeptons == 0
+     && pass3bincl
      && var_dPhiMin > 0.4
      && SelectedJets->size() >= 4
      && SelectedJets->at(3)->pt()/MEV > 90.0
@@ -1903,7 +1877,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   else isGbbSRA4=false;
   
   //configMgr.cutsDict["SR_Gbb_B_4"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>450 && meff_4j>1400"
-  if(isPreselect_Gbb
+  if(NSignalLeptons == 0
+     && pass3bincl
      && var_dPhiMin > 0.4
      && SelectedJets->size() >= 4
      && SelectedJets->at(3)->pt()/MEV > 90.0
@@ -1921,11 +1896,12 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   // And here, the various one-lepton signal regions ...
   
   //configMgr.cutsDict["SR_Gtt_1l_A_2"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=1 && met>200 && meff_incl>1100"
-  if(isPreselect_Gtt_1l
+  if(NSignalLeptons >= 1
      && var_mT > 150
      && var_mTb > 160
      && NJets >= 6
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && NTopJets >= 1
      && var_Met > 0.0
      && var_Meff > 900.0)
@@ -1936,11 +1912,12 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   else isGtt1LSRA2=false;
   
   //configMgr.cutsDict["SR_Gtt_1l_B_2"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=0 && met>300 && meff_incl>900"
-  if(isPreselect_Gtt_1l
+  if(NSignalLeptons >= 1
      && var_mT > 150
      && var_mTb > 160
      && NJets >= 6
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && NTopJets >= 0
      && var_Met > 0.0
      && var_Meff > 600.0)
@@ -1951,10 +1928,11 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   else isGtt1LSRB2=false;
   
   //configMgr.cutsDict["SR_Gtt_1l_C_2"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>0   && jets_n>=6 && bjets_n>=4 && top_n>=0 && met>200 && meff_incl>600"
-  if(isPreselect_Gtt_1l
+  if(NSignalLeptons >= 1
      && var_mT > 150
      && NJets >= 6
-     && NBJets >= 4
+     && pass4bincl
+     //&& NBJets >= 4
      && NTopJets >= 0
      && var_Met > 0.0
      && var_Meff > 400.0)
@@ -1965,11 +1943,12 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   else isGtt1LSRC2=false;
   
   //configMgr.cutsDict["SR_Gtt_1l_A_4"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=1 && met>250 && meff_incl>1600"
-  if(isPreselect_Gtt_1l
+  if(NSignalLeptons >= 1
      && var_mT > 150
      && var_mTb > 160
      && NJets >= 6
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && NTopJets >= 1
      && var_Met > 0.0
      && var_Meff > 1350.0)
@@ -1980,11 +1959,12 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   else isGtt1LSRA4=false;
   
   //configMgr.cutsDict["SR_Gtt_1l_B_4"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>160 && jets_n>=6 && bjets_n>=3 && top_n>=0 && met>350 && meff_incl>1100"
-  if(isPreselect_Gtt_1l
+  if(NSignalLeptons >=1 
      && var_mT > 150
      && var_mTb > 160
      && NJets >= 6
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && NTopJets >= 0
      && var_Met > 0.0
      && var_Meff > 750.0)
@@ -1995,10 +1975,11 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   else isGtt1LSRB4=false;
   
   //configMgr.cutsDict["SR_Gtt_1l_C_4"] = "(signal_electrons_n + signal_muons_n)>=1 && mT>150 && mTb_min>0   && jets_n>=6 && bjets_n>=4 && top_n>=0 && met>250 && meff_incl>700"
-  if(isPreselect_Gtt_1l
+  if(NSignalLeptons >= 1
      && var_mT > 150
      && NJets >= 6
-     && NBJets >= 4
+     && pass4bincl
+     //&& NBJets >= 4
      && NTopJets >= 0
      && var_Met > 0.0
      && var_Meff > 450.0)
@@ -2012,11 +1993,12 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   // And here, the various zero-lepton signal regions ...
   
   //configMgr.cutsDict["SR_Gtt_0l_A"] = "(signal_electrons_n + signal_muons_n)==0 && dphi_min>0.4 && mTb_min>80 && jets_n>=8 && bjets_n>=4 && top_n>=0 && met>350 && meff_incl>1250
-  if(isPreselect_Gtt_0l
+  if(NSignalLeptons == 0
      && var_dPhiMin > 0.4
      && var_mTb > 80
      && NJets >= 8
-     && NBJets >= 4
+     && pass4bincl
+     //&& NBJets >= 4
      && NTopJets >= 0
      && var_Met > 0.0
      && var_Meff > 900.0)
@@ -2027,11 +2009,12 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   else isGtt0LSRA=false;
   
   //configMgr.cutsDict["SR_Gtt_0l_B"] = "(signal_electrons_n + signal_muons_n)==0 && dphi_min>0.4 && mTb_min>80 && jets_n>=8 && bjets_n>=4 && top_n>=1 && met>350 && meff_incl>1250"
-  if(isPreselect_Gtt_0l
+  if(NSignalLeptons == 0
      && var_dPhiMin > 0.4
      && var_mTb > 80
      && NJets >= 8
-     && NBJets >= 4
+     && pass4bincl
+     //&& NBJets >= 4
      && NTopJets >= 1
      && var_Met > 0.0
      && var_Meff > 900.0)
@@ -2042,11 +2025,12 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   else isGtt0LSRB=false;
   
   //configMgr.cutsDict["SR_Gtt_0l_C"] = "(signal_electrons_n + signal_muons_n)==0 && dphi_min>0.4 && mTb_min>80 && jets_n>=8 && bjets_n>=3 && top_n>=1 && met>400 && meff_incl>1700"
-  if(isPreselect_Gtt_0l
+  if(NSignalLeptons == 0
      && var_dPhiMin > 0.4
      && var_mTb > 80
      && NJets >= 8
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && NTopJets >= 1
      && var_Met > 0.0
      && var_Meff > 1300.0)
@@ -2057,11 +2041,12 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   else isGtt0LSRC=false;
   
   //configMgr.cutsDict["SR_Gtt_0l_D"] = "(signal_electrons_n + signal_muons_n)==0 && dphi_min>0.4 && mTb_min>80 && jets_n>=8 && bjets_n>=3 && top_n>=2 && met>400 && meff_incl>1700"
-  if(isPreselect_Gtt_0l
+  if(NSignalLeptons == 0
      && var_dPhiMin > 0.4
      && var_mTb > 80
      && NJets >= 8
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && NTopJets >= 2
      && var_Met > 0.0
      && var_Meff > 1300.0)
@@ -2072,10 +2057,11 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   else isGtt0LSRD=false;
 
   // Gbb CRs
-  if((NSignalElectrons+NSignalMuons)==1
+  if( NSignalLeptons == 1
      && NJets >= 4
      && SelectedJets->at(3)->pt()/MEV > 90.0
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && var_mT < 150
      && var_Met > 0.0
      && var_Meff_4j > 850)
@@ -2084,10 +2070,11 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isGbbCRA2=false;
 
-  if((NSignalElectrons+NSignalMuons)==1
+  if( NSignalLeptons == 1
      &&    NJets >= 4
      &&    SelectedJets->at(3)->pt()/MEV > 90.0
-     &&    NBJets >= 3
+     && pass3bincl
+     //&&    NBJets >= 3
      &&    var_mT < 150
      && var_Met > 0.0
      && var_Meff_4j > 650.0)
@@ -2096,22 +2083,25 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isGbbCRB2=false;
 
-  if((NSignalElectrons+NSignalMuons)==1
+  if( NSignalLeptons == 1
      &&    NJets >= 4     
      &&    SelectedJets->at(3)->pt()/MEV > 30.0
-     &&    NBJets >= 3
+     && pass3bincl
+     //&&    NBJets >= 3
      &&    var_mT < 150
      && var_Met > 0.0
-     && var_Meff_4j > 650.0)
+     && var_Meff_4j > 800.0)
+    //&& var_Meff_4j > 650.0)
     {
       isGbbCRC2=true;
     }
   else isGbbCRC2=false;
   
-  if((NSignalElectrons+NSignalMuons)==1
+  if( NSignalLeptons == 1
      &&    NJets >= 4
      &&    SelectedJets->at(3)->pt()/MEV > 90.0
-     &&    NBJets >= 3
+     && pass3bincl
+     //&&    NBJets >= 3
      &&    var_mT < 150 
      && var_Met > 0.0
      && var_Meff_4j > 950.0)
@@ -2120,10 +2110,11 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isGbbCRA4=false;
   
-  if((NSignalElectrons+NSignalMuons)==1
+  if( NSignalLeptons == 1
      &&    NJets >= 4
      &&    SelectedJets->at(3)->pt()/MEV > 90.0
-     &&    NBJets >= 3
+     && pass3bincl
+     //&&    NBJets >= 3
      &&    var_mT < 150
      && var_Met > 0.0
      && var_Meff_4j > 800.0)
@@ -2132,10 +2123,11 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isGbbCRB4=false;
   
-  // Gtt 1L signal regions
-  if((NSignalElectrons+NSignalMuons)==1
+  // Gtt 1L control regions
+  if( NSignalLeptons >= 1
      && NJets >= 6
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && NTopJets >= 1
      && var_mT < 150
      && var_Met >= 0.0
@@ -2145,9 +2137,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isGtt1LCRA2=false;
 
-  if((NSignalElectrons+NSignalMuons)==1
+  if( NSignalLeptons >= 1
      && NJets >= 6
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && NTopJets >= 0
      && var_mT < 150
      && var_Met >= 0.0
@@ -2157,21 +2150,24 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isGtt1LCRB2=false;
 
-  if((NSignalElectrons+NSignalMuons)==1
+  if( NSignalLeptons >= 1
      && NJets >= 6
-     && NBJets >= 4
+     && pass4bincl
+     //&& NBJets >= 4
      && NTopJets >= 0
      && var_mT < 80
      && var_Met >= 0.0
-     && var_Meff >= 700.0)
+     && var_Meff >= 400.0)
+    //&& var_Meff >= 700.0)
     {
       isGtt1LCRC2=true;
     }
   else isGtt1LCRC2=false;
 
-  if((NSignalElectrons+NSignalMuons)==1
+  if( NSignalLeptons >= 1
      && NJets >= 6
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && NTopJets >= 1
      && var_mT < 150
      && var_Met >= 0.0
@@ -2181,9 +2177,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isGtt1LCRA4=false;
 
-  if((NSignalElectrons+NSignalMuons)==1
+  if( NSignalLeptons >= 1
      && NJets >= 6
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && NTopJets >= 0
      && var_mT < 150
      && var_Met >= 0.0
@@ -2193,9 +2190,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isGtt1LCRB4=false;
 
-  if((NSignalElectrons+NSignalMuons)==1
+  if( NSignalLeptons >=1
      && NJets >= 6
-     && NBJets >= 4
+     && pass4bincl
+     //&& NBJets >= 4
      && NTopJets >= 0
      && var_mT < 80
      && var_Met >= 0.0
@@ -2206,9 +2204,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   else isGtt1LCRC4=false;
   
   // Gtt 0L control regions
-  if((NSignalElectrons+NSignalMuons)==1
+  if( NSignalLeptons == 1
      && NJets >= 7
-     && NBJets >= 4
+     && pass4bincl
+     //&& NBJets >= 4
      && NTopJets >= 0
      && var_mT < 150
      && var_Met >= 0.0
@@ -2218,9 +2217,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isGtt0LCRA=false;
   
-  if((NSignalElectrons+NSignalMuons)==1
+  if( NSignalLeptons ==1
      && NJets >= 7
-     && NBJets >= 4
+     && pass4bincl
+     //&& NBJets >= 4
      && NTopJets >=1
      && var_mT < 150
      && var_Met >= 0.0
@@ -2230,9 +2230,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isGtt0LCRB=false;
   
-  if((NSignalElectrons+NSignalMuons)==1
+  if( NSignalLeptons==1
      && NJets >= 7
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && NTopJets >=1
      && var_mT < 150
      && var_Met >= 0.0
@@ -2242,9 +2243,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isGtt0LCRC=false;
   
-  if((NSignalElectrons+NSignalMuons)==1
+  if( NSignalLeptons == 1
      && NJets >= 7
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && NTopJets >=2
      && var_mT < 150
      && var_Met >= 0.0
@@ -2258,7 +2260,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   if(NBaseLeptons == 0
      && var_dPhiMin > 0.4
      && NJets >= 4
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && var_mTb < 160.0
      && SelectedJets->at(3)->pt()/MEV > 90.0
      && var_Met > 0.0
@@ -2271,7 +2274,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   if(NBaseLeptons == 0
      && var_dPhiMin > 0.4
      && NJets >= 4
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && var_mTb < 160.0
      && SelectedJets->at(3)->pt()/MEV > 90.0
      && var_Met > 0.0
@@ -2284,7 +2288,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   if(NBaseLeptons == 0
      && var_dPhiMin > 0.4
      && NJets >= 4
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && var_mTb < 160.0
      && SelectedJets->at(3)->pt()/MEV > 30.0
      && var_Met > 0.0
@@ -2297,7 +2302,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   if(NBaseLeptons == 0
      && var_dPhiMin > 0.4
      && NJets >= 4
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && var_mTb < 160.0
      && SelectedJets->at(3)->pt()/MEV > 90.0
      && var_Met > 0.0
@@ -2310,7 +2316,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   if(NBaseLeptons == 0
      && var_dPhiMin > 0.4
      && NJets >= 4
-     && NBJets >= 3
+     && pass3bincl
+     //&& NBJets >= 3
      && var_mTb < 160.0
      && SelectedJets->at(3)->pt()/MEV > 90.0
      && var_Met > 0.0
@@ -2325,7 +2332,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     && var_Meff >= 800.0
     && var_Met >= 0.0
     && NJets >= 7
-    && NBJets >= 3
+    & pass3bincl
+     //&& NBJets >= 3
     && NTopJets >= 2
     && var_mT <= 150
     && var_mTb >= 80)
@@ -2338,7 +2346,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     && var_Meff >= 1150.0
     && var_Met >= 0.0
     && NJets >= 7
-    && NBJets >= 3
+    & pass3bincl
+     //&& NBJets >= 3
     && NTopJets >= 1
     && var_mT <= 150
     && var_mTb >= 80)
@@ -2351,7 +2360,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     && var_Meff >= 800.0
     && var_Met >= 0.0
     && NJets >= 7
-    && NBJets >= 4
+    && pass4bincl
+     //&& NBJets >= 4
     && NTopJets >= 1
     && var_mT <= 150
     && var_mTb >= 80)
@@ -2364,7 +2374,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     && var_Meff >= 800.0
     && var_Met >= 0.0
     && NJets >= 7
-    && NBJets >= 4
+    && pass4bincl
+     //&& NBJets >= 4
     && NTopJets >= 0
     && var_mT <= 125
     && var_mTb >= 80)
@@ -2377,7 +2388,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     && var_Meff >= 900.0
     && var_Met >= 0.0
     && NJets >= 8
-    && NBJets >= 2
+    && pass2bincl
+     //&& NBJets >= 2
     && NTopJets >= 2
     && var_mTb < 80)
     {
@@ -2389,7 +2401,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     && var_Meff >= 1200.0
     && var_Met >= 0.0
     && NJets >= 8
-    && NBJets >= 2
+    && pass2bincl
+     //&& NBJets >= 2
     && NTopJets >= 1
     && var_mTb < 80)
     {
@@ -2401,7 +2414,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     && var_Meff >= 900.0
     && var_Met >= 0.0
     && NJets >= 8
-    && NBJets >= 3
+    & pass3bincl
+     //&& NBJets >= 3
     && NTopJets >= 1
     && var_mTb < 80)
     {
@@ -2413,7 +2427,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     && var_Meff >= 1050.0
     && var_Met >= 0.0
     && NJets >= 8
-    && NBJets >= 3
+    & pass3bincl
+     //&& NBJets >= 3
     && NTopJets >= 0
     && var_mTb < 80)
     {
@@ -2422,9 +2437,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   else isVR0LGtt0LIV = false;
 
   // gtt 1L vrs
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
      && NJets >= 6
-     && NBJets == 2
+     && pass2bexcl
+     //&& NBJets == 2
      && NTopJets >=1
      && var_Met >= 0.0
      && var_Meff >= 900.0
@@ -2435,9 +2451,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
     else isVRGtt1LI2mT2b=false;
 
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
      && NJets >= 6
-     && NBJets == 2
+     && pass2bexcl
+     //&& NBJets == 2
      && NTopJets >=0
      && var_Met >= 0.0
      && var_Meff >= 600.0
@@ -2448,9 +2465,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isVRGtt1LII2mT2b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
      && NJets >= 6
-     && NBJets == 2
+     && pass2bexcl
+     //&& NBJets == 2
      && NTopJets >=1
      && var_Met >= 0.0
      && var_Meff >= 1250.0
@@ -2461,9 +2479,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isVRGtt1LI4mT2b = false;
   
-   if((NSignalElectrons+NSignalMuons)>=1
+   if( NSignalLeptons >=1
      && NJets >= 5
-     && NBJets == 2
+     && pass2bexcl
+      //&& NBJets == 2
      && NTopJets >= 0
      && var_Met >= 0.0
      && var_Meff >= 750.0
@@ -2474,9 +2493,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isVRGtt1LII4mT2b = false;
 
-   if((NSignalElectrons+NSignalMuons)>=1
+   if( NSignalLeptons >=1
      && NJets >= 5
-     && NBJets == 3
+     && pass3bexcl
+      //&& NBJets == 3
      && NTopJets >= 1
      && var_Met >= 0.0
      && var_Meff >= 400.0
@@ -2487,9 +2507,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isVRGtt1LI2mT3b = false;
    
-   if((NSignalElectrons+NSignalMuons)>=1
+   if( NSignalLeptons >=1
      && NJets >= 5
-     && NBJets == 3
+     && pass3bexcl
+      //&& NBJets == 3
      && NTopJets >= 0
      && var_Met >= 0.0
      && var_Meff >= 400.0
@@ -2500,9 +2521,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isVRGtt1LII2mT3b = false;
   
-   if((NSignalElectrons+NSignalMuons)>=1
+   if( NSignalLeptons >=1
      && NJets >= 5
-     && NBJets == 3
+     && pass3bexcl
+      //&& NBJets == 3
      && NTopJets >= 1
      && var_Met >= 0.0
      && var_Meff >= 500
@@ -2514,9 +2536,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isVRGtt1LI4mT3b = false; 
 
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
     && NJets >= 5
-    && NBJets == 3
+    && pass3bexcl
+     //&& NBJets == 3
     && NTopJets >= 0
     && var_Met >= 0.0
     && var_Meff >= 600.0
@@ -2527,9 +2550,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
    } 
   else isVRGtt1LII4mT3b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
     && NJets >= 6
-    && NBJets == 2
+    && pass2bexcl
+     //&& NBJets == 2
     && NTopJets >= 1
     && var_Met >= 0.0
     && var_Meff >= 900.
@@ -2540,9 +2564,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isVRGtt1LI2mTb2b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
     && NJets >= 6
-    && NBJets == 2
+    && pass2bexcl
+     //&& NBJets == 2
     && NTopJets >= 0
     && var_Met >= 0.0
     && var_Meff >= 600.0
@@ -2553,9 +2578,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isVRGtt1LII2mTb2b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
     && NJets >= 6
-    && NBJets == 2
+    && pass2bexcl
+     //&& NBJets == 2
     && NTopJets >= 1
     && var_Met >= 0.0
     && var_Meff >= 1250.0
@@ -2566,9 +2592,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isVRGtt1LI4mTb2b = false;
        
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
     && NJets >= 6
-    && NBJets == 2
+    && pass2bexcl
+     //&& NBJets == 2
     && NTopJets >= 0
     && var_Met >= 0.0
     && var_Meff >= 750.0
@@ -2579,9 +2606,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isVRGtt1LII4mTb2b = false;
       
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
     && NJets >= 6
-    && NBJets == 3
+    && pass3bexcl
+     //&& NBJets == 3
     && NTopJets >= 1
     && var_Met >= 0.0
     && var_Meff >= 400.0
@@ -2592,9 +2620,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isVRGtt1LI2mTb3b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
     && NJets >= 6
-    && NBJets == 3
+    && pass3bexcl
+     //&& NBJets == 3
     && NTopJets >= 0
     && var_Met >= 0.0
     && var_Meff >= 400.0
@@ -2605,9 +2634,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isVRGtt1LII2mTb3b = false;
    
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
     && NJets >= 6
-    && NBJets == 3
+    && pass3bexcl
+     //&& NBJets == 3
     && NTopJets >= 1
     && var_Met >= 0.0
     && var_Meff >= 500.0
@@ -2619,9 +2649,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isVRGtt1LI4mTb3b = false;
    
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
     && NJets >= 6
-    && NBJets == 3
+    && pass3bexcl
+     //&& NBJets == 3
     && NTopJets >= 0
     && var_Met >= 0.0
     && var_Meff >= 550.0
@@ -2632,9 +2663,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isVRGtt1LII4mTb3b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
     && NJets >= 5
-    && NBJets == 4
+    && pass4bincl
+     //&& NBJets == 4
     && NTopJets >= 1
     && var_Met >= 0.0
     && var_Meff >= 400.0
@@ -2645,9 +2677,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isVRGtt1LI2mT4b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
     && NJets >= 6
-    && NBJets == 4
+    && pass4bincl
+     //&& NBJets == 4
     && NTopJets >= 0
     && var_Met >= 0.0
     && var_Meff >= 400.0
@@ -2658,9 +2691,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isVRGtt1LII2mT4b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
     && NJets >= 6
-    && NBJets == 2
+    && pass2bexcl
+     //&& NBJets == 2
     && NTopJets >= 0
     && var_Met >= 0.0
     && var_Meff >= 400.0
@@ -2671,9 +2705,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isVRGtt1LIII22b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
     && NJets >= 6
-    && NBJets == 2
+    && pass2bexcl
+     //&& NBJets == 2
     && NTopJets >= 0
     && var_Met >= 0.0
     && var_Meff >= 450.0
@@ -2684,9 +2719,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isVRGtt1LIII42b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
     && NJets >= 6
-    && NBJets == 3
+    && pass3bexcl
+     //&& NBJets == 3
     && NTopJets >= 0
     && var_Met >= 0.0
     && var_Meff >= 400.0
@@ -2697,9 +2733,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isVRGtt1LIII23b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
     && NJets >= 6
-    && NBJets == 3
+    && pass3bexcl
+     //&& NBJets == 3
     && NTopJets >= 0
     && var_Met >= 0.0
     && var_Meff >= 450.0
@@ -2710,12 +2747,13 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isVRGtt1LIII43b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
     && NJets >= 5
-    && NBJets == 4
+    && pass4bincl
+     //&& NBJets == 4
     && NTopJets >= 0
     && var_Met >= 0.0
-    && var_Meff >= 500.0
+    && var_Meff >= 400.0
     && var_mT > 80
     && var_mT < 110)
     {
@@ -2723,9 +2761,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
     }
   else isVRGtt1LIII24b = false;
   
-  if((NSignalElectrons+NSignalMuons)>=1
+  if( NSignalLeptons >=1
     && NJets >= 5
-    && NBJets == 4
+    && pass4bincl
+     //&& NBJets == 4
     && NTopJets >= 0
     && var_Met >= 0.0
     && var_Meff >= 450.0
@@ -2735,14 +2774,10 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
       isVRGtt1LIII44b=true;
     }
   else isVRGtt1LIII44b = false;
-}
+ }
 
-  const xAOD::EventInfo* EventInfo = 0;
-  m_event->retrieve(EventInfo, "EventInfo");
-  
-  mc_channel=-1.0;
-  mc_weight = EventInfo->mcEventWeights().at(0);
 
+  int nb_cf = isTRF ? nbjets_TRF : NBJets;
   TruthAnalysis::cutflow(out_cutflow,
 			 NJets,
 			 NBJets,
@@ -2760,8 +2795,328 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
 			 var_Met,
 			 var_MetSig,
 			 debug);
+
   out_tree->Fill();
+
+  return;
+} 
+
+EL::StatusCode TruthAnalysis :: execute ()
+{
+  // Here you do everything that needs to be done on every single
+  // events, e.g. read input variables, apply cuts, and fill
+  // histograms and trees.  This is where most of your actual analysis
+  // code will go.
+
+  static int count = 0;
+  if(count==0) std::cout << "TruthAnalysis::execute() BEGIN" << std::endl;
+  count++;
+  if(count % 1000 == 0) std::cout << "TruthAnalysis::execute()\tProcessed " << count << " events."  << std::endl;;
+
+  // TODO: Seed this properly
+  const xAOD::JetContainer* TruthJets = 0;
+  EL_RETURN_CHECK("Get jets", m_event->retrieve( TruthJets, "AntiKt4TruthJets" ) );
+
+  static SG::AuxElement::ConstAccessor< int > GhostTaus("GhostTausFinalCount");
+  static SG::AuxElement::ConstAccessor< int > GhostBHadrons("GhostBHadronsFinalCount");
+  static SG::AuxElement::ConstAccessor< int > GhostCHadrons("GhostCHadronsFinalCount");
+
+  static SG::AuxElement::ConstAccessor< float > Tau2("Tau2_wta");
+  static SG::AuxElement::ConstAccessor< float > Tau3("Tau3_wta");
+
+  ConstDataVector<xAOD::JetContainer> * SelectedJets   =  new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
+  ConstDataVector<xAOD::JetContainer> * SelectedBJets  =  new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
+
+  // chiara: adding vector of jets with |eta|<2.5 and pt>30. These are the ones to use to apply TRF
+  //Trisha : modifying name
+  ConstDataVector<xAOD::JetContainer> * InputJets_TRF  =  m_probTag ? new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS) : NULL;
+
+  int TruthBNum = 0;
+  int TruthCNum = 0;
+  int TruthTauNum = 0;
+
+  //Trisha - input vectors for TRF
+  m_sel_jets_pt.clear(); 
+  m_sel_jets_eta.clear();
+  m_sel_jets_phi.clear();
+  m_sel_jets_truthLabel.clear();
+  m_sel_jets_btag_weight.clear();
+  //m_sel_jets_index.clear();
+
+  for(const auto jet : *TruthJets){
+    if(fabs(jet->eta()) < 2.8 && jet->pt() / MEV > 30.){
+      SelectedJets->push_back(jet);
+    }
+
+    // handle b-jets now
+
+    if(fabs(jet->eta()) > 2.5 || jet->pt() / MEV < 30.){
+      continue;
+    }
+    if(m_probTag){
+      // chiara: 
+      InputJets_TRF->push_back(jet); //Trisha : still needed because index will refer to this vector
+
+      //input vectors
+      m_sel_jets_pt.push_back(jet->pt() / MEV); 
+      m_sel_jets_eta.push_back(jet->eta());
+      m_sel_jets_phi.push_back(jet->phi());
+      m_sel_jets_btag_weight.push_back(0); // chiara: not really needed for out scopes, but needed for the code to compile :)
+    }
+
+    bool HasB = (GhostBHadrons(*jet) >= 1);
+    bool HasC = (GhostCHadrons(*jet) >= 1);
+    bool HasTau = (GhostTaus(*jet) >= 1);
+    // Should we look at taus as well?
+    /*
+    if(HasB)
+      TruthBNum++;
+    if(HasC)
+      TruthCNum++;
+
+    if(HasTau)
+      TruthTauNum++;
+    */
+
+    if(HasB){
+      if(m_probTag){ m_sel_jets_truthLabel.push_back(5); }
+
+      double randB = m_myRand->Rndm();
+      if(randB <= 0.85){
+        // then it counts as a B
+        SelectedBJets->push_back(jet);
+      }
+    }
+    else if(HasC){
+      if(m_probTag){ m_sel_jets_truthLabel.push_back(4); }
+      double randC = m_myRand->Rndm();
+      if(randC < 0.38){
+        // then it counts as a B still
+        SelectedBJets->push_back(jet);
+      }
+    }
+    else if(HasTau){
+      if(m_probTag){ m_sel_jets_truthLabel.push_back(15); }
+      double randTau = m_myRand->Rndm();
+      if(randTau < 0.26){
+	// it's  b, even so
+	SelectedBJets->push_back(jet);
+	}
+    }
+    else{ // it's a light jet in truth
+      if(m_probTag){ m_sel_jets_truthLabel.push_back(0); }
+      double randL = m_myRand->Rndm();
+      if(randL < 0.036){
+        SelectedBJets->push_back(jet);
+      }
+    }
+  }//jet loop
+
+
+  // Jet Reclustering!
+  ConstDataVector<xAOD::JetContainer> * SelectedRCJets   =  new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
+  ConstDataVector<xAOD::JetContainer> * SelectedTopJets   =  new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
+
+  m_reclusteringTool->execute();
+  const xAOD::JetContainer* RC10TruthJets = 0;
+  m_event->retrieve( RC10TruthJets, "RC10TruthJets");
+  for(const auto jet : *RC10TruthJets)
+    {
+      if(fabs(jet->eta()) < 2.0 && (jet->pt() / MEV) > 300.0)
+	{
+	  SelectedRCJets->push_back(jet);
+	  	 
+	  if((jet->m() / MEV) > 100.0)
+	    {
+	      SelectedTopJets->push_back(jet);
+	    }
+	}
+    }
+
+  const xAOD::TruthParticleContainer* TruthElectrons = 0;
+  EL_RETURN_CHECK("Get electrons", m_event->retrieve( TruthElectrons, "TruthElectrons" ) );
+
+  // check pt cut on leptons; susytools defaults to 10.
+  ConstDataVector<xAOD::TruthParticleContainer> * SignalElectrons    =  new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
+  ConstDataVector<xAOD::TruthParticleContainer> * BaselineElectrons  =  new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
+
+  for(const auto electron : *TruthElectrons)
+    {
+     if(fabs(electron->eta()) < 2.47 && electron->pt() / MEV > 20.)
+	{
+	  SignalElectrons->push_back(electron);
+	}
+      if(fabs(electron->eta()) < 2.47 && electron->pt() / MEV > 20.)
+	{
+	  BaselineElectrons->push_back(electron);
+	}
+    }
+
+  const xAOD::TruthParticleContainer* TruthMuons = 0;
+  EL_RETURN_CHECK("Get muons", m_event->retrieve( TruthMuons, "TruthMuons" ) );
+
+  // check pt cut on leptons; susytools defaults to 10.
+  ConstDataVector<xAOD::TruthParticleContainer> * SignalMuons    =  new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
+  ConstDataVector<xAOD::TruthParticleContainer> * BaselineMuons  =  new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
+  for(const auto muon : *TruthMuons){
+    if(fabs(muon->eta()) < 2.5 && muon->pt() / MEV > 20.){
+      SignalMuons->push_back(muon);
+    }
+    if(fabs(muon->eta()) < 2.5 && muon->pt() / MEV > 20.){
+      BaselineMuons->push_back(muon);
+    }
+  }
+
+  const xAOD::MissingETContainer* TruthMET = 0;
+  EL_RETURN_CHECK("Get MET", m_event->retrieve( TruthMET, "MET_Truth" ) );
   
+  xAOD::MissingETContainer::const_iterator TruthMET_it = TruthMET->find("NonInt");
+  if (TruthMET_it == TruthMET->end()) std::cout << "No NonINT inside MET container" << std::endl;  
+  xAOD::MissingET* TruthMET_NonInt = *TruthMET_it;
+
+  TruthMET_it = TruthMET->find("Int");
+  if (TruthMET_it == TruthMET->end()) std::cout << "No INT inside MET container" << std::endl;
+  xAOD::MissingET* TruthMET_Int = *TruthMET_it;
+
+  //std::cout << "MET " << TruthMET_NonInt->met()/1000.0 << "\t" << TruthMET_Int->met()/1000.0 << std::endl;
+
+  var_dPhiMin = Variables::delta_phi_nj(TruthMET_NonInt, SelectedJets->asDataVector(), SelectedJets->size()); // Should it be this MET?
+  var_Meff = Variables::Meff_incl(TruthMET_NonInt, SelectedJets->asDataVector(), SignalMuons->asDataVector(), SignalElectrons->asDataVector());
+  var_Meff_4j = Variables::Meff_4j(TruthMET_NonInt, SelectedJets->asDataVector(), 4 /* How many jets to use? */);
+  var_mT = Variables::mT(TruthMET_NonInt, SignalMuons->asDataVector(), SignalElectrons->asDataVector());
+  var_HT = Variables::Ht(SelectedJets->asDataVector(), SignalMuons->asDataVector(), SignalElectrons->asDataVector());
+  var_Met = TruthMET_NonInt->met()/1000.0;
+  //var_Met = TruthMET_Int->met()/1000.0;
+  var_MetSig = Variables::Met_significance(TruthMET_NonInt, SelectedJets->asDataVector(), 4 /* How many jets to use in HT? */);
+
+  var_dPhiMin = 1.0; // REMOVED TO TEST, MLB ON 11-11-15
+
+  NSignalElectrons = SignalElectrons->size();
+  NSignalMuons     = SignalMuons->size();
+  NBaseElectrons   = BaselineElectrons->size();
+  NBaseMuons       = BaselineMuons->size();
+  NJets	  	       = SelectedJets->size();
+  //NBJets           = SelectedBJets->size();
+  NTopJets	       = SelectedTopJets->size();
+  
+  NSignalLeptons   = NSignalElectrons + NSignalMuons;
+  NBaseLeptons     = NBaseElectrons + NBaseMuons;
+
+  if(SignalMuons->size()>0) var_mu_pt = SignalMuons->at(0)->pt() / MEV;
+  if(SignalMuons->size()>0) var_mu_eta = SignalMuons->at(0)->eta();
+  if(SignalMuons->size()>0) var_mu_phi = SignalMuons->at(0)->phi();
+  if(SignalMuons->size()>0) var_mu_e = SignalMuons->at(0)->e() / MEV;
+
+  if(SignalElectrons->size()>0) var_el_pt = SignalElectrons->at(0)->pt() / MEV;
+  if(SignalElectrons->size()>0) var_el_eta = SignalElectrons->at(0)->eta();
+  if(SignalElectrons->size()>0) var_el_phi = SignalElectrons->at(0)->phi();
+  if(SignalElectrons->size()>0) var_el_e = SignalElectrons->at(0)->e() / MEV;
+
+  if(SelectedJets->size()>0) var_jet_pt_1 = SelectedJets->at(0)->pt() / MEV;
+  if(SelectedJets->size()>1) var_jet_pt_2 = SelectedJets->at(1)->pt() / MEV;
+  if(SelectedJets->size()>2) var_jet_pt_3 = SelectedJets->at(2)->pt() / MEV;
+  if(SelectedJets->size()>3) var_jet_pt_4 = SelectedJets->at(3)->pt() / MEV;
+  if(SelectedJets->size()>0) var_jet_eta_1 = SelectedJets->at(0)->eta();
+  if(SelectedJets->size()>1) var_jet_eta_2 = SelectedJets->at(1)->eta();
+  if(SelectedJets->size()>2) var_jet_eta_3 = SelectedJets->at(2)->eta();
+  if(SelectedJets->size()>3) var_jet_eta_4 = SelectedJets->at(3)->eta();
+  if(SelectedJets->size()>0) var_jet_phi_1 = SelectedJets->at(0)->phi();
+  if(SelectedJets->size()>1) var_jet_phi_2 = SelectedJets->at(1)->phi();
+  if(SelectedJets->size()>2) var_jet_phi_3 = SelectedJets->at(2)->phi();
+  if(SelectedJets->size()>3) var_jet_phi_4 = SelectedJets->at(3)->phi();
+  if(SelectedJets->size()>0) var_jet_e_1 = SelectedJets->at(0)->e() / MEV;
+  if(SelectedJets->size()>1) var_jet_e_2 = SelectedJets->at(1)->e() / MEV;
+  if(SelectedJets->size()>2) var_jet_e_3 = SelectedJets->at(2)->e() / MEV;
+  if(SelectedJets->size()>3) var_jet_e_4 = SelectedJets->at(3)->e() / MEV;
+
+  if(SelectedRCJets->size()>0) var_rcjet_pt_1 = SelectedRCJets->at(0)->pt() / MEV;
+  if(SelectedRCJets->size()>1) var_rcjet_pt_2 = SelectedRCJets->at(1)->pt() / MEV;
+  if(SelectedRCJets->size()>2) var_rcjet_pt_3 = SelectedRCJets->at(2)->pt() / MEV;
+  if(SelectedRCJets->size()>3) var_rcjet_pt_4 = SelectedRCJets->at(3)->pt() / MEV;
+  if(SelectedRCJets->size()>0) var_rcjet_eta_1 = SelectedRCJets->at(0)->eta();
+  if(SelectedRCJets->size()>1) var_rcjet_eta_2 = SelectedRCJets->at(1)->eta();
+  if(SelectedRCJets->size()>2) var_rcjet_eta_3 = SelectedRCJets->at(2)->eta();
+  if(SelectedRCJets->size()>3) var_rcjet_eta_4 = SelectedRCJets->at(3)->eta();
+  if(SelectedRCJets->size()>0) var_rcjet_phi_1 = SelectedRCJets->at(0)->phi();
+  if(SelectedRCJets->size()>1) var_rcjet_phi_2 = SelectedRCJets->at(1)->phi();
+  if(SelectedRCJets->size()>2) var_rcjet_phi_3 = SelectedRCJets->at(2)->phi();
+  if(SelectedRCJets->size()>3) var_rcjet_phi_4 = SelectedRCJets->at(3)->phi();
+  if(SelectedRCJets->size()>0) var_rcjet_mass_1 = SelectedRCJets->at(0)->m() / MEV;
+  if(SelectedRCJets->size()>1) var_rcjet_mass_2 = SelectedRCJets->at(1)->m() / MEV;
+  if(SelectedRCJets->size()>2) var_rcjet_mass_3 = SelectedRCJets->at(2)->m() / MEV;
+  if(SelectedRCJets->size()>3) var_rcjet_mass_4 = SelectedRCJets->at(3)->m() / MEV;
+  
+  Bool_t isOneLepton=false; isOneLepton = (NSignalLeptons == 1);
+  Bool_t isZeroLepton=false; isZeroLepton = (NBaseLeptons == 0);
+
+  const xAOD::EventInfo* EventInfo = 0;
+  m_event->retrieve(EventInfo, "EventInfo");
+  
+  mc_channel=-1.0;
+  mc_weight = EventInfo->mcEventWeights().at(0);
+
+
+  //--------------- All of the above do not need bjets --------------------
+  //Only var_mTb has to be recalculated
+
+
+  if(m_probTag){
+    // chiara
+    float TRF_weight_appo = compute_TRF();
+    //float TRF_weight_appo = compute_TRF();
+
+    //Trisha
+    //2bex, 3bex, 4bex, 5bin 
+    
+    for( int i = 2; i <=4; i++ ){
+      ConstDataVector<xAOD::JetContainer> * SelectedBJets_TRF_in = new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
+      ConstDataVector<xAOD::JetContainer> * SelectedBJets_TRF_ex = new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
+      int jind = 0;
+
+      for(const auto jet : *InputJets_TRF){
+	bool isB_ex = false;
+	bool isB_in = false;
+	if(i == 2){ 
+	  isB_ex = m_jets_isb_85_TRF_2excl.at(jind); 
+	  isB_in = m_jets_isb_85_TRF_2incl.at(jind); 
+	}
+	else if(i == 3){
+	  isB_ex = m_jets_isb_85_TRF_3excl.at(jind); 
+	  isB_in = m_jets_isb_85_TRF_3incl.at(jind); 
+	}
+	else if(i == 4){
+	  isB_in = m_jets_isb_85_TRF_4incl.at(jind); 
+	}
+	if(isB_in){ SelectedBJets_TRF_in->push_back(jet);}
+	if(isB_ex){ SelectedBJets_TRF_ex->push_back(jet);}
+	jind++;
+      }//jet loop
+      //std::cout<<"i = "<<i<<" SelectedBJets_TRF_in.size() = "<<SelectedBJets_TRF_in->size()
+      //<<" SelectedBJets_TRF_ex.size() = "<<SelectedBJets_TRF_ex->size()<<" InputJets_TRF.size() = "<<InputJets_TRF->size()<<std::endl;
+      processEventPerBMultiplicity(SelectedBJets_TRF_in, SelectedJets, TruthMET_NonInt, true, true, i);
+      if(i < 4){ processEventPerBMultiplicity(SelectedBJets_TRF_ex, SelectedJets, TruthMET_NonInt, true, false, i); }
+      
+      delete SelectedBJets_TRF_in;
+      delete SelectedBJets_TRF_ex;
+      
+    }//b-multiplicity
+    
+  } //if TRF-tagging
+
+  processEventPerBMultiplicity(SelectedBJets, SelectedJets, TruthMET_NonInt); 
+
+  /*
+  delete InputJets_TRF;
+  delete SelectedJets;
+  delete SelectedBJets;
+  delete SelectedRCJets;
+  delete SelectedTopJets;
+
+  delete SignalElectrons;
+  delete SignalMuons;
+  delete BaselineElectrons;
+  delete BaselineMuons;
+  */
   return EL::StatusCode::SUCCESS;
 }
 
@@ -2874,4 +3229,87 @@ EL::StatusCode TruthAnalysis :: cutflow (TH1F*& hist,
   if(v_NTopJets>=1) hist->Fill("VLooseTop",1.0);
   
   return EL::StatusCode::SUCCESS;
+}
+
+//Float_t TruthAnalysis :: compute_TRF(ConstDataVector<xAOD::JetContainer> * SelectedBJets_TRF){
+Float_t TruthAnalysis :: compute_TRF(){
+
+  // chiara: clear TRF verctors Trisha : output vectors
+  m_TRFweight_in.clear();
+  m_TRFweight_ex.clear();
+  m_TRFPerm_in.clear();
+  m_TRFPerm_ex.clear();
+  m_jets_isb_85_TRF_2excl.clear();
+  m_jets_isb_85_TRF_2incl.clear();
+  m_jets_isb_85_TRF_3excl.clear();
+  m_jets_isb_85_TRF_3incl.clear();
+  m_jets_isb_85_TRF_4incl.clear();
+
+  for(int i = 0; i < m_sel_jets_truthLabel.size(); i++){
+    m_jets_isb_85_TRF_2excl.push_back(0);
+    m_jets_isb_85_TRF_2incl.push_back(0);
+    m_jets_isb_85_TRF_3excl.push_back(0);
+    m_jets_isb_85_TRF_3incl.push_back(0);
+    m_jets_isb_85_TRF_4incl.push_back(0);
+  }
+
+  /*
+  for(const auto jet : *SelectedBJets_TRF){
+    // chiara: typically pt needs to be in MeV, for this firs iteration is in GeV because I used GeV for CDI file. 
+    // In this case, GeV or MeV does not change anythig as there is only one val in the map
+    m_sel_jets_pt.push_back(jet->pt() / MEV); 
+    m_sel_jets_eta.push_back(jet->eta());
+    m_sel_jets_phi.push_back(jet->phi());
+    sel_jets_btag_weight.push_back(0); // chiara: not really needed for out scopes, but needed for the code to compile :)
+    bool HasB = (GhostBHadrons(*jet) >= 1);
+    bool HasC = (GhostCHadrons(*jet) >= 1);
+    bool HasTau = (GhostTaus(*jet) >= 1);
+    if(HasB) m_sel_jets_truthLabel.push_back(5);
+    else 
+      if(HasC) m_sel_jets_truthLabel.push_back(4);
+      else 
+	if(HasTau) m_sel_jets_truthLabel.push_back(15);
+	else
+	  m_sel_jets_truthLabel.push_back(0);
+
+    m_jets_isb_85_TRF_2excl.push_back(0);
+    m_jets_isb_85_TRF_2incl.push_back(0);
+    m_jets_isb_85_TRF_3excl.push_back(0);
+    m_jets_isb_85_TRF_3incl.push_back(0);
+    m_jets_isb_85_TRF_4incl.push_back(0);
+  }
+  */
+
+  if(m_sel_jets_truthLabel.size()>0){
+    m_TRF->setSeed(m_sel_jets_pt.at(0) + m_sel_jets_pt.size());
+    m_TRF->setJets(m_sel_jets_pt, m_sel_jets_eta, m_sel_jets_truthLabel, m_sel_jets_btag_weight);
+    m_TRF->getTRFweights("CumDef",4,m_TRFweight_ex,m_TRFweight_in);
+
+    m_TRF->chooseTagPermutation("CumDef",4,m_TRFPerm_ex,m_TRFPerm_in);
+
+    for(size_t i=0; i<m_sel_jets_pt.size(); i++){
+      if(m_TRFPerm_ex.at(2).size()>0)   if(m_TRFPerm_ex.at(2).at(i)) m_jets_isb_85_TRF_2excl.at(i)=1;
+      if(m_TRFPerm_in.at(2).size()>0)   if(m_TRFPerm_in.at(2).at(i)) m_jets_isb_85_TRF_2incl.at(i)=1;
+      if(m_TRFPerm_ex.at(3).size()>0)   if(m_TRFPerm_ex.at(3).at(i)) m_jets_isb_85_TRF_3excl.at(i)=1;
+      if(m_TRFPerm_in.at(3).size()>0)   if(m_TRFPerm_in.at(3).at(i)) m_jets_isb_85_TRF_3incl.at(i)=1;
+      if(m_TRFPerm_in.at(4).size()>0)   if(m_TRFPerm_in.at(4).at(i)) m_jets_isb_85_TRF_4incl.at(i)=1;
+    }
+
+
+    m_TRFweight_2excl = m_TRFweight_ex.at(2);
+    m_TRFweight_2incl = m_TRFweight_in.at(2);
+    m_TRFweight_3excl = m_TRFweight_ex.at(3);
+    m_TRFweight_3incl = m_TRFweight_in.at(3);
+    m_TRFweight_4incl = m_TRFweight_in.at(4);
+  }
+  else{
+    m_TRFweight_2excl = 0;
+    m_TRFweight_2incl = 0;
+    m_TRFweight_3excl = 0;
+    m_TRFweight_3incl = 0;
+    m_TRFweight_4incl = 0;
+  }
+
+  return m_TRFweight_2excl;
+
 }
