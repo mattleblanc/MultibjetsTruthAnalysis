@@ -700,7 +700,7 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
   isVRGtt1LIII24b = 0;
   isVRGtt1LIII44b = 0;
 
-  bool doMCNLO=true;
+  bool doMCNLO=false;
 
   bool pass2bexcl = (NBJets == 2) && (!isTRF || ( isTRF &&  (nbjets_TRF == 2) && !isTRF_incl) );
   bool pass2bincl = (NBJets >= 2) && (!isTRF || ( isTRF &&  (nbjets_TRF == 2) && isTRF_incl) );
@@ -709,21 +709,20 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
   bool pass4bincl = (NBJets >= 4) && (!isTRF || ( isTRF &&  (nbjets_TRF == 4) && isTRF_incl) );
 
   if(!doMCNLO)
-{
-  // Gtt 1 lepton region
-  //configMgr.cutsDict["Presel_Gtt_1l"] = "(signal_electrons_n + signal_muons_n)>=1 && jets_n>=6 && bjets_n>=3 && met>200 && meff_incl<1000."
-  
-  if(NSignalLeptons >= 1
-     && NJets >= 4
-     && pass3bincl
-     && var_Met > 200.0) // Gtt 1L preselection
     {
-      isPreselect_Gtt_1l = true;
-      if(debug) std::cout << "DEBUG::PRESEL\tisGtt1L" << std::endl;
-    }
-  else isPreselect_Gtt_1l = false;
-
-
+      // Gtt 1 lepton region
+      //configMgr.cutsDict["Presel_Gtt_1l"] = "(signal_electrons_n + signal_muons_n)>=1 && jets_n>=6 && bjets_n>=3 && met>200 && meff_incl<1000."
+  
+      if(NSignalLeptons >= 1
+	 && NJets >= 4
+	 && pass3bincl
+	 && var_Met > 200.0) // Gtt 1L preselection
+	{
+	  isPreselect_Gtt_1l = true;
+	  if(debug) std::cout << "DEBUG::PRESEL\tisGtt1L" << std::endl;
+	}
+      else isPreselect_Gtt_1l = false;
+      
   // Gbb preselection and Gtt 0 lepton preselection regions
   //configMgr.cutsDict["Presel_Gbb"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && jets_n>=4 && bjets_n>=3 && met>200 && meff_4j < 1000."
   if(NBaseLeptons == 0
@@ -736,7 +735,7 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
       if(debug) std::cout << "DEBUG::PRESEL\tisGbb" << std::endl;
     }
   else isPreselect_Gbb = false;
-  
+
   //configMgr.cutsDict["Presel_Gtt_0l"] = "(signal_electrons_n + signal_muons_n)==0 && jets_n>=6 && bjets_n>=3 && met>200 && meff_incl<1000."
   if(NSignalLeptons == 0
      && NJets >= 4
@@ -795,7 +794,7 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
       if(debug) std::cout << "DEBUG::SR\tisGbbSRA2" << std::endl;
     }
   else isGbbSRA2=false;
-  
+
   //configMgr.cutsDict["SR_Gbb_B_2"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>400 && meff_4j>1200"
   if(NBaseLeptons == 0
      && pass3bincl
@@ -810,7 +809,7 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
       if(debug) std::cout << "DEBUG::SR\tisGbbSRB2" << std::endl;
     }
   else isGbbSRB2=false;
-  
+
   //configMgr.cutsDict["SR_Gbb_C_2"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>30 && pt_bjet_3>30 && met>500 && meff_4j>1400"
   if(NBaseLeptons == 0
      && pass3bincl
@@ -840,9 +839,10 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
       if(debug) std::cout << "DEBUG::SR\tisGbbSRA4" << std::endl;
     }
   else isGbbSRA4=false;
-  
+
   //configMgr.cutsDict["SR_Gbb_B_4"] = "(baseline_electrons_n + baseline_muons_n)==0 && dphi_min>0.4 && pt_jet_4>90 && pt_bjet_3>90 && met>450 && meff_4j>1400"
   if(NBaseLeptons == 0
+     && pass3bincl
      && var_dPhiMin > 0.4
      && SelectedJets->size() >= 4
      && SelectedJets->at(3)->pt()/MEV > 90.0
@@ -854,7 +854,6 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
       if(debug) std::cout << "DEBUG::SR\tisGbbSRB4" << std::endl;
     }
   else isGbbSRB4=false;
-
 
   // Gtt 1L SR flags
   // And here, the various one-lepton signal regions ...
@@ -2807,6 +2806,165 @@ EL::StatusCode TruthAnalysis :: execute ()
   // events, e.g. read input variables, apply cuts, and fill
   // histograms and trees.  This is where most of your actual analysis
   // code will go.
+
+  m_all_events = 1;
+  mc_channel=-1;
+  mc_weight=0.0;
+  isPreselect_Gbb=false;
+  isPreselect_Gtt_1l=false;
+  isPreselect_Gtt_0l=false;
+  isPreselect=false;
+  isGbbSRA1=false;
+  isGbbSRB1=false;
+  isGbbSRA2=false;
+  isGbbSRB2=false;
+  isGbbSRC2=false;
+  isGbbSRA4=false;
+  isGbbSRB4=false;
+  isGtt1LSRA2=false;
+  isGtt1LSRB2=false;
+  isGtt1LSRC2=false;
+  isGtt1LSRA4=false;
+  isGtt1LSRB4=false;
+  isGtt1LSRC4=false;
+  isGtt0LSRA=false;
+  isGtt0LSRB=false;
+  isGtt0LSRC=false;
+  isGtt0LSRD=false;
+  isGbbCRA2 = 0;
+  isGbbCRB2 = 0;
+  isGbbCRC2 = 0;
+  isGbbCRA4 = 0;
+  isGbbCRB4 = 0;
+  isGtt1LCRA2 = 0;
+  isGtt1LCRB2 = 0;
+  isGtt1LCRC2 = 0;
+  isGtt1LCRA4 = 0;
+  isGtt1LCRB4 = 0;
+  isGtt1LCRC4 = 0;
+  isGtt0LCRA = 0;
+  isGtt0LCRB = 0;
+  isGtt0LCRC = 0;
+  isGtt0LCRD = 0;
+
+  isGbbVRI2 = 0;
+  isGbbVRII2 = 0;
+  isGbbVRIII2 = 0;
+  isGbbVRI4 = 0;
+  isGbbVRII4 = 0;
+  isVR1LGtt0LI = 0;
+  isVR1LGtt0LII = 0;
+  isVR1LGtt0LIII = 0;
+  isVR1LGtt0LIV = 0;
+  isVR0LGtt0LI = 0;
+  isVR0LGtt0LII = 0;
+  isVR0LGtt0LIII = 0;
+  isVR0LGtt0LIV = 0;
+  isVRGtt1LI2mT2b = 0;
+  isVRGtt1LII2mT2b = 0;
+  isVRGtt1LI4mT2b = 0;
+  isVRGtt1LII4mT2b = 0;
+  isVRGtt1LI2mT3b = 0;
+  isVRGtt1LII2mT3b = 0;
+  isVRGtt1LI4mT3b = 0; 
+  isVRGtt1LII4mT3b = 0;
+  isVRGtt1LI2mTb2b = 0;
+  isVRGtt1LII2mTb2b = 0;
+  isVRGtt1LI4mTb2b = 0;
+  isVRGtt1LII4mTb2b = 0;
+  isVRGtt1LI2mTb3b = 0;
+  isVRGtt1LII2mTb3b = 0;
+  isVRGtt1LI4mTb3b = 0;
+  isVRGtt1LII4mTb3b = 0;
+  isVRGtt1LI2mT4b = 0;
+  isVRGtt1LII2mT4b = 0;
+  isVRGtt1LIII22b = 0;
+  isVRGtt1LIII42b = 0;
+  isVRGtt1LIII23b = 0;
+  isVRGtt1LIII43b = 0;
+  isVRGtt1LIII24b = 0;
+  isVRGtt1LIII44b = 0;
+
+  var_dPhiMin = 0;
+  var_Meff = 0;
+  var_Meff_4j = 0;
+  var_mT = 0;
+  var_mTb = 0;
+  var_HT = 0;
+  var_Met = 0;
+  var_MetSig = 0;
+
+  var_rcjet_pt_1 = 0;
+  var_rcjet_pt_2 = 0;
+  var_rcjet_pt_3 = 0;
+  var_rcjet_pt_4 = 0;
+  var_rcjet_eta_1 = 0;
+  var_rcjet_eta_2 = 0;
+  var_rcjet_eta_3 = 0;
+  var_rcjet_eta_4 = 0;
+  var_rcjet_phi_1 = 0;
+  var_rcjet_phi_2 = 0;
+  var_rcjet_phi_3 = 0;
+  var_rcjet_phi_4 = 0;
+  var_rcjet_mass_1 = 0;
+  var_rcjet_mass_2 = 0;
+  var_rcjet_mass_3 = 0;
+  var_rcjet_mass_4 = 0;
+
+  var_bjet_pt_1 = 0;
+  var_bjet_pt_2 = 0;
+  var_bjet_pt_3 = 0;
+  var_bjet_pt_4 = 0;
+  var_bjet_eta_1 = 0;
+  var_bjet_eta_2 = 0;
+  var_bjet_eta_3 = 0;
+  var_bjet_eta_4 = 0;
+  var_bjet_phi_1 = 0;
+  var_bjet_phi_2 = 0;
+  var_bjet_phi_3 = 0;
+  var_bjet_phi_4 = 0;
+  var_bjet_e_1 = 0;
+  var_bjet_e_2 = 0;
+  var_bjet_e_3 = 0;
+  var_bjet_e_4 = 0;
+
+  var_jet_pt_1 = 0;
+  var_jet_pt_2 = 0;
+  var_jet_pt_3 = 0;
+  var_jet_pt_4 = 0;
+  var_jet_eta_1 = 0;
+  var_jet_eta_2 = 0;
+  var_jet_eta_3 = 0;
+  var_jet_eta_4 = 0;
+  var_jet_phi_1 = 0;
+  var_jet_phi_2 = 0;
+  var_jet_phi_3 = 0;
+  var_jet_phi_4 = 0;
+  var_jet_e_1 = 0;
+  var_jet_e_2 = 0;
+  var_jet_e_3 = 0;
+  var_jet_e_4 = 0;
+
+  var_mu_pt = 0;
+  var_mu_eta = 0;
+  var_mu_phi = 0;
+  var_mu_e = 0;
+
+  var_el_pt = 0;
+  var_el_eta = 0;
+  var_el_phi = 0;
+  var_el_e = 0;
+
+  NSignalElectrons = 0;
+  NSignalMuons = 0;
+  NBaseElectrons = 0;
+  NBaseMuons = 0;
+  NJets = 0;
+  NBJets = 0;
+  NTopJets = 0;
+
+  NSignalLeptons = 0;
+  NBaseLeptons = 0;
 
   static int count = 0;
   if(count==0) std::cout << "TruthAnalysis::execute() BEGIN" << std::endl;
