@@ -13,6 +13,15 @@
 // reclustering forward declaration
 class JetReclusteringTool;
 
+// chiara
+class TRFinterface;
+
+//Trisha
+class TRandom3;
+// chiara: including the TRF package   
+// #include "BtaggingTRFandRW/TRFinterface.h"
+#include <vector>
+
 namespace xAOD{ 
   class TEvent;
 }
@@ -24,8 +33,6 @@ class TruthAnalysis : public EL::Algorithm
 public:
   // float cutValue;
 
-
-
   // variables that don't get filled at submission time should be
   // protected from being send from the submission node to the worker
   // node (done by the //!)
@@ -33,6 +40,7 @@ public:
   // Tree *myTree; //!
   // TH1 *myHist; //!
 
+  TRandom3* m_myRand;
   xAOD::TEvent*  m_event; //!
 
   // this is a standard constructor
@@ -73,6 +81,21 @@ public:
 
  private:
   JetReclusteringTool* m_reclusteringTool = nullptr; //!
+
+  //Trisha:
+  void processEventPerBMultiplicity(ConstDataVector<xAOD::JetContainer> * SelectedBJets
+				    , ConstDataVector<xAOD::JetContainer> * SelectedJets
+				    , xAOD::MissingET* TruthMET_NonInt
+				    , bool isTRF=false, bool isTRF_incl=false, int nbjets_TRF=0);
+  bool m_probTag;
+
+  // chiara: function to compute TRF
+  //Float compute_TRF(ConstDataVector<xAOD::JetContainer> * SelectedBJets_TRF);
+  Float_t compute_TRF();
+  // chiara: TRF interface
+#ifndef __CINT__
+  TRFinterface * m_TRF; //!
+#endif
 
   TTree* out_tree; // !
   TH1F* out_cutflow; //!
@@ -174,6 +197,8 @@ public:
   float var_mTb;
   float var_HT;
   float var_Met;
+  float var_Met_x;
+  float var_Met_y;
   float var_MetSig;
 
   float var_mu_pt;
@@ -241,11 +266,59 @@ public:
   int NBaseElectrons;
   int NBaseMuons;
   int NJets;
-  int NBJets;
+  int NBJets; //Number of b-jets in direct-tagging or in permutation of TRF
+  int NBJets_TRF; //Number of bjet multiplicity in this event of TRF (i.e. 2 for 2bin, even if permutation contains 3 bjets) 
   int NTopJets;
 
   int NSignalLeptons;
   int NBaseLeptons;
+
+  bool m_isTRF;
+  bool m_isTRF_incl;
+  double m_TRF_wgt;
+
+  // chiara: variables to calculate the TRF weight for TRF weights
+  std::vector<double>  m_TRFweight_in; //! 
+  std::vector<double>  m_TRFweight_ex; //!
+  std::vector<std::vector<bool> > m_TRFPerm_in; //! 
+  std::vector<std::vector<bool> > m_TRFPerm_ex; //! 
+
+  // chiara: variables to be stored in the tree
+  //Trisha - slight modification so these are copied 
+  //to final output variables for direct tagging events only
+  std::vector<int> m_jets_isb_85_TRF_2excl; //!
+  std::vector<int> m_jets_isb_85_TRF_2incl; //!
+  std::vector<int> m_jets_isb_85_TRF_3excl; //!
+  std::vector<int> m_jets_isb_85_TRF_3incl; //!
+  std::vector<int> m_jets_isb_85_TRF_4incl; //!
+  Double_t m_TRFweight_2excl; //!              
+  Double_t m_TRFweight_2incl; //! 
+  Double_t m_TRFweight_3excl; //! 
+  Double_t m_TRFweight_3incl; //! 
+  Double_t m_TRFweight_4incl; //! 
+  // vectros to be used for TRF
+  std::vector<double> m_sel_jets_pt;  //!  
+  std::vector<double> m_sel_jets_eta; //!  
+  std::vector<double> m_sel_jets_phi; //!  
+  std::vector<int> m_sel_jets_truthLabel; //!  
+  std::vector<double> m_sel_jets_btag_weight; //!  
+  std::vector<int> m_sel_jets_index; //!  
+
+
+  // Trisha: Final variables to be stored in the tree
+  std::vector<int> m_out_jets_isb_85_TRF_2excl; //!
+  std::vector<int> m_out_jets_isb_85_TRF_2incl; //!
+  std::vector<int> m_out_jets_isb_85_TRF_3excl; //!
+  std::vector<int> m_out_jets_isb_85_TRF_3incl; //!
+  std::vector<int> m_out_jets_isb_85_TRF_4incl; //!
+
+  // vectros to be used for TRF
+  std::vector<double> m_out_sel_jets_pt;  //!  
+  std::vector<double> m_out_sel_jets_eta; //!  
+  std::vector<double> m_out_sel_jets_phi; //!  
+
+
+
 };
 
 #endif

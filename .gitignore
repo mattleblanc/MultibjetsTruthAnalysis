@@ -30,7 +30,7 @@
 # Misc.
 *~
 gh.sh
-Root/TruthAnalysis.cxx.nominal.*
+Root/TruthAnalysis.cxx.*
 
 # Output
 testOut/
