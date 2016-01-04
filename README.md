@@ -13,7 +13,7 @@ Reminder: optimise for discovery.
 
 # How-To
 
-First, make sure you're able to run. Check out the packages you'll need, and set up your environment. `MultibjetsTruthAnalysis` is dependent on @kratsg's `xAODJetReclustering` package, in order to make the reclustered large-R jets which are used for top-tagging.
+First, make sure you're able to run. Check out the packages you'll need, and set up your environment. `MultibjetsTruthAnalysis` is dependent on @kratsg's `xAODJetReclustering` package, in order to make the reclustered large-R jets which are used for top-tagging. You'll also need to set up the `BtaggingTRFandRW` package, which is included as a tarball in the `data/` directory of this one -- a setup script for that is included, just run it as shown below.
 
 ```
 setupATLAS
@@ -22,8 +22,8 @@ mkdir myWorkDir && cd $_
 rcSetup Base,2.3.31
 git clone git@github.com:mattleblanc/MultibjetsTruthAnalysis.git
 git clone https://github.com/kratsg/xAODJetReclustering
+./MultibjetsTruthAnalysis/scripts/setup-BtaggingTRFandRW.sh
 ```
-
 Be sure to set up FAX before RootCore. Be sure to initialise your proxy before trying to run: 
 
 ```
