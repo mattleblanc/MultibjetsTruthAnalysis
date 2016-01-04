@@ -15,7 +15,11 @@
 // Run as > root -l -b -q postTruth.C
 
 #include <iostream>
+#include "TFile.h"
+#include "TTree.h"
 #include "TH1.h"
+#include "TH2.h"
+#include "TRandom.h"
 
 void theTruth(void);
 
@@ -25,7 +29,8 @@ void postTruth(void)
 
 	theTruth();
 
-	TString inDir = "/Users/mleblanc/susyGtt/20151101_truth/trfOut/";
+	//TString inDir = "/Users/mleblanc/susyGtt/20151101_truth/trfOut/";
+	TString inDir = "";
 	TString inDir2 = "/fetch/data-outTree/";
 
 	//TFile* f_410000; f_410000 = new TFile(inDir+"410000"+inDir2+"410000.merge.root");
@@ -38,7 +43,7 @@ void postTruth(void)
 	TFile* f_407032; f_407032 = new TFile(inDir+"407032"+inDir2+"407032.merge.root");
 	TFile* f_407036; f_407036 = new TFile(inDir+"407036"+inDir2+"407036.merge.root");
 	TFile* f_407040; f_407040 = new TFile(inDir+"407040"+inDir2+"407040.merge.root");
-	TFile* f_407044; f_407044 = new TFile(inDir+"407044"+inDir2+"407044.merge.root");
+	//TFile* f_407044; f_407044 = new TFile(inDir+"407044"+inDir2+"407044.merge.root");
 
 	// TTree* t_410000; t_410000 = (TTree*)f_410000->Get("out_tree");
 	// TTree* t_410001; t_410001 = (TTree*)f_410001->Get("out_tree");
@@ -50,7 +55,7 @@ void postTruth(void)
 	TTree* t_407032; t_407032 = (TTree*)f_407032->Get("out_tree");
 	TTree* t_407036; t_407036 = (TTree*)f_407036->Get("out_tree");
 	TTree* t_407040; t_407040 = (TTree*)f_407040->Get("out_tree");
-	TTree* t_407044; t_407044 = (TTree*)f_407044->Get("out_tree");
+	//TTree* t_407044; t_407044 = (TTree*)f_407044->Get("out_tree");
 
 	std::vector<pair<TTree*, Int_t>> v_trees;
 	//// v_trees.push_back(std::make_pair(t_410000,410000));
@@ -63,7 +68,7 @@ void postTruth(void)
 	v_trees.push_back(std::make_pair(t_407032,407032));
 	v_trees.push_back(std::make_pair(t_407036,407036));
 	v_trees.push_back(std::make_pair(t_407040,407040));
-	v_trees.push_back(std::make_pair(t_407044,407044));
+	//v_trees.push_back(std::make_pair(t_407044,407044));
 
 	TH2D* h_yields; h_yields = new TH2D("yields","yields",7,1,8,72,1,73); // x=DSID, y=SR
 	TH2D* h_yields_trf; h_yields_trf = new TH2D("yields_trf","yields_trf",7,1,8,72,1,73); // x=DSID, y=SR
@@ -108,9 +113,8 @@ void postTruth(void)
 		if(reg=="407032") weight /= 2.95191;
         if(reg=="407036") weight /= 2.43458;
         if(reg=="407040") weight /= 3.7725e+06; 
-        if(reg=="407044") weight /= 2.85515e+09;
+        //if(reg=="407044") weight /= 2.85515e+09;
 
-        // reweight MCNLO to nominal
 		weight*=1.e3; // pb to fb
 		weight*=3.3; // 2015 lumi
 
@@ -508,51 +512,51 @@ void postTruth(void)
 				if(isGtt1LSRC2) h_yields_trf->Fill(reg, "Gtt1LSRC2", weight_temp);
 				if(isGtt1LSRA4) h_yields_trf->Fill(reg, "Gtt1LSRA4", weight_temp);
 				if(isGtt1LSRB4) h_yields_trf->Fill(reg, "Gtt1LSRB4", weight_temp);
-				//if(isGtt1LSRC4) h_yields_trf->Fill(reg, "Gtt1LSRC4", weight_temp);
-		      	if(reg=="407012" || reg=="407032" || reg=="407036" || reg=="407040" || reg=="407044")
-		      	{
-					if((isTRF > 0 && NBJets >= 4 && NBJets_TRF == 4 && isTRF_incl > 0) && (NJets >= 6 && NTopJets >= 0 && var_Met > 250. && var_Meff > 700. && var_mT > 150. && NSignalLeptons >= 1))
-					{
-						h_yields_trf->Fill(reg, "Gtt1LSRC4", weight_temp);
-					}
-				}
-				else
-				{
-					if((isTRF > 0 && NBJets >= 4 && NBJets_TRF == 4 && isTRF_incl > 0) && (NJets >= 6 && NTopJets >= 0 && var_Met > 0.0 && var_Meff > 450.0 && var_mT > 150. && NSignalLeptons >= 1))
-					{
-						h_yields_trf->Fill(reg, "Gtt1LSRC4", weight_temp);
-					}
-				}
-				//if(isGtt0LSRA) h_yields_trf->Fill(reg, "Gtt0LSRA", weight_temp);
-		      	if(reg=="407012" || reg=="407032" || reg=="407036" || reg=="407040" || reg=="407044")
-		      	{
-					if((isTRF > 0 && NBJets >= 4 && NBJets_TRF == 4 && isTRF_incl > 0) && (var_mTb > 80 && NJets >= 8 && NTopJets >= 0 && var_Met > 350. && var_Meff > 1250. && NSignalLeptons == 0))
-					{
-						h_yields_trf->Fill(reg, "Gtt0LSRA", weight_temp);
-					}
-				}
-				else
-				{
-					if((isTRF > 0 && NBJets >= 4 && NBJets_TRF == 4 && isTRF_incl > 0) && (var_mTb > 80 && NJets >= 8 && NTopJets >= 0 && var_Met > 0.0 && var_Meff > 900.0 && NSignalLeptons == 0))
-					{
-						h_yields_trf->Fill(reg, "Gtt0LSRA", weight_temp);
-					}
-				}
-				//if(isGtt0LSRB) h_yields_trf->Fill(reg, "Gtt0LSRB", weight_temp);
-				if(reg=="407012" || reg=="407032" || reg=="407036" || reg=="407040" || reg=="407044")
-		      	{
-					if((isTRF > 0 && NBJets >= 4 && NBJets_TRF == 4 && isTRF_incl > 0) && (var_mTb > 80 && NJets >= 8 && NTopJets >= 1 && var_Met > 350.0 && var_Meff > 1250.0 && NSignalLeptons == 0)) 
-					{
-						h_yields_trf->Fill(reg, "Gtt0LSRB", weight_temp);
-					}
-				}
-				else
-				{
-					if((isTRF > 0 && NBJets >= 4 && NBJets_TRF == 4 && isTRF_incl > 0) && (var_mTb > 80 && NJets >= 8 && NTopJets >= 1 && var_Met > 0.0 && var_Meff > 900.0 && NSignalLeptons == 0)) 
-					{
-						h_yields_trf->Fill(reg, "Gtt0LSRB", weight_temp);
-					}
-				}
+				if(isGtt1LSRC4) h_yields_trf->Fill(reg, "Gtt1LSRC4", weight_temp);
+		  //     	if(reg=="407012" || reg=="407032" || reg=="407036" || reg=="407040" || reg=="407044")
+		  //     	{
+				// 	if((isTRF > 0 && NBJets >= 4 && NBJets_TRF == 4 && isTRF_incl > 0) && (NJets >= 6 && NTopJets >= 0 && var_Met > 250. && var_Meff > 700. && var_mT > 150. && NSignalLeptons >= 1))
+				// 	{
+				// 		h_yields_trf->Fill(reg, "Gtt1LSRC4", weight_temp);
+				// 	}
+				// }
+				// else
+				// {
+				// 	if((isTRF > 0 && NBJets >= 4 && NBJets_TRF == 4 && isTRF_incl > 0) && (NJets >= 6 && NTopJets >= 0 && var_Met > 0.0 && var_Meff > 450.0 && var_mT > 150. && NSignalLeptons >= 1))
+				// 	{
+				// 		h_yields_trf->Fill(reg, "Gtt1LSRC4", weight_temp);
+				// 	}
+				// }
+				if(isGtt0LSRA) h_yields_trf->Fill(reg, "Gtt0LSRA", weight_temp);
+		  //     	if(reg=="407012" || reg=="407032" || reg=="407036" || reg=="407040" || reg=="407044")
+		  //     	{
+				// 	if((isTRF > 0 && NBJets >= 4 && NBJets_TRF == 4 && isTRF_incl > 0) && (var_mTb > 80 && NJets >= 8 && NTopJets >= 0 && var_Met > 350. && var_Meff > 1250. && NSignalLeptons == 0))
+				// 	{
+				// 		h_yields_trf->Fill(reg, "Gtt0LSRA", weight_temp);
+				// 	}
+				// }
+				// else
+				// {
+				// 	if((isTRF > 0 && NBJets >= 4 && NBJets_TRF == 4 && isTRF_incl > 0) && (var_mTb > 80 && NJets >= 8 && NTopJets >= 0 && var_Met > 0.0 && var_Meff > 900.0 && NSignalLeptons == 0))
+				// 	{
+				// 		h_yields_trf->Fill(reg, "Gtt0LSRA", weight_temp);
+				// 	}
+				// }
+				if(isGtt0LSRB) h_yields_trf->Fill(reg, "Gtt0LSRB", weight_temp);
+				// if(reg=="407012" || reg=="407032" || reg=="407036" || reg=="407040" || reg=="407044")
+		  //     	{
+				// 	if((isTRF > 0 && NBJets >= 4 && NBJets_TRF == 4 && isTRF_incl > 0) && (var_mTb > 80 && NJets >= 8 && NTopJets >= 1 && var_Met > 350.0 && var_Meff > 1250.0 && NSignalLeptons == 0)) 
+				// 	{
+				// 		h_yields_trf->Fill(reg, "Gtt0LSRB", weight_temp);
+				// 	}
+				// }
+				// else
+				// {
+				// 	if((isTRF > 0 && NBJets >= 4 && NBJets_TRF == 4 && isTRF_incl > 0) && (var_mTb > 80 && NJets >= 8 && NTopJets >= 1 && var_Met > 0.0 && var_Meff > 900.0 && NSignalLeptons == 0)) 
+				// 	{
+				// 		h_yields_trf->Fill(reg, "Gtt0LSRB", weight_temp);
+				// 	}
+				// }
 				if(isGtt0LSRC) h_yields_trf->Fill(reg, "Gtt0LSRC", weight_temp);
 				if(isGtt0LSRD) h_yields_trf->Fill(reg, "Gtt0LSRD", weight_temp);
 

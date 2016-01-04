@@ -16,6 +16,19 @@
 // ... yes, this could probably be done in a more clever way, but I am not always a clever man, and I am extraordinarily picky
 // about how my plots look ... so the fine-grained control over each one that this provides is nice, for me.
 
+#include <iostream>
+#include <sstream> 
+#include "TFile.h"
+#include "TTree.h"
+#include "TH1.h"
+#include "TCanvas.h"
+#include "TStyle.h"
+#include "TColor.h"
+#include "TLine.h"
+#include "TLatex.h"
+#include "TLegend.h"
+#include "TRandom.h"
+
 void stampATLAS(const std::string &text, float x, float y);
 void stampATLAS_ratio(const std::string &text, float x, float y);
 void stampLumiText(float lumi, float x, float y, const std::string &text, float size);
@@ -32,6 +45,7 @@ void truthPlot(std::vector<pair<TTree*, Int_t>> treevec,
 			   float xmax, 
 			   float ymin,
 			   float ymax,
+			   int rebin,
 			   const std::string atlasLabel,
 			   const std::string extraText,
 			   TString reg,
@@ -42,10 +56,9 @@ void plotTruth(TString reg)
 	std::cout << "plotTruth.C\tWe can handle this." << std::endl;
 	std::cout << "Making plots for region:\t" << reg << std::endl;
 
-	TString inDir = "/Users/mleblanc/susyGtt/20151101_truth/trfOut/";
+	//TString inDir = "/Users/mleblanc/susyGtt/20151101_truth/trfOut/";
 	//TString inDir = "/Users/mleblanc/susyGtt/20151101_truth/testOut/";
 	TString inDir2 = "/fetch/data-outTree/";
-
 
 	//TFile* f_410000; f_410000 = new TFile(inDir+"410000"+inDir2+"410000.merge.root");
 	// TFile* f_410001; f_410001 = new TFile(inDir+"410001"+inDir2+"410001.merge.root");
@@ -182,20 +195,20 @@ void plotTruth(TString reg)
 		// TH1F* tempHistM1; tempHistM1 = new TH1F(dsid,dsid,300,0,300);
 		// TH1F* tempHistM2; tempHistM2 = new TH1F(dsid,dsid,300,0,300);
 
-		TH1F* h_mu_pt; h_mu_pt = new TH1F(dsid,dsid,200,0,600); 
-  		TH1F* h_mu_eta; h_mu_eta = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_mu_phi; h_mu_phi = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_mu_e; h_mu_e = new TH1F(dsid,dsid,200,0,600);  
+		TH1F* h_mu_pt; h_mu_pt = new TH1F(dsid,dsid,40,0,400); 
+  		TH1F* h_mu_eta; h_mu_eta = new TH1F(dsid,dsid,150,-3.0,3.0); 
+  		TH1F* h_mu_phi; h_mu_phi = new TH1F(dsid,dsid,160,-3.2,3.2); 
+  		TH1F* h_mu_e; h_mu_e = new TH1F(dsid,dsid,40,0,400);  
 
-  		TH1F* h_el_pt; h_el_pt = new TH1F(dsid,dsid,200,0,600); 
-  		TH1F* h_el_eta; h_el_eta = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_el_phi; h_el_phi = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_el_e; h_el_e = new TH1F(dsid,dsid,200,0,600);  
+  		TH1F* h_el_pt; h_el_pt = new TH1F(dsid,dsid,40,0,400); 
+  		TH1F* h_el_eta; h_el_eta = new TH1F(dsid,dsid,150,-3.2,3.2); 
+  		TH1F* h_el_phi; h_el_phi = new TH1F(dsid,dsid,160,-3.2,3.2); 
+  		TH1F* h_el_e; h_el_e = new TH1F(dsid,dsid,40,0,400);  
 
-  		TH1F* h_rcjet_pt_1; h_rcjet_pt_1 = new TH1F(dsid,dsid,50,200,1200); 
-  		TH1F* h_rcjet_pt_2; h_rcjet_pt_2 = new TH1F(dsid,dsid,50,200,1200); 
-  		TH1F* h_rcjet_pt_3; h_rcjet_pt_3 = new TH1F(dsid,dsid,50,200,1200); 
-  		TH1F* h_rcjet_pt_4; h_rcjet_pt_4 = new TH1F(dsid,dsid,50,200,1200); 
+  		TH1F* h_rcjet_pt_1; h_rcjet_pt_1 = new TH1F(dsid,dsid,50,200,2200); 
+  		TH1F* h_rcjet_pt_2; h_rcjet_pt_2 = new TH1F(dsid,dsid,50,200,2200); 
+  		TH1F* h_rcjet_pt_3; h_rcjet_pt_3 = new TH1F(dsid,dsid,50,200,2200); 
+  		TH1F* h_rcjet_pt_4; h_rcjet_pt_4 = new TH1F(dsid,dsid,50,200,2200); 
   		TH1F* h_rcjet_eta_1; h_rcjet_eta_1 = new TH1F(dsid,dsid,30,-3,3);  
   		TH1F* h_rcjet_eta_2; h_rcjet_eta_2 = new TH1F(dsid,dsid,30,-3,3);  
   		TH1F* h_rcjet_eta_3; h_rcjet_eta_3 = new TH1F(dsid,dsid,30,-3,3);  
@@ -204,44 +217,44 @@ void plotTruth(TString reg)
   		TH1F* h_rcjet_phi_2; h_rcjet_phi_2 = new TH1F(dsid,dsid,32,-3.14,3.14);  
   		TH1F* h_rcjet_phi_3; h_rcjet_phi_3 = new TH1F(dsid,dsid,32,-3.14,3.14);  
   		TH1F* h_rcjet_phi_4; h_rcjet_phi_4 = new TH1F(dsid,dsid,32,-3.14,3.14);  
-  		TH1F* h_rcjet_mass_1; h_rcjet_mass_1 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_rcjet_mass_2; h_rcjet_mass_2 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_rcjet_mass_3; h_rcjet_mass_3 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_rcjet_mass_4; h_rcjet_mass_4 = new TH1F(dsid,dsid,200,0,300); 
+  		TH1F* h_rcjet_mass_1; h_rcjet_mass_1 = new TH1F(dsid,dsid,60,0,300); 
+  		TH1F* h_rcjet_mass_2; h_rcjet_mass_2 = new TH1F(dsid,dsid,60,0,300); 
+  		TH1F* h_rcjet_mass_3; h_rcjet_mass_3 = new TH1F(dsid,dsid,60,0,300); 
+  		TH1F* h_rcjet_mass_4; h_rcjet_mass_4 = new TH1F(dsid,dsid,60,0,300); 
 
-  		TH1F* h_bjet_pt_1; h_bjet_pt_1 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_bjet_pt_2; h_bjet_pt_2 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_bjet_pt_3; h_bjet_pt_3 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_bjet_pt_4; h_bjet_pt_4 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_bjet_eta_1; h_bjet_eta_1 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_bjet_eta_2; h_bjet_eta_2 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_bjet_eta_3; h_bjet_eta_3 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_bjet_eta_4; h_bjet_eta_4 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_bjet_phi_1; h_bjet_phi_1 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_bjet_phi_2; h_bjet_phi_2 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_bjet_phi_3; h_bjet_phi_3 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_bjet_phi_4; h_bjet_phi_4 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_bjet_e_1; h_bjet_e_1 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_bjet_e_2; h_bjet_e_2 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_bjet_e_3; h_bjet_e_3 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_bjet_e_4; h_bjet_e_4 = new TH1F(dsid,dsid,200,0,300); 
+  		TH1F* h_bjet_pt_1; h_bjet_pt_1 = new TH1F(dsid,dsid,150,0,3000); 
+  		TH1F* h_bjet_pt_2; h_bjet_pt_2 = new TH1F(dsid,dsid,150,0,3000); 
+  		TH1F* h_bjet_pt_3; h_bjet_pt_3 = new TH1F(dsid,dsid,150,0,3000); 
+  		TH1F* h_bjet_pt_4; h_bjet_pt_4 = new TH1F(dsid,dsid,150,0,3000); 
+  		TH1F* h_bjet_eta_1; h_bjet_eta_1 = new TH1F(dsid,dsid,30,-3.0,3.0); 
+  		TH1F* h_bjet_eta_2; h_bjet_eta_2 = new TH1F(dsid,dsid,30,-3.0,3.0); 
+  		TH1F* h_bjet_eta_3; h_bjet_eta_3 = new TH1F(dsid,dsid,30,-3.0,3.0); 
+  		TH1F* h_bjet_eta_4; h_bjet_eta_4 = new TH1F(dsid,dsid,30,-3.0,3.0); 
+  		TH1F* h_bjet_phi_1; h_bjet_phi_1 = new TH1F(dsid,dsid,32,-3.2,3.2); 
+  		TH1F* h_bjet_phi_2; h_bjet_phi_2 = new TH1F(dsid,dsid,32,-3.2,3.2); 
+  		TH1F* h_bjet_phi_3; h_bjet_phi_3 = new TH1F(dsid,dsid,32,-3.2,3.2); 
+  		TH1F* h_bjet_phi_4; h_bjet_phi_4 = new TH1F(dsid,dsid,32,-3.2,3.2); 
+  		TH1F* h_bjet_e_1; h_bjet_e_1 = new TH1F(dsid,dsid,60,0,3000); 
+  		TH1F* h_bjet_e_2; h_bjet_e_2 = new TH1F(dsid,dsid,60,0,3000); 
+  		TH1F* h_bjet_e_3; h_bjet_e_3 = new TH1F(dsid,dsid,60,0,3000); 
+  		TH1F* h_bjet_e_4; h_bjet_e_4 = new TH1F(dsid,dsid,60,0,3000); 
 
-  		TH1F* h_jet_pt_1; h_jet_pt_1 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_jet_pt_2; h_jet_pt_2 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_jet_pt_3; h_jet_pt_3 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_jet_pt_4; h_jet_pt_4 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_jet_eta_1; h_jet_eta_1 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_jet_eta_2; h_jet_eta_2 = new TH1F(dsid,dsid,200,0,300);  
-  		TH1F* h_jet_eta_3; h_jet_eta_3 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_jet_eta_4; h_jet_eta_4 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_jet_phi_1; h_jet_phi_1 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_jet_phi_2; h_jet_phi_2 = new TH1F(dsid,dsid,200,0,300);  
-  		TH1F* h_jet_phi_3; h_jet_phi_3 = new TH1F(dsid,dsid,200,0,300);  
-  		TH1F* h_jet_phi_4; h_jet_phi_4 = new TH1F(dsid,dsid,200,0,300);  
-  		TH1F* h_jet_e_1; h_jet_e_1 = new TH1F(dsid,dsid,200,0,300);  
-  		TH1F* h_jet_e_2; h_jet_e_2 = new TH1F(dsid,dsid,200,0,300);  
-  		TH1F* h_jet_e_3; h_jet_e_3 = new TH1F(dsid,dsid,200,0,300); 
-  		TH1F* h_jet_e_4; h_jet_e_4 = new TH1F(dsid,dsid,200,0,300); 
+  		TH1F* h_jet_pt_1; h_jet_pt_1 = new TH1F(dsid,dsid,150,0,3000); 
+  		TH1F* h_jet_pt_2; h_jet_pt_2 = new TH1F(dsid,dsid,150,0,3000); 
+  		TH1F* h_jet_pt_3; h_jet_pt_3 = new TH1F(dsid,dsid,150,0,3000); 
+  		TH1F* h_jet_pt_4; h_jet_pt_4 = new TH1F(dsid,dsid,150,0,3000); 
+  		TH1F* h_jet_eta_1; h_jet_eta_1 = new TH1F(dsid,dsid,30,-3.0,3.0); 
+  		TH1F* h_jet_eta_2; h_jet_eta_2 = new TH1F(dsid,dsid,30,-3.0,3.0);
+  		TH1F* h_jet_eta_3; h_jet_eta_3 = new TH1F(dsid,dsid,30,-3.0,3.0);
+  		TH1F* h_jet_eta_4; h_jet_eta_4 = new TH1F(dsid,dsid,30,-3.0,3.0);
+  		TH1F* h_jet_phi_1; h_jet_phi_1 = new TH1F(dsid,dsid,32,-3.2,3.2); 
+  		TH1F* h_jet_phi_2; h_jet_phi_2 = new TH1F(dsid,dsid,32,-3.2,3.2); 
+  		TH1F* h_jet_phi_3; h_jet_phi_3 = new TH1F(dsid,dsid,32,-3.2,3.2); 
+  		TH1F* h_jet_phi_4; h_jet_phi_4 = new TH1F(dsid,dsid,32,-3.2,3.2); 
+  		TH1F* h_jet_e_1; h_jet_e_1 = new TH1F(dsid,dsid,60,0,3000);  
+  		TH1F* h_jet_e_2; h_jet_e_2 = new TH1F(dsid,dsid,60,0,3000);  
+  		TH1F* h_jet_e_3; h_jet_e_3 = new TH1F(dsid,dsid,60,0,3000); 
+  		TH1F* h_jet_e_4; h_jet_e_4 = new TH1F(dsid,dsid,60,0,3000); 
 
   		TH1F* h_baselepton_n; h_baselepton_n = new TH1F(dsid,dsid,15,0,15);
   		TH1F* h_jet_n; h_jet_n = new TH1F(dsid,dsid,15,0,15);
@@ -406,7 +419,7 @@ void plotTruth(TString reg)
 		Int_t isGtt1LCRC4; v_trees.at(iTree).first->SetBranchAddress("isGtt1LCRC4",&isGtt1LCRC4);
 
 		Int_t isGtt0LCRA; v_trees.at(iTree).first->SetBranchAddress("isGtt0LCRA",&isGtt0LCRA);
-		Int_t isGtt0LCRB; v_trees.at(iTree).first->SetBranchAddress("isGtt0LCRB",&isGtt0LCRB);		
+		Int_t isGtt0LCRB; v_trees.at(iTree).first->SetBranchAddress("isGtt0LCRB",&isGtt0LCRB);
 		Int_t isGtt0LCRC; v_trees.at(iTree).first->SetBranchAddress("isGtt0LCRC",&isGtt0LCRC);
 		Int_t isGtt0LCRD; v_trees.at(iTree).first->SetBranchAddress("isGtt0LCRD",&isGtt0LCRD);
 
@@ -493,7 +506,7 @@ void plotTruth(TString reg)
 		{
 			v_trees.at(iTree).first->GetEntry(i);
 
-			if(i>100000) break; // MAX, REMOVE THIS FOR PLOTS
+			//if(i>200000) break; // MAX, REMOVE THIS FOR PLOTS
 
 			temp_weight = weight;
 			temp_weight *= mc_weight;
@@ -647,8 +660,8 @@ void plotTruth(TString reg)
 	string extraText; extraText = "SUSY 0L Multi-b/t Search";
 
 	TLegend* leg;
-	//leg = new TLegend(0.8,0.4,1.2,0.9); // for ratio
-	leg = new TLegend(0.6,0.2,1.0,0.7);
+	leg = new TLegend(0.8,0.4,1.2,0.9); // for ratio
+	//leg = new TLegend(0.6,0.2,1.0,0.7);
 	leg->SetFillStyle(0);
 	leg->SetBorderSize(0);
 	leg->SetTextSize(0.04);
@@ -658,9 +671,20 @@ void plotTruth(TString reg)
 	gStyle->SetOptStat(0);
 	gStyle->SetOptTitle(0);
 
-	TPad *pad_histo = 0;
-	TPad *pad_ratio = 0;
-//	c->Divide(1, 2, 0.0, 0.5);
+	// TPad *pad_histo = 0;
+	// TPad *pad_ratio = 0;
+	// c->Divide(1, 2, 0.0, 0.5);
+
+	// TPad *c_1 = ((TPad*)(c->GetPad(1)));
+	// TPad *c_2 = ((TPad*)(c->GetPad(2)));
+	// pad_histo = (TPad *) c->cd(1);
+	// pad_ratio = (TPad *) c->cd(2);
+	// pad_histo->SetPad(0.05,0.35,0.95,0.95);
+	// pad_ratio->SetPad(0.05,0.05,0.95,0.35);
+ //    c_2->SetTopMargin(0.02);
+ //    c_2->SetBottomMargin(0.02);
+ //    c_1->SetLeftMargin(0.10);
+ //    c_2->SetLeftMargin(0.10);
 
 	/*
 	for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
@@ -697,811 +721,478 @@ void plotTruth(TString reg)
 	leg->Clear();
 	c->Clear();
 */
-	truthPlot(v_trees, v_truth_met, v_colours, leg, c, true,
-			   "Missing Transverse Energy [GeV]", "Events", 
-			   0, 1000.0, 0.11, 1000000.0, // x1 x2 y1 y2
-			   "Internal", extraText,
-			   reg, "truth_met");
-	c->Clear();
 
-	truthPlot(v_trees, v_truth_Meff, v_colours, leg, c, true,
-			   "Effective Mass [GeV]", "Events", 
-			   0, 2000.0, 0.11, 1000000.0,
-			   "Internal", extraText,
-			   reg, "truth_meff");
-	c->Clear();
-
+	// LIN SCALE PLOTS
 	truthPlot(v_trees, v_jet_n, v_colours, leg, c, false,
-			 "Akt4 Jet Multiplicity", "Events", 
-			 0, 20.0, 0.11, 1000000.0,
+			 "Akt4 jet multiplicity", "Events", 
+			 0, 20.0, 0.11, 1000000.0, 1,
 			 "Internal", extraText,
 			 reg, "jet_n");
 	c->Clear();
 
 	truthPlot(v_trees, v_bjet_n, v_colours, leg, c, false,
-			 "b-tagged Akt4 Jet Multiplicity", "Events", 
-			 0, 20.0, 0.11, 1000000.0,
+			 "b-tagged akt4 jet multiplicity", "Events", 
+			 0, 20.0, 0.11, 1000000.0, 1,
 			 "Internal", extraText,
 			 reg, "bjet_n");
 	c->Clear();
 
-		truthPlot(v_trees, v_baselepton_n, v_colours, leg, c, false,
-			 "Lepton Multiplicity", "Events", 
-			 0, 20.0, 0.11, 1000000.0,
+	truthPlot(v_trees, v_rcjet_n, v_colours, leg, c, false,
+			 "RC akt10 jet multiplicity", "Events", 
+			 0, 20.0, 0.11, 1000000.0, 1,
 			 "Internal", extraText,
-			 reg, "lepton_n");
+			 reg, "rcjet_n");
 	c->Clear();
 
-	// for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
-	// {
-	// 	TString dsid;
-	// 	dsid.Form("%d", v_trees.at(iTree).second); 
-
-	// 	std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
-
-	// 	Bool_t isFirst=false; isFirst = (iTree==0);
-	// 	Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
-
-	// 	//effective mass
-	// 	v_truth_Meff_4j.at(iTree)->SetMaximum(v_truth_Meff_4j.at(iTree)->GetMaximum()*100);
-	// 	v_truth_Meff_4j.at(iTree)->GetXaxis()->SetRangeUser(0,2000);
-	// 	v_truth_Meff_4j.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
-	// 	v_truth_Meff_4j.at(iTree)->Rebin(4);
-	// 	leg->AddEntry(v_truth_Meff_4j.at(iTree),dsid,"l");
-	// 	v_truth_Meff_4j.at(iTree)->GetXaxis()->SetTitle("Effective Mass 4j [GeV]");
-	// 	v_truth_Meff_4j.at(iTree)->GetYaxis()->SetTitle("Events");
-	// 	if(isFirst) v_truth_Meff_4j.at(iTree)->Draw("hist");
-	// 	else v_truth_Meff_4j.at(iTree)->Draw("hist same");
-	// 	stampATLAS_ratio("Internal", 0.55, 0.8);
-	// 	stampText(extraText,0.55,0.725,0.035);
-	// 	leg->Draw();
-	// 	c->SetLogy();
-	// 	gPad->RedrawAxis();
-	// 	c->Update();
-	// 	if(isLast) c->SaveAs("plots/"+reg+"/truth_Meff4j.eps");
-	// }
-
-	// leg->Clear();
-	// c->Clear();
-
-	// for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
-	// {
-	// 	TString dsid;
-	// 	dsid.Form("%d", v_trees.at(iTree).second); 
-
-	// 	std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
-
-	// 	Bool_t isFirst=false; isFirst = (iTree==0);
-	// 	Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
-
-	// 	//effective mass
-	// 	v_truth_mT.at(iTree)->SetMaximum(v_truth_mT.at(iTree)->GetMaximum()*100);
-	// 	v_truth_mT.at(iTree)->GetXaxis()->SetRangeUser(0,600);
-	// 	v_truth_mT.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
-	// 	v_truth_mT.at(iTree)->Rebin(4);
-	// 	leg->AddEntry(v_truth_mT.at(iTree),dsid,"l");
-	// 	v_truth_mT.at(iTree)->GetXaxis()->SetTitle("MT [GeV]");
-	// 	v_truth_mT.at(iTree)->GetYaxis()->SetTitle("Events");
-	// 	if(isFirst) v_truth_mT.at(iTree)->Draw("hist");
-	// 	else v_truth_mT.at(iTree)->Draw("hist same");
-	// 	stampATLAS_ratio("Internal", 0.55, 0.8);
-	// 	stampText(extraText,0.55,0.725,0.035);
-	// 	leg->Draw();
-	// 	c->SetLogy();
-	// 	gPad->RedrawAxis();
-	// 	c->Update();
-	// 	if(isLast) c->SaveAs("plots/"+reg+"/truth_mT.eps");
-	// }
-
-	// leg->Clear();
-	// c->Clear();
-
-	// for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
-	// {
-	// 	TString dsid;
-	// 	dsid.Form("%d", v_trees.at(iTree).second); 
-
-	// 	std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
-
-	// 	Bool_t isFirst=false; isFirst = (iTree==0);
-	// 	Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
-
-	// 	//effective mass
-	// 	v_truth_mTb.at(iTree)->SetMaximum(v_truth_mTb.at(iTree)->GetMaximum()*100);
-	// 	v_truth_mTb.at(iTree)->GetXaxis()->SetRangeUser(0,600);
-	// 	v_truth_mTb.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
-	// 	v_truth_mTb.at(iTree)->Rebin(4);
-	// 	leg->AddEntry(v_truth_mTb.at(iTree),dsid,"l");
-	// 	v_truth_mTb.at(iTree)->GetXaxis()->SetTitle("MTb [GeV]");
-	// 	v_truth_mTb.at(iTree)->GetYaxis()->SetTitle("Events");
-	// 	if(isFirst) v_truth_mTb.at(iTree)->Draw("hist");
-	// 	else v_truth_mTb.at(iTree)->Draw("hist same");
-	// 	stampATLAS_ratio("Internal", 0.55, 0.8);
-	// 	stampText(extraText,0.55,0.725,0.035);
-	// 	leg->Draw();
-	// 	c->SetLogy();
-	// 	gPad->RedrawAxis();
-	// 	c->Update();
-	// 	if(isLast) c->SaveAs("plots/"+reg+"/truth_mTb.eps");
-	// }
-
-	// leg->Clear();
-	// c->Clear();
-
-	//     for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
- //  {
- //    TString dsid;
- //    dsid.Form("%d", v_trees.at(iTree).second); 
-
- //    std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
-
- //    Bool_t isFirst=false; isFirst = (iTree==0);
- //    Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
-
- //    //effective mass
- //    v_el_pt.at(iTree)->SetMaximum(v_el_pt.at(iTree)->GetMaximum()*1000);
- //    v_el_pt.at(iTree)->GetXaxis()->SetRangeUser(0,400);
- //    v_el_pt.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
- //    v_el_pt.at(iTree)->Rebin(10);
- //    leg->AddEntry(v_el_pt.at(iTree),dsid,"l");
- //    v_el_pt.at(iTree)->GetXaxis()->SetTitle("Electron pT [GeV]");
- //    v_el_pt.at(iTree)->GetYaxis()->SetTitle("Events");
- //    if(isFirst) v_el_pt.at(iTree)->Draw("hist");
- //    else v_el_pt.at(iTree)->Draw("hist same");
- //    stampATLAS_ratio("Internal", 0.55, 0.8);
- //    stampText(extraText,0.55,0.725,0.035);
- //    leg->Draw();
- //    c->SetLogy();
- //    gPad->RedrawAxis();
- //    c->Update();
- //    if(isLast) c->SaveAs("plots/"+reg+"/el_pt.eps");
- //  }
-
- //  leg->Clear();
- //  c->Clear();
-
-
- //    for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
- //  {
- //    TString dsid;
- //    dsid.Form("%d", v_trees.at(iTree).second); 
-
- //    std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
-
- //    Bool_t isFirst=false; isFirst = (iTree==0);
- //    Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
-
- //    //effective mass
- //    v_mu_pt.at(iTree)->SetMaximum(v_mu_pt.at(iTree)->GetMaximum()*1000);
- //    v_mu_pt.at(iTree)->GetXaxis()->SetRangeUser(0,400);
- //    v_mu_pt.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
- //    v_mu_pt.at(iTree)->Rebin(10);
- //    leg->AddEntry(v_mu_pt.at(iTree),dsid,"l");
- //    v_mu_pt.at(iTree)->GetXaxis()->SetTitle("Muon pT [GeV]");
- //    v_mu_pt.at(iTree)->GetYaxis()->SetTitle("Events");
- //    if(isFirst) v_mu_pt.at(iTree)->Draw("hist");
- //    else v_mu_pt.at(iTree)->Draw("hist same");
- //    stampATLAS_ratio("Internal", 0.55, 0.8);
- //    stampText(extraText,0.55,0.725,0.035);
- //    leg->Draw();
- //    c->SetLogy();
- //    gPad->RedrawAxis();
- //    c->Update();
- //    if(isLast) c->SaveAs("plots/"+reg+"/mu_pt.eps");
- //  }
-
- //  leg->Clear();
- //  c->Clear();
-
-
- //  for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
- //  {
- //    TString dsid;
- //    dsid.Form("%d", v_trees.at(iTree).second); 
-
- //    std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
-
- //    Bool_t isFirst=false; isFirst = (iTree==0);
- //    Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
-
- //    //effective mass
- //    v_jet_pt_1.at(iTree)->SetMaximum(v_jet_pt_1.at(iTree)->GetMaximum()*1000);
- //    v_jet_pt_1.at(iTree)->GetXaxis()->SetRangeUser(0,1000);
- //    v_jet_pt_1.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
- //    v_jet_pt_1.at(iTree)->Rebin(10);
- //    leg->AddEntry(v_jet_pt_1.at(iTree),dsid,"l");
- //    v_jet_pt_1.at(iTree)->GetXaxis()->SetTitle("Leading Truth Jet p_T [GeV]");
- //    v_jet_pt_1.at(iTree)->GetYaxis()->SetTitle("Events");
- //    if(isFirst) v_jet_pt_1.at(iTree)->Draw("hist");
- //    else v_jet_pt_1.at(iTree)->Draw("hist same");
- //    stampATLAS_ratio("Internal", 0.55, 0.8);
- //    stampText(extraText,0.55,0.725,0.035);
- //    leg->Draw();
- //    c->SetLogy();
- //    gPad->RedrawAxis();
- //    c->Update();
- //    if(isLast) c->SaveAs("plots/"+reg+"/jet_pt_1.eps");
- //  }
-
- //  leg->Clear();
- //  c->Clear();
-
- //  for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
- //  {
- //    TString dsid;
- //    dsid.Form("%d", v_trees.at(iTree).second); 
-
- //    std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
-
- //    Bool_t isFirst=false; isFirst = (iTree==0);
- //    Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
-
- //    //effective mass
- //    v_jet_pt_2.at(iTree)->SetMaximum(v_jet_pt_2.at(iTree)->GetMaximum()*1000);
- //    v_jet_pt_2.at(iTree)->GetXaxis()->SetRangeUser(0,1000);
- //    v_jet_pt_2.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
- //    v_jet_pt_2.at(iTree)->Rebin(10);
- //    leg->AddEntry(v_jet_pt_2.at(iTree),dsid,"l");
- //    v_jet_pt_2.at(iTree)->GetXaxis()->SetTitle("2nd Truth Jet p_T [GeV]");
- //    v_jet_pt_2.at(iTree)->GetYaxis()->SetTitle("Events");
- //    if(isFirst) v_jet_pt_2.at(iTree)->Draw("hist");
- //    else v_jet_pt_2.at(iTree)->Draw("hist same");
- //    stampATLAS_ratio("Internal", 0.55, 0.8);
- //    stampText(extraText,0.55,0.725,0.035);
- //    leg->Draw();
- //    c->SetLogy();
- //    gPad->RedrawAxis();
- //    c->Update();
- //    if(isLast) c->SaveAs("plots/"+reg+"/jet_pt_2.eps");
- //  }
-
- //  leg->Clear();
- //  c->Clear();
-
- //  for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
- //  {
- //    TString dsid;
- //    dsid.Form("%d", v_trees.at(iTree).second); 
-
- //    std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
-
- //    Bool_t isFirst=false; isFirst = (iTree==0);
- //    Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
-
- //    //effective mass
- //    v_jet_pt_3.at(iTree)->SetMaximum(v_jet_pt_3.at(iTree)->GetMaximum()*1000);
- //    v_jet_pt_3.at(iTree)->GetXaxis()->SetRangeUser(0,400);
- //    v_jet_pt_3.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
- //    v_jet_pt_3.at(iTree)->Rebin(10);
- //    leg->AddEntry(v_jet_pt_3.at(iTree),dsid,"l");
- //    v_jet_pt_3.at(iTree)->GetXaxis()->SetTitle("3rd Truth Jet p_T [GeV]");
- //    v_jet_pt_3.at(iTree)->GetYaxis()->SetTitle("Events");
- //    if(isFirst) v_jet_pt_3.at(iTree)->Draw("hist");
- //    else v_jet_pt_3.at(iTree)->Draw("hist same");
- //    stampATLAS_ratio("Internal", 0.55, 0.8);
- //    stampText(extraText,0.55,0.725,0.035);
- //    leg->Draw();
- //    c->SetLogy();
- //    gPad->RedrawAxis();
- //    c->Update();
- //    if(isLast) c->SaveAs("plots/"+reg+"/jet_pt_3.eps");
- //  }
-
- //  leg->Clear();
- //  c->Clear();
-
- //  for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
- //  {
- //    TString dsid;
- //    dsid.Form("%d", v_trees.at(iTree).second); 
-
- //    std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
-
- //    Bool_t isFirst=false; isFirst = (iTree==0);
- //    Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
-
- //    //effective mass
- //    v_jet_pt_4.at(iTree)->SetMaximum(v_jet_pt_4.at(iTree)->GetMaximum()*1000);
- //    v_jet_pt_4.at(iTree)->GetXaxis()->SetRangeUser(0,400);
- //    v_jet_pt_4.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
- //    v_jet_pt_4.at(iTree)->Rebin(10);
- //    leg->AddEntry(v_jet_pt_4.at(iTree),dsid,"l");
- //    v_jet_pt_4.at(iTree)->GetXaxis()->SetTitle("4th Truth Jet p_T [GeV]");
- //    v_jet_pt_4.at(iTree)->GetYaxis()->SetTitle("Events");
- //    if(isFirst) v_jet_pt_4.at(iTree)->Draw("hist");
- //    else v_jet_pt_4.at(iTree)->Draw("hist same");
- //    stampATLAS_ratio("Internal", 0.55, 0.8);
- //    stampText(extraText,0.55,0.725,0.035);
- //    leg->Draw();
- //    c->SetLogy();
- //    gPad->RedrawAxis();
- //    c->Update();
- //    if(isLast) c->SaveAs("plots/"+reg+"/jet_pt_4.eps");
- //  }
-
- //  leg->Clear();
- //  c->Clear();
-
- //  for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
- //  {
- //    TString dsid;
- //    dsid.Form("%d", v_trees.at(iTree).second); 
-
- //    std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
-
- //    Bool_t isFirst=false; isFirst = (iTree==0);
- //    Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
-
- //    //effective mass
- //    v_rcjet_pt_1.at(iTree)->SetMaximum(v_rcjet_pt_1.at(iTree)->GetMaximum()*1000);
- //    v_rcjet_pt_1.at(iTree)->GetXaxis()->SetRangeUser(0,1000);
- //    v_rcjet_pt_1.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
- //    v_rcjet_pt_1.at(iTree)->Rebin(10);
- //    leg->AddEntry(v_rcjet_pt_1.at(iTree),dsid,"l");
- //    v_rcjet_pt_1.at(iTree)->GetXaxis()->SetTitle("Leading Reclustered Truth Jet p_T [GeV]");
- //    v_rcjet_pt_1.at(iTree)->GetYaxis()->SetTitle("Events");
- //    if(isFirst) v_rcjet_pt_1.at(iTree)->Draw("hist");
- //    else v_rcjet_pt_1.at(iTree)->Draw("hist same");
- //    stampATLAS_ratio("Internal", 0.55, 0.8);
- //    stampText(extraText,0.55,0.725,0.035);
- //    leg->Draw();
- //    c->SetLogy();
- //    gPad->RedrawAxis();
- //    c->Update();
- //    if(isLast) c->SaveAs("plots/"+reg+"/rcjet_pt_1.eps");
- //  }
-
- //  leg->Clear();
- //  c->Clear();
-
- //  for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
- //  {
- //    TString dsid;
- //    dsid.Form("%d", v_trees.at(iTree).second); 
-
- //    std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
-
- //    Bool_t isFirst=false; isFirst = (iTree==0);
- //    Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
-
- //    //effective mass
- //    v_rcjet_pt_2.at(iTree)->SetMaximum(v_rcjet_pt_2.at(iTree)->GetMaximum()*1000);
- //    v_rcjet_pt_2.at(iTree)->GetXaxis()->SetRangeUser(0,1000);
- //    v_rcjet_pt_2.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
- //    v_rcjet_pt_2.at(iTree)->Rebin(10);
- //    leg->AddEntry(v_rcjet_pt_2.at(iTree),dsid,"l");
- //    v_rcjet_pt_2.at(iTree)->GetXaxis()->SetTitle("2nd Reclustered Truth Jet p_T [GeV]");
- //    v_rcjet_pt_2.at(iTree)->GetYaxis()->SetTitle("Events");
- //    if(isFirst) v_rcjet_pt_2.at(iTree)->Draw("hist");
- //    else v_rcjet_pt_2.at(iTree)->Draw("hist same");
- //    stampATLAS_ratio("Internal", 0.55, 0.8);
- //    stampText(extraText,0.55,0.725,0.035);
- //    leg->Draw();
- //    c->SetLogy();
- //    gPad->RedrawAxis();
- //    c->Update();
- //    if(isLast) c->SaveAs("plots/"+reg+"/rcjet_pt_2.eps");
- //  }
-
- //  leg->Clear();
- //  c->Clear();
-
- //  for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
- //  {
- //    TString dsid;
- //    dsid.Form("%d", v_trees.at(iTree).second); 
-
- //    std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
-
- //    Bool_t isFirst=false; isFirst = (iTree==0);
- //    Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
-
- //    //effective mass
- //    v_rcjet_pt_3.at(iTree)->SetMaximum(v_rcjet_pt_3.at(iTree)->GetMaximum()*1000);
- //    v_rcjet_pt_3.at(iTree)->GetXaxis()->SetRangeUser(0,400);
- //    v_rcjet_pt_3.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
- //    v_rcjet_pt_3.at(iTree)->Rebin(10);
- //    leg->AddEntry(v_rcjet_pt_3.at(iTree),dsid,"l");
- //    v_rcjet_pt_3.at(iTree)->GetXaxis()->SetTitle("3rd Reclustered Truth Jet p_T [GeV]");
- //    v_rcjet_pt_3.at(iTree)->GetYaxis()->SetTitle("Events");
- //    if(isFirst) v_rcjet_pt_3.at(iTree)->Draw("hist");
- //    else v_rcjet_pt_3.at(iTree)->Draw("hist same");
- //    stampATLAS_ratio("Internal", 0.55, 0.8);
- //    stampText(extraText,0.55,0.725,0.035);
- //    leg->Draw();
- //    c->SetLogy();
- //    gPad->RedrawAxis();
- //    c->Update();
- //    if(isLast) c->SaveAs("plots/"+reg+"/rcjet_pt_3.eps");
- //  }
-
- //  leg->Clear();
- //  c->Clear();
-
- //  for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
- //  {
- //    TString dsid;
- //    dsid.Form("%d", v_trees.at(iTree).second); 
-
- //    std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
-
- //    Bool_t isFirst=false; isFirst = (iTree==0);
- //    Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
-
- //    //effective mass
- //    v_rcjet_pt_4.at(iTree)->SetMaximum(v_rcjet_pt_4.at(iTree)->GetMaximum()*1000);
- //    v_rcjet_pt_4.at(iTree)->GetXaxis()->SetRangeUser(0,400);
- //    v_rcjet_pt_4.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
- //    v_rcjet_pt_4.at(iTree)->Rebin(10);
- //    leg->AddEntry(v_rcjet_pt_4.at(iTree),dsid,"l");
- //    v_rcjet_pt_4.at(iTree)->GetXaxis()->SetTitle("4th Reclustered Truth Jet p_T [GeV]");
- //    v_rcjet_pt_4.at(iTree)->GetYaxis()->SetTitle("Events");
- //    if(isFirst) v_rcjet_pt_4.at(iTree)->Draw("hist");
- //    else v_rcjet_pt_4.at(iTree)->Draw("hist same");
- //    stampATLAS_ratio("Internal", 0.55, 0.8);
- //    stampText(extraText,0.55,0.725,0.035);
- //    leg->Draw();
- //    c->SetLogy();
- //    gPad->RedrawAxis();
- //    c->Update();
- //    if(isLast) c->SaveAs("plots/"+reg+"/rcjet_pt_4.eps");
- //  }
-
- //  leg->Clear();
- //  c->Clear();
-
-
- //  for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
- //  {
- //    TString dsid;
- //    dsid.Form("%d", v_trees.at(iTree).second); 
-
- //    std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
-
- //    Bool_t isFirst=false; isFirst = (iTree==0);
- //    Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
-
- //    //effective mass
- //    v_bjet_pt_1.at(iTree)->SetMaximum(v_bjet_pt_1.at(iTree)->GetMaximum()*1000);
- //    v_bjet_pt_1.at(iTree)->GetXaxis()->SetRangeUser(0,1000);
- //    v_bjet_pt_1.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
- //    v_bjet_pt_1.at(iTree)->Rebin(10);
- //    leg->AddEntry(v_bjet_pt_1.at(iTree),dsid,"l");
- //    v_bjet_pt_1.at(iTree)->GetXaxis()->SetTitle("Leading b-Tagged Truth Jet p_T [GeV]");
- //    v_bjet_pt_1.at(iTree)->GetYaxis()->SetTitle("Events");
- //    if(isFirst) v_bjet_pt_1.at(iTree)->Draw("hist");
- //    else v_bjet_pt_1.at(iTree)->Draw("hist same");
- //    stampATLAS_ratio("Internal", 0.55, 0.8);
- //    stampText(extraText,0.55,0.725,0.035);
- //    leg->Draw();
- //    c->SetLogy();
- //    gPad->RedrawAxis();
- //    c->Update();
- //    if(isLast) c->SaveAs("plots/"+reg+"/bjet_pt_1.eps");
- //  }
-
- //  leg->Clear();
- //  c->Clear();
-
- //  for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
- //  {
- //    TString dsid;
- //    dsid.Form("%d", v_trees.at(iTree).second); 
-
- //    std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
-
- //    Bool_t isFirst=false; isFirst = (iTree==0);
- //    Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
-
- //    //effective mass
- //    v_bjet_pt_2.at(iTree)->SetMaximum(v_bjet_pt_2.at(iTree)->GetMaximum()*1000);
- //    v_bjet_pt_2.at(iTree)->GetXaxis()->SetRangeUser(0,1000);
- //    v_bjet_pt_2.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
- //    v_bjet_pt_2.at(iTree)->Rebin(10);
- //    leg->AddEntry(v_bjet_pt_2.at(iTree),dsid,"l");
- //    v_bjet_pt_2.at(iTree)->GetXaxis()->SetTitle("2nd b-Tagged Truth Jet p_T [GeV]");
- //    v_bjet_pt_2.at(iTree)->GetYaxis()->SetTitle("Events");
- //    if(isFirst) v_bjet_pt_2.at(iTree)->Draw("hist");
- //    else v_bjet_pt_2.at(iTree)->Draw("hist same");
- //    stampATLAS_ratio("Internal", 0.55, 0.8);
- //    stampText(extraText,0.55,0.725,0.035);
- //    leg->Draw();
- //    c->SetLogy();
- //    gPad->RedrawAxis();
- //    c->Update();
- //    if(isLast) c->SaveAs("plots/"+reg+"/bjet_pt_2.eps");
- //  }
-
- //  leg->Clear();
- //  c->Clear();
-
- //  for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
- //  {
- //    TString dsid;
- //    dsid.Form("%d", v_trees.at(iTree).second); 
-
- //    std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
-
- //    Bool_t isFirst=false; isFirst = (iTree==0);
- //    Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
-
- //    //effective mass
- //    v_bjet_pt_3.at(iTree)->SetMaximum(v_bjet_pt_3.at(iTree)->GetMaximum()*1000);
- //    v_bjet_pt_3.at(iTree)->GetXaxis()->SetRangeUser(0,400);
- //    v_bjet_pt_3.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
- //    v_bjet_pt_3.at(iTree)->Rebin(10);
- //    leg->AddEntry(v_bjet_pt_3.at(iTree),dsid,"l");
- //    v_bjet_pt_3.at(iTree)->GetXaxis()->SetTitle("3rd b-Tagged Truth Jet p_T [GeV]");
- //    v_bjet_pt_3.at(iTree)->GetYaxis()->SetTitle("Events");
- //    if(isFirst) v_bjet_pt_3.at(iTree)->Draw("hist");
- //    else v_bjet_pt_3.at(iTree)->Draw("hist same");
- //    stampATLAS_ratio("Internal", 0.55, 0.8);
- //    stampText(extraText,0.55,0.725,0.035);
- //    leg->Draw();
- //    c->SetLogy();
- //    gPad->RedrawAxis();
- //    c->Update();
- //    if(isLast) c->SaveAs("plots/"+reg+"/bjet_pt_3.eps");
- //  }
-
- //  leg->Clear();
- //  c->Clear();
-
- //  for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
- //  {
- //    TString dsid;
- //    dsid.Form("%d", v_trees.at(iTree).second); 
-
- //    std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
-
- //    Bool_t isFirst=false; isFirst = (iTree==0);
- //    Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
-
- //    //effective mass
- //    v_bjet_pt_4.at(iTree)->SetMaximum(v_bjet_pt_4.at(iTree)->GetMaximum()*1000);
- //    v_bjet_pt_4.at(iTree)->GetXaxis()->SetRangeUser(0,400);
- //    v_bjet_pt_4.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
- //    v_bjet_pt_4.at(iTree)->Rebin(10);
- //    leg->AddEntry(v_bjet_pt_4.at(iTree),dsid,"l");
- //    v_bjet_pt_4.at(iTree)->GetXaxis()->SetTitle("4th b-Tagged Truth Jet p_T [GeV]");
- //    v_bjet_pt_4.at(iTree)->GetYaxis()->SetTitle("Events");
- //    if(isFirst) v_bjet_pt_4.at(iTree)->Draw("hist");
- //    else v_bjet_pt_4.at(iTree)->Draw("hist same");
- //    stampATLAS_ratio("Internal", 0.55, 0.8);
- //    stampText(extraText,0.55,0.725,0.035);
- //    leg->Draw();
- //    c->SetLogy();
- //    gPad->RedrawAxis();
- //    c->Update();
- //    if(isLast) c->SaveAs("plots/"+reg+"/bjet_pt_4.eps");
- //  }
-
- //  leg->Clear();
- //  c->Clear();
-
- //    for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
- //  {
- //    TString dsid;
- //    dsid.Form("%d", v_trees.at(iTree).second); 
-
- //    std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
-
- //    Bool_t isFirst=false; isFirst = (iTree==0);
- //    Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
-
- //    //effective mass
- //    v_rcjet_mass_1.at(iTree)->SetMaximum(v_rcjet_mass_1.at(iTree)->GetMaximum()*1000);
- //    v_rcjet_mass_1.at(iTree)->GetXaxis()->SetRangeUser(0,400);
- //    v_rcjet_mass_1.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
- //    v_rcjet_mass_1.at(iTree)->Rebin(10);
- //    leg->AddEntry(v_rcjet_mass_1.at(iTree),dsid,"l");
- //    v_rcjet_mass_1.at(iTree)->GetXaxis()->SetTitle("Leading Reclustered Truth Jet Mass [GeV]");
- //    v_rcjet_mass_1.at(iTree)->GetYaxis()->SetTitle("Events");
- //    if(isFirst) v_rcjet_mass_1.at(iTree)->Draw("hist");
- //    else v_rcjet_mass_1.at(iTree)->Draw("hist same");
- //    stampATLAS_ratio("Internal", 0.55, 0.8);
- //    stampText(extraText,0.55,0.725,0.035);
- //    leg->Draw();
- //    c->SetLogy();
- //    gPad->RedrawAxis();
- //    c->Update();
- //    if(isLast) c->SaveAs("plots/"+reg+"/rcjet_m_1.eps");
- //  }
-
- //  leg->Clear();
- //  c->Clear();
-
- //  for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
- //  {
- //    TString dsid;
- //    dsid.Form("%d", v_trees.at(iTree).second); 
-
- //    std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
-
- //    Bool_t isFirst=false; isFirst = (iTree==0);
- //    Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
-
- //    //effective mass
- //    v_rcjet_mass_2.at(iTree)->SetMaximum(v_rcjet_mass_2.at(iTree)->GetMaximum()*1000);
- //    v_rcjet_mass_2.at(iTree)->GetXaxis()->SetRangeUser(0,400);
- //    v_rcjet_mass_2.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
- //    v_rcjet_mass_2.at(iTree)->Rebin(10);
- //    leg->AddEntry(v_rcjet_mass_2.at(iTree),dsid,"l");
- //    v_rcjet_mass_2.at(iTree)->GetXaxis()->SetTitle("Leading Reclustered Truth Jet Mass [GeV]");
- //    v_rcjet_mass_2.at(iTree)->GetYaxis()->SetTitle("Events");
- //    if(isFirst) v_rcjet_mass_2.at(iTree)->Draw("hist");
- //    else v_rcjet_mass_2.at(iTree)->Draw("hist same");
- //    stampATLAS_ratio("Internal", 0.55, 0.8);
- //    stampText(extraText,0.55,0.725,0.035);
- //    leg->Draw();
- //    c->SetLogy();
- //    gPad->RedrawAxis();
- //    c->Update();
- //    if(isLast) c->SaveAs("plots/"+reg+"/rcjet_m_2.eps");
- //  }
-
- //  leg->Clear();
- //  c->Clear();
-
- //  for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
- //  {
- //    TString dsid;
- //    dsid.Form("%d", v_trees.at(iTree).second); 
-
- //    std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
-
- //    Bool_t isFirst=false; isFirst = (iTree==0);
- //    Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
-
- //    //effective mass
- //    v_rcjet_mass_3.at(iTree)->SetMaximum(v_rcjet_mass_3.at(iTree)->GetMaximum()*1000);
- //    v_rcjet_mass_3.at(iTree)->GetXaxis()->SetRangeUser(0,400);
- //    v_rcjet_mass_3.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
- //    v_rcjet_mass_3.at(iTree)->Rebin(10);
- //    leg->AddEntry(v_rcjet_mass_3.at(iTree),dsid,"l");
- //    v_rcjet_mass_3.at(iTree)->GetXaxis()->SetTitle("3rd Reclustered Truth Jet Mass [GeV]");
- //    v_rcjet_mass_3.at(iTree)->GetYaxis()->SetTitle("Events");
- //    if(isFirst) v_rcjet_mass_3.at(iTree)->Draw("hist");
- //    else v_rcjet_mass_3.at(iTree)->Draw("hist same");
- //    stampATLAS_ratio("Internal", 0.55, 0.8);
- //    stampText(extraText,0.55,0.725,0.035);
- //    leg->Draw();
- //    c->SetLogy();
- //    gPad->RedrawAxis();
- //    c->Update();
- //    if(isLast) c->SaveAs("plots/"+reg+"/rcjet_m_3.eps");
- //  }
-
- //  leg->Clear();
- //  c->Clear();
-
-  // for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
-  // {
-  //   TString dsid;
-  //   dsid.Form("%d", v_trees.at(iTree).second); 
-
-  //   std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
-
-  //   Bool_t isFirst=false; isFirst = (iTree==0);
-  //   Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
-
-  //   //effective mass
-  //   v_rcjet_mass_4.at(iTree)->SetMaximum(v_rcjet_mass_4.at(iTree)->GetMaximum()*1000);
-  //   v_rcjet_mass_4.at(iTree)->GetXaxis()->SetRangeUser(0,400);
-  //   v_rcjet_mass_4.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
-  //   v_rcjet_mass_4.at(iTree)->Rebin(10);
-  //   leg->AddEntry(v_rcjet_mass_4.at(iTree),dsid,"l");
-  //   v_rcjet_mass_4.at(iTree)->GetXaxis()->SetTitle("4th Reclustered Truth Jet Mass [GeV]");
-  //   v_rcjet_mass_4.at(iTree)->GetYaxis()->SetTitle("Events");
-  //   if(isFirst) v_rcjet_mass_4.at(iTree)->Draw("hist");
-  //   else v_rcjet_mass_4.at(iTree)->Draw("hist same");
-  //   stampATLAS_ratio("Internal", 0.55, 0.8);
-  //   stampText(extraText,0.55,0.725,0.035);
-  //   leg->Draw();
-  //   c->SetLogy();
-  //   gPad->RedrawAxis();
-  //   c->Update();
-  //   if(isLast) c->SaveAs("plots/"+reg+"/rcjet_m_4.eps");
-  // }
-
-  // leg->Clear();
-  // c->Clear();
-
-
-
-  //   for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
-  // {
-  //   TString dsid;
-  //   dsid.Form("%d", v_trees.at(iTree).second); 
-
-  //   std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
-
-  //   Bool_t isFirst=false; isFirst = (iTree==0);
-  //   Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
-
-  //   //effective mass
-  //   v_jet_n.at(iTree)->SetMaximum(v_jet_n.at(iTree)->GetMaximum()*1000);
-  //   v_jet_n.at(iTree)->GetXaxis()->SetRangeUser(0,400);
-  //   v_jet_n.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
-  //   leg->AddEntry(v_jet_n.at(iTree),dsid,"l");
-  //   v_jet_n.at(iTree)->GetXaxis()->SetTitle("Jet Mulitplicity");
-  //   v_jet_n.at(iTree)->GetYaxis()->SetTitle("Events");
-  //   if(isFirst) v_jet_n.at(iTree)->Draw("hist");
-  //   else v_jet_n.at(iTree)->Draw("hist same");
-  //   stampATLAS_ratio("Internal", 0.55, 0.8);
-  //   stampText(extraText,0.55,0.725,0.035);
-  //   leg->Draw();
-  //   c->SetLogy();
-  //   gPad->RedrawAxis();
-  //   c->Update();
-  //   if(isLast) c->SaveAs("plots/"+reg+"/jet_n.eps");
-  // }
-
-  // leg->Clear();
-  // c->Clear();
-
- //    for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
- //  {
- //    TString dsid;
- //    dsid.Form("%d", v_trees.at(iTree).second); 
-
- //    std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
-
- //    Bool_t isFirst=false; isFirst = (iTree==0);
- //    Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
-
- //    //effective mass
- //    v_bjet_n.at(iTree)->SetMaximum(v_bjet_n.at(iTree)->GetMaximum()*10);
- //    v_bjet_n.at(iTree)->GetXaxis()->SetRangeUser(0,400);
- //    v_bjet_n.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
- //    leg->AddEntry(v_bjet_n.at(iTree),dsid,"l");
- //    v_bjet_n.at(iTree)->GetXaxis()->SetTitle("b-Jet Mulitplicity");
- //    v_bjet_n.at(iTree)->GetYaxis()->SetTitle("Events");
- //    if(isFirst) v_bjet_n.at(iTree)->Draw("hist");
- //    else v_bjet_n.at(iTree)->Draw("hist same");
- //    stampATLAS_ratio("Internal", 0.55, 0.8);
- //    stampText(extraText,0.55,0.725,0.035);
- //    leg->Draw();
- //    // c->SetLogy();
- //    gPad->RedrawAxis();
- //    c->Update();
- //    if(isLast) c->SaveAs("plots/"+reg+"/bjet_n.eps");
- //  }
-
- //  leg->Clear();
- //  c->Clear();
-
-    for(unsigned int iTree=0; iTree<v_trees.size(); iTree++)
-  {
-    TString dsid;
-    dsid.Form("%d", v_trees.at(iTree).second); 
-
-    std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
-
-    Bool_t isFirst=false; isFirst = (iTree==0);
-    Bool_t isLast=false; isLast = ((iTree==0 && v_trees.size()==1)||(iTree==v_trees.size()-1 && v_trees.size()>1));
-
-    //effective mass
-    v_rcjet_n.at(iTree)->SetMaximum(v_rcjet_n.at(iTree)->GetMaximum()*1000);
-    v_rcjet_n.at(iTree)->GetXaxis()->SetRangeUser(0,400);
-    v_rcjet_n.at(iTree)->SetLineColor(TColor::GetColor(v_colours.at(iTree%v_trees.size())));
-    leg->AddEntry(v_rcjet_n.at(iTree),dsid,"l");
-    v_rcjet_n.at(iTree)->GetXaxis()->SetTitle("Top Jet Mulitplicity");
-    v_rcjet_n.at(iTree)->GetYaxis()->SetTitle("Events");
-    if(isFirst) v_rcjet_n.at(iTree)->Draw("hist");
-    else v_rcjet_n.at(iTree)->Draw("hist same");
-    stampATLAS_ratio("Internal", 0.55, 0.8);
-    stampText(extraText,0.55,0.725,0.035);
-    leg->Draw();
-    c->SetLogy();
-    gPad->RedrawAxis();
-    c->Update();
-    if(isLast) c->SaveAs("plots/"+reg+"/rcjet_n.eps");
-  }
-
-  leg->Clear();
-  c->Clear();
-
+	truthPlot(v_trees, v_baselepton_n, v_colours, leg, c, false,
+			  "Lepton multiplicity", "Events", 
+			  0, 10.0, 0.0, 100000.0, 1,
+			  "Internal", extraText,
+			  reg, "lepton_n");
+	c->Clear();
+
+
+	// LOG SCALE PLOTS
+	truthPlot(v_trees, v_truth_met, v_colours, leg, c, true,
+			  "Missing transverse energy [GeV]", "Events", 
+			  0, 1000.0, 0.11, 500000.0, 2, // x1 x2 y1 y2 rebin
+			  "Internal", extraText,
+			  reg, "truth_met");
+	c->Clear();
+
+	truthPlot(v_trees, v_truth_Meff, v_colours, leg, c, true,
+			  "Effective mass [GeV]", "Events", 
+			  0, 2000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "truth_meff");
+	c->Clear();
+
+	truthPlot(v_trees, v_truth_Meff_4j, v_colours, leg, c, true,
+			  "Effective mass 4j [GeV]", "Events", 
+			  0, 2000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "truth_meff4j");
+	c->Clear();
+
+	truthPlot(v_trees, v_truth_mTb, v_colours, leg, c, true,
+			  "mTb min [GeV]", "Events", 
+			  0, 2000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "truth_mTb");
+	c->Clear();
+
+	truthPlot(v_trees, v_truth_mT, v_colours, leg, c, true,
+			  "Transverse mass [GeV]", "Events", 
+			  0, 2000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "truth_mT");
+	c->Clear();
+
+	// el pt
+	truthPlot(v_trees, v_el_pt, v_colours, leg, c, true,
+			  "el p_{T} [GeV]", "Events", 
+			  0, 1000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "el_pt");
+	c->Clear();
+
+	truthPlot(v_trees, v_el_eta, v_colours, leg, c, true,
+			  "el #eta", "Events", 
+			  -3.0, 3.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "el_eta");
+	c->Clear();
+
+	truthPlot(v_trees, v_el_phi, v_colours, leg, c, true,
+			  "el #phi", "Events", 
+			  -3.2, 3.2, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "el_phi");
+	c->Clear();
+
+	truthPlot(v_trees, v_el_e, v_colours, leg, c, true,
+			  "el E [GeV]", "Events", 
+			  0, 1000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "el_e");
+	c->Clear();
+
+	// mu pt
+	truthPlot(v_trees, v_mu_pt, v_colours, leg, c, true,
+			  "#mu p_{T} [GeV]", "Events", 
+			  0, 1000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "mu_pt");
+	c->Clear();
+
+	truthPlot(v_trees, v_mu_eta, v_colours, leg, c, true,
+			  "#mu #eta", "Events", 
+			  -3.0, 3.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "mu_eta");
+	c->Clear();
+
+	truthPlot(v_trees, v_mu_phi, v_colours, leg, c, true,
+			  "#mu #phi", "Events", 
+			  -3.2, 3.2, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "mu_phi");
+	c->Clear();
+
+	truthPlot(v_trees, v_mu_e, v_colours, leg, c, true,
+			  "#mu E [GeV]", "Events", 
+			  0, 1000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "mu_e");
+	c->Clear();
+
+	// jet pt
+	truthPlot(v_trees, v_jet_pt_1, v_colours, leg, c, true,
+			  "Leading akt4 jet p_{T} [GeV]", "Events", 
+			  0, 1000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "jet_pt_1");
+	c->Clear();
+
+	truthPlot(v_trees, v_jet_pt_2, v_colours, leg, c, true,
+			  "Subleading akt4 jet p_{T} [GeV]", "Events", 
+			  0, 1000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "jet_pt_2");
+	c->Clear();
+
+	truthPlot(v_trees, v_jet_pt_3, v_colours, leg, c, true,
+			  "3rd akt4 jet p_{T} [GeV]", "Events", 
+			  0, 1000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "jet_pt_3");
+	c->Clear();
+
+	truthPlot(v_trees, v_jet_pt_4, v_colours, leg, c, true,
+			  "3rd akt4 jet p_{T} [GeV]", "Events", 
+			  0, 1000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "jet_pt_4");
+	c->Clear();
+
+	// jet eta
+	truthPlot(v_trees, v_jet_eta_1, v_colours, leg, c, true,
+			  "Leading akt4 jet #eta", "Events", 
+			  -3.0, 3.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "jet_eta_1");
+	c->Clear();
+
+	truthPlot(v_trees, v_jet_eta_2, v_colours, leg, c, true,
+			  "Subleading akt4 jet #eta", "Events", 
+			  -3.0, 3.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "jet_eta_2");
+	c->Clear();
+
+	truthPlot(v_trees, v_jet_eta_3, v_colours, leg, c, true,
+			  "3rd akt4 jet #eta", "Events", 
+			  -3.0, 3.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "jet_eta_3");
+	c->Clear();
+
+	truthPlot(v_trees, v_jet_eta_4, v_colours, leg, c, true,
+			  "3rd akt4 jet #eta", "Events", 
+			  -3.0, 3.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "jet_eta_4");
+	c->Clear();
+
+	// jet phi
+	truthPlot(v_trees, v_jet_phi_1, v_colours, leg, c, true,
+			  "Leading akt4 jet #phi", "Events", 
+			  -3.2, 3.2, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "jet_phi_1");
+	c->Clear();
+
+	truthPlot(v_trees, v_jet_phi_2, v_colours, leg, c, true,
+			  "Subleading akt4 jet #phi", "Events", 
+			  -3.2, 3.2, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "jet_phi_2");
+	c->Clear();
+
+	truthPlot(v_trees, v_jet_phi_3, v_colours, leg, c, true,
+			  "3rd akt4 jet #phi", "Events", 
+			  -3.2, 3.2, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "jet_phi_3");
+	c->Clear();
+
+	truthPlot(v_trees, v_jet_phi_4, v_colours, leg, c, true,
+			  "3rd akt4 jet #phi", "Events", 
+			  -3.2, 3.2, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "jet_phi_4");
+	c->Clear();
+
+	// jet energy
+	truthPlot(v_trees, v_jet_e_1, v_colours, leg, c, true,
+			  "Leading akt4 jet Energy [GeV]", "Events", 
+			  0, 2000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "jet_e_1");
+	c->Clear();
+
+	truthPlot(v_trees, v_jet_e_2, v_colours, leg, c, true,
+			  "Subleading akt4 jet Energy [GeV]", "Events", 
+			  0, 2000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "jet_e_2");
+	c->Clear();
+
+	truthPlot(v_trees, v_jet_e_3, v_colours, leg, c, true,
+			  "3rd akt4 jet Energy [GeV]", "Events", 
+			  0, 2000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "jet_e_3");
+	c->Clear();
+
+	truthPlot(v_trees, v_jet_e_4, v_colours, leg, c, true,
+			  "3rd akt4 jet Energy [GeV]", "Events", 
+			  0, 2000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "jet_e_4");
+	c->Clear();
+
+	// bjet pt
+	truthPlot(v_trees, v_bjet_pt_1, v_colours, leg, c, true,
+			  "Leading b-tagged akt4 jet p_{T} [GeV]", "Events", 
+			  0, 1000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "bjet_pt_1");
+	c->Clear();
+
+	truthPlot(v_trees, v_bjet_pt_2, v_colours, leg, c, true,
+			  "Subleading b-tagged akt4 jet p_{T} [GeV]", "Events", 
+			  0, 1000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "bjet_pt_2");
+	c->Clear();
+
+	truthPlot(v_trees, v_bjet_pt_3, v_colours, leg, c, true,
+			  "3rd b-tagged akt4 jet p_{T} [GeV]", "Events", 
+			  0, 1000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "bjet_pt_3");
+	c->Clear();
+
+	truthPlot(v_trees, v_bjet_pt_4, v_colours, leg, c, true,
+			  "3rd b-tagged akt4 jet p_{T} [GeV]", "Events", 
+			  0, 1000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "bjet_pt_4");
+	c->Clear();
+
+	// bjet eta
+	truthPlot(v_trees, v_bjet_eta_1, v_colours, leg, c, true,
+			  "Leading b-tagged akt4 jet #eta", "Events", 
+			  -3.0, 3.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "bjet_eta_1");
+	c->Clear();
+
+	truthPlot(v_trees, v_bjet_eta_2, v_colours, leg, c, true,
+			  "Subleading b-tagged akt4 jet #eta", "Events", 
+			  -3.0, 3.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "bjet_eta_2");
+	c->Clear();
+
+	truthPlot(v_trees, v_bjet_eta_3, v_colours, leg, c, true,
+			  "3rd b-tagged akt4 jet #eta", "Events", 
+			  -3.0, 3.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "bjet_eta_3");
+	c->Clear();
+
+	truthPlot(v_trees, v_bjet_eta_4, v_colours, leg, c, true,
+			  "3rd b-tagged akt4 jet #eta", "Events", 
+			  -3.0, 3.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "bjet_eta_4");
+	c->Clear();
+
+	// bjet phi
+	truthPlot(v_trees, v_bjet_phi_1, v_colours, leg, c, true,
+			  "Leading b-tagged akt4 jet #phi", "Events", 
+			  -3.2, 3.2, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "bjet_phi_1");
+	c->Clear();
+
+	truthPlot(v_trees, v_bjet_phi_2, v_colours, leg, c, true,
+			  "Subleading b-tagged akt4 jet #phi", "Events", 
+			  -3.2, 3.2, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "bjet_phi_2");
+	c->Clear();
+
+	truthPlot(v_trees, v_bjet_phi_3, v_colours, leg, c, true,
+			  "3rd b-tagged akt4 jet #phi", "Events", 
+			  -3.2, 3.2, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "bjet_phi_3");
+	c->Clear();
+
+	truthPlot(v_trees, v_bjet_phi_4, v_colours, leg, c, true,
+			  "3rd b-tagged akt4 jet #phi", "Events", 
+			  -3.2, 3.2, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "bjet_phi_4");
+	c->Clear();
+
+	// bjet energy
+	truthPlot(v_trees, v_bjet_e_1, v_colours, leg, c, true,
+			  "Leading b-tagged akt4 jet Energy [GeV]", "Events", 
+			  0, 2000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "bjet_e_1");
+	c->Clear();
+
+	truthPlot(v_trees, v_bjet_e_2, v_colours, leg, c, true,
+			  "Subleading b-tagged akt4 jet Energy [GeV]", "Events", 
+			  0, 2000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "bjet_e_2");
+	c->Clear();
+
+	truthPlot(v_trees, v_bjet_e_3, v_colours, leg, c, true,
+			  "3rd b-tagged akt4 jet Energy [GeV]", "Events", 
+			  0, 2000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "bjet_e_3");
+	c->Clear();
+
+	truthPlot(v_trees, v_bjet_e_4, v_colours, leg, c, true,
+			  "3rd b-tagged akt4 jet Energy [GeV]", "Events", 
+			  0, 2000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "bjet_e_4");
+	c->Clear();
+
+	// rc jet pt
+	truthPlot(v_trees, v_rcjet_pt_1, v_colours, leg, c, true,
+			  "Leading RC akt10 jet p_{T} [GeV]", "Events", 
+			  0, 2000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "rcjet_pt_1");
+	c->Clear();
+
+	truthPlot(v_trees, v_rcjet_pt_2, v_colours, leg, c, true,
+			  "Subleading RC akt10 jet p_{T} [GeV]", "Events", 
+			  0, 2000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "rcjet_pt_2");
+	c->Clear();
+
+	truthPlot(v_trees, v_rcjet_pt_3, v_colours, leg, c, true,
+			  "3rd RC akt10 jet p_{T} [GeV]", "Events", 
+			  0, 2000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "rcjet_pt_3");
+	c->Clear();
+
+	truthPlot(v_trees, v_rcjet_pt_4, v_colours, leg, c, true,
+			  "4th RC akt10 jet p_{T} [GeV]", "Events", 
+			  0, 2000.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "rcjet_pt_4");
+	c->Clear();
+
+	// rc jet eta
+	truthPlot(v_trees, v_rcjet_eta_1, v_colours, leg, c, true,
+			  "Leading RC akt10 jet #eta", "Events", 
+			  -3.0, 3.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "rcjet_eta_1");
+	c->Clear();
+
+	truthPlot(v_trees, v_rcjet_eta_2, v_colours, leg, c, true,
+			  "Subleading RC akt10 jet #eta", "Events", 
+			  -3.0, 3.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "rcjet_eta_2");
+	c->Clear();
+
+	truthPlot(v_trees, v_rcjet_eta_3, v_colours, leg, c, true,
+			  "3rd RC akt10 jet #eta", "Events", 
+			  -3.0, 3.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "rcjet_eta_3");
+	c->Clear();
+
+	truthPlot(v_trees, v_rcjet_eta_4, v_colours, leg, c, true,
+			  "4th RC akt10 jet #eta", "Events", 
+			  -3.0, 3.0, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "rcjet_eta_4");
+	c->Clear();
+
+	// rc jet phi
+	truthPlot(v_trees, v_rcjet_phi_1, v_colours, leg, c, true,
+			  "Leading RC akt10 jet #phi", "Events", 
+			  -3.2, 3.2, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "rcjet_phi_1");
+	c->Clear();
+
+	truthPlot(v_trees, v_rcjet_phi_2, v_colours, leg, c, true,
+			  "Subleading RC akt10 jet #phi", "Events", 
+			  -3.2, 3.2, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "rcjet_phi_2");
+	c->Clear();
+
+	truthPlot(v_trees, v_rcjet_phi_3, v_colours, leg, c, true,
+			  "3rd RC akt10 jet #phi", "Events", 
+			  -3.2, 3.2, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "rcjet_phi_3");
+	c->Clear();
+
+	truthPlot(v_trees, v_rcjet_phi_4, v_colours, leg, c, true,
+			  "4th RC akt10 jet #phi", "Events", 
+			  -3.2, 3.2, 0.11, 1000000.0, 2,
+			  "Internal", extraText,
+			  reg, "rcjet_phi_4");
+	c->Clear();
+
+	// rcjet mass
+	truthPlot(v_trees, v_rcjet_mass_1, v_colours, leg, c, true,
+			  "Leading RC akt10 jet mass [GeV]", "Events", 
+			  0, 2000.0, 0.11, 100000000.0, 2,
+			  "Internal", extraText,
+			  reg, "rcjet_m_1");
+	c->Clear();
+
+	truthPlot(v_trees, v_rcjet_mass_2, v_colours, leg, c, true,
+			  "Subleading RC akt10 jet mass [GeV]", "Events", 
+			  0, 2000.0, 0.11, 100000000.0, 2,
+			  "Internal", extraText,
+			  reg, "rcjet_m_2");
+	c->Clear();
+
+	truthPlot(v_trees, v_rcjet_mass_3, v_colours, leg, c, true,
+			  "3rd RC akt10 jet mass [GeV]", "Events", 
+			  0, 2000.0, 0.11, 100000000.0, 2,
+			  "Internal", extraText,
+			  reg, "rcjet_m_3");
+	c->Clear();
+
+	truthPlot(v_trees, v_rcjet_mass_4, v_colours, leg, c, true,
+			  "4th RC akt10 jet mass [GeV]", "Events", 
+			  0, 2000.0, 0.11, 100000000.0, 2,
+			  "Internal", extraText,
+			  reg, "rcjet_m_4");
+	c->Clear();
 
 	// Sign out.
 	std::cout << "Done with plotting." << std::endl;
@@ -1538,8 +1229,8 @@ void stampATLAS_ratio(const std::string &text, float x, float y)
   p.SetTextFont(42);
   p.SetTextColor(1);
   p.SetTextSize(0.06);
-  //p.DrawLatex(x+0.10, y, text.c_str()); // CHANGE TO THIS WHEN RATIO
-  p.DrawLatex(x+0.15, y, text.c_str());
+  p.DrawLatex(x+0.10, y, text.c_str()); // CHANGE TO THIS WHEN RATIO
+  //p.DrawLatex(x+0.15, y, text.c_str());
 }
 
 void stampLumiText(float lumi, float x, float y, const std::string &text, float size)
@@ -1576,79 +1267,105 @@ void truthPlot(std::vector<pair<TTree*, Int_t>> treevec,
 			   float xmax,
 			   float ymin,
 			   float ymax,
+			   int rebin,
 			   const std::string atlasLabel,
 			   const std::string extraText,
 			   TString reg,
 			   TString filename)
 {
-	// TPad *c_1 = ((TPad*)(c->GetPad(1)));
-	// TPad *c_2 = ((TPad*)(c->GetPad(2)));
-	// c_1->SetPad(0.05,0.35,0.95,0.95);
-	// c_2->SetPad(0.05,0.05,0.95,0.35);
- //    c_2->SetTopMargin(0.02);
- //    c_2->SetBottomMargin(0.02);
- //    c_1->SetLeftMargin(0.10);
- //    c_2->SetLeftMargin(0.10);
+	c->Divide(1, 2, 0.0, 0.5);
+	TPad *c_1 = 0; c_1 = ((TPad*)(c->GetPad(1)));
+	TPad *c_2 = 0; c_2 = ((TPad*)(c->GetPad(2)));
+	c_1->SetPad(0.05,0.3,0.95,0.95);
+	c_2->SetPad(0.05,0.10,0.95,0.3);
+    c_2->SetTopMargin(0.02);
+    c_2->SetBottomMargin(0.30);
+    c_1->SetLeftMargin(0.10);
+    c_2->SetLeftMargin(0.10);
 
-    // std::vector<TH1F*> vecrats;
-    // for(unsigned int iHist=0; iHist<histovec.size(); iHist++)
-    // {
-    // 	if(iHist==0) continue;
-    // 	if(iHist==1) vecrats.push_back(histovec.at(0)->Divide(histovec.at(1)));
-    // 	if(iHist==2) continue;
-    // 	else vecrats.push_back(histovec.at(1)->Divide(histovec.at(iHist)));
-    // }
+  	for(unsigned int iTree=0; iTree<treevec.size(); iTree++)
+  	{
+	    TString dsid;
+	    dsid.Form("%d", treevec.at(iTree).second); 
 
-  for(unsigned int iTree=0; iTree<treevec.size(); iTree++)
-  {
-    TString dsid;
-    dsid.Form("%d", treevec.at(iTree).second); 
+	    std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
 
-    std::cout << "DSID: " << dsid << "\tPLOTTING" << std::endl;
+	    Bool_t isFirst=false; isFirst = (iTree==0);
+	    Bool_t isLast=false; isLast = ((iTree==0 && treevec.size()==1)||(iTree==treevec.size()-1 && treevec.size()>1));
 
-    Bool_t isFirst=false; isFirst = (iTree==0);
-    Bool_t isLast=false; isLast = ((iTree==0 && treevec.size()==1)||(iTree==treevec.size()-1 && treevec.size()>1));
+	    // Main pad
+		c_1->cd();
+	    histovec.at(iTree)->SetMinimum(ymin);
+	    if(doLog) histovec.at(iTree)->SetMaximum(ymax);
+	    else histovec.at(iTree)->SetMaximum(histovec.at(iTree)->GetMaximum()*1.33);
+	    histovec.at(iTree)->GetXaxis()->SetRangeUser(xmin,xmax);
+	    histovec.at(iTree)->SetLineColor(TColor::GetColor(colourvec.at(iTree%treevec.size())));
+	    leg->AddEntry(histovec.at(iTree),dsid,"l");
+	    histovec.at(iTree)->GetXaxis()->SetTitle(xLabel);
+	    histovec.at(iTree)->GetYaxis()->SetTitle(yLabel);
+	    // histovec.at(iTree)->GetYaxis()->SetTitleSize(0.12);
+	    // histovec.at(iTree)->GetXaxis()->SetTitleSize(0.12);
+	    //histovec.at(iTree)->Rebin(rebin);
+	 	if(isFirst) histovec.at(iTree)->Draw("hist");
+	    else histovec.at(iTree)->Draw("hist same");
+	    stampATLAS_ratio(atlasLabel, 0.55, 0.8);
+	    stampText(extraText,0.55,0.725,0.035);
+	    stampText((std::string)reg,0.55,0.650,0.035);
+  	    stampText("Normalised to 3.3 fb^{-1}",0.55,0.575,0.035);
+	    leg->Draw();
+	    if(doLog) c_1->SetLogy();
+	    else c_1->SetLogy(0);
 
-    // Main pad
-	//c->cd(1);
-    histovec.at(iTree)->SetMinimum(ymin);
-    histovec.at(iTree)->SetMaximum(ymax);
+	    // construct the ratio plot ...
 
-    histovec.at(iTree)->SetMaximum(ymax/10000.0); // Added to fix range while testing.
+	    TH1F* rat = (TH1F*)histovec.at(iTree)->Clone("rat");
+	  //  	if(dsid=="410003" || dsid=="407012") 
+	  //  		{
+	  //  			std::cout << "for dsid " << dsid << ", no entry in ratio pad" << std::endl;
+	  //  			continue;
+			// }
 
-    histovec.at(iTree)->GetXaxis()->SetRangeUser(xmin,xmax);
-    histovec.at(iTree)->SetLineColor(TColor::GetColor(colourvec.at(iTree%treevec.size())));
-    leg->AddEntry(histovec.at(iTree),dsid,"l");
-    histovec.at(iTree)->GetXaxis()->SetTitle(xLabel);
-    histovec.at(iTree)->GetYaxis()->SetTitle(yLabel);
-    histovec.at(iTree)->GetXaxis()->SetTitleSize(0.12);
-    if(isFirst) histovec.at(iTree)->Draw("hist");
-    else histovec.at(iTree)->Draw("hist same");
-    stampATLAS_ratio(atlasLabel, 0.55, 0.8);
-    stampText(extraText,0.55,0.725,0.035);
-    leg->Draw();
-    if(doLog) c->SetLogy(1);
-    else c->SetLogy(0);
+	   	if(dsid=="410003"  || dsid=="410004") 
+	   		{
+//	   			std::cout << "for dsid " << dsid << ", we divide by 410003" << std::endl;
+	   			rat->Divide(histovec.at(iTree),histovec.front());
+			}
+	   	else
+		   	{
+//	   			std::cout << "for dsid " << dsid << ", we divide by 407012" << std::endl;
+	   			rat->Divide(histovec.at(iTree),histovec.back());
+			}
 
-	// if(iTree!=0)
-	// {
-	// vecrats->push_back(histovec.at(0)->Divide(histovec.at(iTree)));
+	     // Ratio pad
+	    c_2->cd();
+	    rat->SetMinimum(0.1);
+	    rat->SetMaximum(1.9);
+	    rat->GetXaxis()->SetRangeUser(xmin,xmax);
+	    rat->GetXaxis()->SetTitle(xLabel);
+	    rat->GetYaxis()->SetTitle("Ratio");
+	    rat->GetYaxis()->SetTitleOffset(0.30);
+	   	rat->GetXaxis()->SetTitleSize(0.12);
+	   	rat->GetYaxis()->SetTitleSize(0.12);
+	   	rat->GetYaxis()->SetLabelSize(0.12);
+	   	rat->GetXaxis()->SetLabelSize(0.12);
+	   	rat->GetYaxis()->SetNdivisions(4, 0, 2);
 
- //    // Ratio pad
- //    c->cd(2);
- //    vecrats.at(iTree)->SetMinimum(-1.0);
- //    vecrats.at(iTree)->SetMaximum(1.0);
- //    vecrats.at(iTree)->GetXaxis()->SetRangeUser(xmin,xmax);
- //    vecrats.at(iTree)->SetLineColor(TColor::GetColor(colourvec.at(iTree%treevec.size())));
- //    vecrats.at(iTree)->GetXaxis()->SetTitle(xLabel);
- //    vecrats.at(iTree)->GetYaxis()->SetTitle("Ratio");
- //    vecrats.at(iTree)->GetYaxis()->SetTitleSize(0.12);
- //    vecrats.at(iTree)->GetXaxis()->SetTitleSize(0.12);
- //    if(!isFirst) vecrats.at(iTree)->Draw("hist same");
+	   	// line at 1.0
+	    TLine* lin; lin = new TLine(rat->GetXaxis()->GetBinLowEdge(1), 1.0, rat->GetXaxis()->GetBinUpEdge(rat->GetNbinsX()+1), 1.0);
+   		lin->SetLineColor(kBlack);
+   		lin->SetLineWidth(1);
+   		lin->SetLineStyle(2);
+   		lin->Draw();
+   		//gPad->RedrawAxis();
 
-    gPad->RedrawAxis();
-    c->Update();
- //   if(isLast) c->SaveAs("plots/"+reg+"/"+filename+".eps");
+	     // if(!(dsid=="410003" || dsid=="407012"))
+   		if(isFirst) rat->Draw("e0");
+	    if(!(dsid=="410004" || dsid=="407012")) rat->Draw("e0 same");
+	     //else rat->Draw("e1 same");
+
+
+	    gPad->RedrawAxis();
+	    c->Update();
   }
  c->SaveAs("plots/"+reg+"/"+filename+".eps"); 
 

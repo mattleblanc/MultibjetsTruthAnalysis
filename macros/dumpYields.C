@@ -13,6 +13,13 @@
 
 // Run as > root -l -b -q dumpYields.C
 
+#include <iostream>
+#include "TFile.h"
+#include "TTree.h"
+#include "TH1.h"
+#include "TH2.h"
+#include "TRandom.h"
+
 void dumpYields(void)
 {
 	TFile* f; f = new TFile("truthYields.root");
@@ -20,16 +27,16 @@ void dumpYields(void)
 
 	std::cout << "Yields obtained. Dumping systematics ..." << std::endl;
 
-	for(unsigned int iDSID=0; iDSID<h_yields->GetXaxis()->GetNbins()+1; iDSID++)
+	for(int iDSID=0; iDSID<h_yields->GetXaxis()->GetNbins()+1; iDSID++)
 	{
 		std::cout << std::setw(12) << h_yields->GetXaxis()->GetBinLabel(iDSID) << " ";
 	}
 	std::cout << std::endl;
 
-	for(unsigned int iVar=0; iVar<h_yields->GetYaxis()->GetNbins(); iVar++)
+	for(int iVar=0; iVar<h_yields->GetYaxis()->GetNbins(); iVar++)
 	{
 		std::cout << std::setw(12) << h_yields->GetYaxis()->GetBinLabel(iVar);
-		for(unsigned int iDSID=1; iDSID<h_yields->GetXaxis()->GetNbins()+1; iDSID++)
+		for(int iDSID=1; iDSID<h_yields->GetXaxis()->GetNbins()+1; iDSID++)
 		{
 			//std::cout << std::setw(12) << setprecision(3) << h_yields->GetBinError(iDSID,iVar)/h_yields->GetBinContent(iDSID,iVar) << " ";
 			std::cout << std::setw(12) << setprecision(3) << h_yields->GetBinContent(iDSID,iVar) << " ";
@@ -54,20 +61,20 @@ void dumpYields(void)
 	//systs.push_back("Tune");
 
 	// Print out variation names ...
-	for(unsigned int iSyst=0; iSyst<systs.size(); iSyst++)
+	for(unsigned long iSyst=0; iSyst<systs.size(); iSyst++)
 	{
 		std::cout << std::setw(12) << systs.at(iSyst) << " ";
 	}
 	std::cout << std::endl;
 
 	// Get the systematics.
-	for(unsigned int iVar=6; iVar<h_yields->GetYaxis()->GetNbins(); iVar++)
+	for(int iVar=6; iVar<h_yields->GetYaxis()->GetNbins(); iVar++)
 	{
 		// Which region?
 		std::cout << std::setw(12) << h_yields->GetYaxis()->GetBinLabel(iVar);
 
 		// Then, loop over the variation samples.
-		for(unsigned int iDSID=1; iDSID<h_yields->GetXaxis()->GetNbins()+1; iDSID++)
+		for(int iDSID=1; iDSID<h_yields->GetXaxis()->GetNbins()+1; iDSID++)
 		{
 					if(iDSID<3) std::cout << std::setw(12) << setprecision(5) << fabs((h_yields->GetBinContent(1,iVar) - h_yields->GetBinContent(iDSID,iVar)))/(h_yields->GetBinContent(1,iVar))*100 << " ";
 					else std::cout << std::setw(12) << setprecision(5) << fabs((h_yields->GetBinContent(3,iVar) - h_yields->GetBinContent(iDSID,iVar)))/(h_yields->GetBinContent(3,iVar))*100 << " ";
@@ -77,16 +84,16 @@ void dumpYields(void)
 	}
 
 	std::cout << "\nSR/CR ...\n" << std::endl;
-	for(unsigned int iSyst=0; iSyst<systs.size(); iSyst++)
+	for(unsigned long iSyst=0; iSyst<systs.size(); iSyst++)
 	{
 		std::cout << std::setw(12) << systs.at(iSyst) << " ";
 	}
 	std::cout << std::endl;
 
-	for(unsigned int iVar=6; iVar<h_yields->GetYaxis()->GetNbins()-15; iVar++) // We just want to loop over the signal regions here.
+	for(int iVar=6; iVar<h_yields->GetYaxis()->GetNbins()-15; iVar++) // We just want to loop over the signal regions here.
 	{
 		std::cout << std::setw(12) << h_yields->GetYaxis()->GetBinLabel(iVar);
-		for(unsigned int iDSID=1; iDSID<h_yields->GetXaxis()->GetNbins()+1; iDSID++)
+		for(int iDSID=1; iDSID<h_yields->GetXaxis()->GetNbins()+1; iDSID++)
 		{
 					if(iDSID<3) std::cout << std::setw(12) << setprecision(5) << (fabs((h_yields->GetBinContent(1,iVar) - h_yields->GetBinContent(iDSID,iVar)))/(h_yields->GetBinContent(1,iVar))) /  (fabs((h_yields->GetBinContent(1,iVar+15) - h_yields->GetBinContent(iDSID,iVar+15)))/(h_yields->GetBinContent(1,iVar+15))) << " ";
 					else std::cout << std::setw(12) << setprecision(5) << (fabs((h_yields->GetBinContent(3,iVar) - h_yields->GetBinContent(iDSID,iVar)))/(h_yields->GetBinContent(1,iVar))) /  (fabs((h_yields->GetBinContent(3,iVar+15) - h_yields->GetBinContent(iDSID,iVar+15)))/(h_yields->GetBinContent(3,iVar+15))) << " ";
@@ -97,19 +104,19 @@ void dumpYields(void)
 	std::cout << std::endl;
 
 	std::cout << "\nTransfer factor uncertainty ...\n" << std::endl;
-	for(unsigned int iSyst=0; iSyst<systs.size(); iSyst++)
+	for(unsigned long iSyst=0; iSyst<systs.size(); iSyst++)
 	{
 		std::cout << std::setw(12) << systs.at(iSyst) << " ";
 	}
 	std::cout << std::endl;
 
-	for(unsigned int iVar=6; iVar<h_yields->GetYaxis()->GetNbins(); iVar++) // We just want to loop over the signal regions here.
+	for(int iVar=6; iVar<h_yields->GetYaxis()->GetNbins(); iVar++) // We just want to loop over the signal regions here.
 	{
 		vector<float> uncerts;
 
 		std::cout << std::setw(12) << h_yields->GetYaxis()->GetBinLabel(iVar);
 
-		for(unsigned int iDSID=1; iDSID<h_yields->GetXaxis()->GetNbins(); iDSID++)
+		for(int iDSID=1; iDSID<h_yields->GetXaxis()->GetNbins(); iDSID++)
 		{
 			float tf_nom, tf_syst;
 			if(iDSID<3)
