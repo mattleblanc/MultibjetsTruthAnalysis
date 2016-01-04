@@ -24,19 +24,8 @@
 
 # 410004
 python MultibjetsTruthAnalysis/scripts/Run.py \
-    --submitDir=/home/mleblanc/out/paper/410004/ \
+    --submitDir=/home/mleblanc/out/160102/410004/ \
     --inputDS="mc15_13TeV:mc15_13TeV.410004.PowhegHerwigppEvtGen_UEEE5_ttbar_hdamp172p5_nonallhad.merge.DAOD_TRUTH1.e3836_p2425/" \
-    --driver=condor \
-    --doRcJets=1 \
-    --doAK10Jets=0 \
-    --debug=1 \
-    --doTRF=0 \
-    --process="testMLB00"
-
-#410003
-python MultibjetsTruthAnalysis/scripts/Run.py \
-    --submitDir=/home/mleblanc/out/paper/410003/ \
-    --inputDS="mc15_13TeV:mc15_13TeV.410003.aMcAtNloHerwigppEvtGen_ttbar_nonallhad.merge.DAOD_TRUTH1.e3964_p2425/" \
     --driver=condor \
     --doRcJets=1 \
     --doAK10Jets=0 \

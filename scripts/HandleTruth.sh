@@ -52,7 +52,7 @@
 #    --process="testMLB00"
 
 python MultibjetsTruthAnalysis/scripts/Run.py \
-    --submitDir=/home/mleblanc/out/truthOut/410003/ \
+    --submitDir=/home/mleblanc/out/160102/410003/ \
     --inputDS="mc15_13TeV:mc15_13TeV.410003.aMcAtNloHerwigppEvtGen_ttbar_nonallhad.merge.DAOD_TRUTH1.e3964_p2425/" \
     --driver=condor \
     --doRcJets=1 \
@@ -62,7 +62,7 @@ python MultibjetsTruthAnalysis/scripts/Run.py \
     --process="testMLB00"
 
 python MultibjetsTruthAnalysis/scripts/Run.py \
-    --submitDir=/home/mleblanc/out/paper/410004/ \
+    --submitDir=/home/mleblanc/out/160102/410004/ \
     --inputDS="mc15_13TeV:mc15_13TeV.410004.PowhegHerwigppEvtGen_UEEE5_ttbar_hdamp172p5_nonallhad.merge.DAOD_TRUTH1.e3836_p2425/" \
     --driver=condor \
     --doRcJets=1 \
@@ -83,7 +83,7 @@ python MultibjetsTruthAnalysis/scripts/Run.py \
 
 #407032
 python MultibjetsTruthAnalysis/scripts/Run.py \
-    --submitDir=/home/mleblanc/out/paper/407032/ \
+    --submitDir=/home/mleblanc/out/160102/407032/ \
     --inputDS="mc15_13TeV:mc15_13TeV.407032.PhPyEG_CT10_P2012radHiC6L1_ttbarMET200_hdamp345_down_nonAH.merge.DAOD_TRUTH1.e4505_p2436/" \
     --driver=condor \
     --doRcJets=1 \
@@ -94,7 +94,7 @@ python MultibjetsTruthAnalysis/scripts/Run.py \
 
 #407036    
 python MultibjetsTruthAnalysis/scripts/Run.py \
-    --submitDir=/home/mleblanc/out/paper/407036/ \
+    --submitDir=/home/mleblanc/out/160102/407036/ \
     --inputDS="mc15_13TeV:mc15_13TeV.407036.PhPyEG_CT10_P2012radLoC6L1_ttbarMET200_hdamp172_up_nonAH.merge.DAOD_TRUTH1.e4505_p2436/" \
     --driver=condor \
     --doRcJets=1 \
@@ -105,7 +105,7 @@ python MultibjetsTruthAnalysis/scripts/Run.py \
 
 #407012
 python MultibjetsTruthAnalysis/scripts/Run.py \
-    --submitDir=/home/mleblanc/out/paper/407012/ \
+    --submitDir=/home/mleblanc/out/160102/407012/ \
     --inputDS="mc15_13TeV:mc15_13TeV.407012.PowhegPythiaEvtGen_P2012CT10_ttbarMET200_hdamp172p5_nonAH.merge.DAOD_TRUTH1.e4023_p2436/" \
     --driver=condor \
     --doRcJets=1 \
@@ -116,7 +116,7 @@ python MultibjetsTruthAnalysis/scripts/Run.py \
 
 #407040
 python MultibjetsTruthAnalysis/scripts/Run.py \
-    --submitDir=/home/mleblanc/out/paper/407040/ \
+    --submitDir=/home/mleblanc/out/160102/407040/ \
     --inputDS="mc15_13TeV:mc15_13TeV.407040.PhHppEG_CT10_UE5C6L1_ttbarMET200_hdamp172p5_nonAH.merge.DAOD_TRUTH1.e4497_p2436/" \
     --driver=condor \
     --doRcJets=1 \
