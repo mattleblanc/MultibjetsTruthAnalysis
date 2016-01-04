@@ -49,11 +49,6 @@
 // this is needed to distribute the algorithm to the workers
 ClassImp(TruthAnalysis)
 
-
-
-
-
-
 TruthAnalysis :: TruthAnalysis ()
 {
   // Here you put any code for the base initialization of variables,
@@ -2894,66 +2889,66 @@ EL::StatusCode TruthAnalysis :: execute ()
   var_Met = 0;
   var_MetSig = 0;
 
-  var_rcjet_pt_1 = 0;
-  var_rcjet_pt_2 = 0;
-  var_rcjet_pt_3 = 0;
-  var_rcjet_pt_4 = 0;
-  var_rcjet_eta_1 = 0;
-  var_rcjet_eta_2 = 0;
-  var_rcjet_eta_3 = 0;
-  var_rcjet_eta_4 = 0;
-  var_rcjet_phi_1 = 0;
-  var_rcjet_phi_2 = 0;
-  var_rcjet_phi_3 = 0;
-  var_rcjet_phi_4 = 0;
-  var_rcjet_mass_1 = 0;
-  var_rcjet_mass_2 = 0;
-  var_rcjet_mass_3 = 0;
-  var_rcjet_mass_4 = 0;
+  var_rcjet_pt_1 = -999;
+  var_rcjet_pt_2 = -999;
+  var_rcjet_pt_3 = -999;
+  var_rcjet_pt_4 = -999;
+  var_rcjet_eta_1 = -999;
+  var_rcjet_eta_2 = -999;
+  var_rcjet_eta_3 = -999;
+  var_rcjet_eta_4 = -999;
+  var_rcjet_phi_1 = -999;
+  var_rcjet_phi_2 = -999;
+  var_rcjet_phi_3 = -999;
+  var_rcjet_phi_4 = -999;
+  var_rcjet_mass_1 = -999;
+  var_rcjet_mass_2 = -999;
+  var_rcjet_mass_3 = -999;
+  var_rcjet_mass_4 = -999;
 
-  var_bjet_pt_1 = 0;
-  var_bjet_pt_2 = 0;
-  var_bjet_pt_3 = 0;
-  var_bjet_pt_4 = 0;
-  var_bjet_eta_1 = 0;
-  var_bjet_eta_2 = 0;
-  var_bjet_eta_3 = 0;
-  var_bjet_eta_4 = 0;
-  var_bjet_phi_1 = 0;
-  var_bjet_phi_2 = 0;
-  var_bjet_phi_3 = 0;
-  var_bjet_phi_4 = 0;
-  var_bjet_e_1 = 0;
-  var_bjet_e_2 = 0;
-  var_bjet_e_3 = 0;
-  var_bjet_e_4 = 0;
+  var_bjet_pt_1 = -999;
+  var_bjet_pt_2 = -999;
+  var_bjet_pt_3 = -999;
+  var_bjet_pt_4 = -999;
+  var_bjet_eta_1 = -999;
+  var_bjet_eta_2 = -999;
+  var_bjet_eta_3 = -999;
+  var_bjet_eta_4 = -999;
+  var_bjet_phi_1 = -999;
+  var_bjet_phi_2 = -999;
+  var_bjet_phi_3 = -999;
+  var_bjet_phi_4 = -999;
+  var_bjet_e_1 = -999;
+  var_bjet_e_2 = -999;
+  var_bjet_e_3 = -999;
+  var_bjet_e_4 = -999;
 
-  var_jet_pt_1 = 0;
-  var_jet_pt_2 = 0;
-  var_jet_pt_3 = 0;
-  var_jet_pt_4 = 0;
-  var_jet_eta_1 = 0;
-  var_jet_eta_2 = 0;
-  var_jet_eta_3 = 0;
-  var_jet_eta_4 = 0;
-  var_jet_phi_1 = 0;
-  var_jet_phi_2 = 0;
-  var_jet_phi_3 = 0;
-  var_jet_phi_4 = 0;
-  var_jet_e_1 = 0;
-  var_jet_e_2 = 0;
-  var_jet_e_3 = 0;
-  var_jet_e_4 = 0;
+  var_jet_pt_1 = -999;
+  var_jet_pt_2 = -999;
+  var_jet_pt_3 = -999;
+  var_jet_pt_4 = -999;
+  var_jet_eta_1 = -999;
+  var_jet_eta_2 = -999;
+  var_jet_eta_3 = -999;
+  var_jet_eta_4 = -999;
+  var_jet_phi_1 = -999;
+  var_jet_phi_2 = -999;
+  var_jet_phi_3 = -999;
+  var_jet_phi_4 = -999;
+  var_jet_e_1 = -999;
+  var_jet_e_2 = -999;
+  var_jet_e_3 = -999;
+  var_jet_e_4 = -999;
 
-  var_mu_pt = 0;
-  var_mu_eta = 0;
-  var_mu_phi = 0;
-  var_mu_e = 0;
+  var_mu_pt = -999;
+  var_mu_eta = -999;
+  var_mu_phi = -999;
+  var_mu_e = -999;
 
-  var_el_pt = 0;
-  var_el_eta = 0;
-  var_el_phi = 0;
-  var_el_e = 0;
+  var_el_pt = -999;
+  var_el_eta = -999;
+  var_el_phi = -999;
+  var_el_e = -999;
 
   NSignalElectrons = 0;
   NSignalMuons = 0;
