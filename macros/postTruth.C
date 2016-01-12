@@ -513,50 +513,8 @@ void postTruth(void)
 				if(isGtt1LSRA4) h_yields_trf->Fill(reg, "Gtt1LSRA4", weight_temp);
 				if(isGtt1LSRB4) h_yields_trf->Fill(reg, "Gtt1LSRB4", weight_temp);
 				if(isGtt1LSRC4) h_yields_trf->Fill(reg, "Gtt1LSRC4", weight_temp);
-		  //     	if(reg=="407012" || reg=="407032" || reg=="407036" || reg=="407040" || reg=="407044")
-		  //     	{
-				// 	if((isTRF > 0 && NBJets >= 4 && NBJets_TRF == 4 && isTRF_incl > 0) && (NJets >= 6 && NTopJets >= 0 && var_Met > 250. && var_Meff > 700. && var_mT > 150. && NSignalLeptons >= 1))
-				// 	{
-				// 		h_yields_trf->Fill(reg, "Gtt1LSRC4", weight_temp);
-				// 	}
-				// }
-				// else
-				// {
-				// 	if((isTRF > 0 && NBJets >= 4 && NBJets_TRF == 4 && isTRF_incl > 0) && (NJets >= 6 && NTopJets >= 0 && var_Met > 0.0 && var_Meff > 450.0 && var_mT > 150. && NSignalLeptons >= 1))
-				// 	{
-				// 		h_yields_trf->Fill(reg, "Gtt1LSRC4", weight_temp);
-				// 	}
-				// }
 				if(isGtt0LSRA) h_yields_trf->Fill(reg, "Gtt0LSRA", weight_temp);
-		  //     	if(reg=="407012" || reg=="407032" || reg=="407036" || reg=="407040" || reg=="407044")
-		  //     	{
-				// 	if((isTRF > 0 && NBJets >= 4 && NBJets_TRF == 4 && isTRF_incl > 0) && (var_mTb > 80 && NJets >= 8 && NTopJets >= 0 && var_Met > 350. && var_Meff > 1250. && NSignalLeptons == 0))
-				// 	{
-				// 		h_yields_trf->Fill(reg, "Gtt0LSRA", weight_temp);
-				// 	}
-				// }
-				// else
-				// {
-				// 	if((isTRF > 0 && NBJets >= 4 && NBJets_TRF == 4 && isTRF_incl > 0) && (var_mTb > 80 && NJets >= 8 && NTopJets >= 0 && var_Met > 0.0 && var_Meff > 900.0 && NSignalLeptons == 0))
-				// 	{
-				// 		h_yields_trf->Fill(reg, "Gtt0LSRA", weight_temp);
-				// 	}
-				// }
 				if(isGtt0LSRB) h_yields_trf->Fill(reg, "Gtt0LSRB", weight_temp);
-				// if(reg=="407012" || reg=="407032" || reg=="407036" || reg=="407040" || reg=="407044")
-		  //     	{
-				// 	if((isTRF > 0 && NBJets >= 4 && NBJets_TRF == 4 && isTRF_incl > 0) && (var_mTb > 80 && NJets >= 8 && NTopJets >= 1 && var_Met > 350.0 && var_Meff > 1250.0 && NSignalLeptons == 0)) 
-				// 	{
-				// 		h_yields_trf->Fill(reg, "Gtt0LSRB", weight_temp);
-				// 	}
-				// }
-				// else
-				// {
-				// 	if((isTRF > 0 && NBJets >= 4 && NBJets_TRF == 4 && isTRF_incl > 0) && (var_mTb > 80 && NJets >= 8 && NTopJets >= 1 && var_Met > 0.0 && var_Meff > 900.0 && NSignalLeptons == 0)) 
-				// 	{
-				// 		h_yields_trf->Fill(reg, "Gtt0LSRB", weight_temp);
-				// 	}
-				// }
 				if(isGtt0LSRC) h_yields_trf->Fill(reg, "Gtt0LSRC", weight_temp);
 				if(isGtt0LSRD) h_yields_trf->Fill(reg, "Gtt0LSRD", weight_temp);
 
@@ -706,85 +664,85 @@ void postTruth(void)
 			// 	//std::cout << "is TRF\tTRF_wgt is " << TRF_wgt << std::endl;
 			// 	weight_temp*=TRF_wgt;
 
-			// 	if(all) h_yields_trf->Fill(reg, "All", TRF_wgt);
-			// 	if(isPreselect) h_yields_trf->Fill(reg, "Presel", TRF_wgt);
-			// 	if(isPreselect_Gbb) h_yields_trf->Fill(reg, "PreGbb", TRF_wgt);
-			// 	if(isPreselect_Gtt_0l) h_yields_trf->Fill(reg, "PreGtt0l", TRF_wgt);
-			// 	if(isPreselect_Gtt_1l) h_yields_trf->Fill(reg, "PreGtt1l", TRF_wgt);
+			// 	if(all) h_yields_trf->Fill(reg, "All", 1.0/*TRF_wgt*/);
+			// 	if(isPreselect) h_yields_trf->Fill(reg, "Presel", 1.0/*TRF_wgt*/);
+			// 	if(isPreselect_Gbb) h_yields_trf->Fill(reg, "PreGbb", 1.0/*TRF_wgt*/);
+			// 	if(isPreselect_Gtt_0l) h_yields_trf->Fill(reg, "PreGtt0l", 1.0/*TRF_wgt*/);
+			// 	if(isPreselect_Gtt_1l) h_yields_trf->Fill(reg, "PreGtt1l", 1.0/*TRF_wgt*/);
 
-			// 	if(isGbbSRA2) h_yields_trf->Fill(reg, "GbbSRA2", TRF_wgt);
-			// 	if(isGbbSRB2) h_yields_trf->Fill(reg, "GbbSRB2", TRF_wgt);
-			// 	if(isGbbSRC2) h_yields_trf->Fill(reg, "GbbSRC2", TRF_wgt);
-			// 	if(isGbbSRA4) h_yields_trf->Fill(reg, "GbbSRA4", TRF_wgt);
-			// 	if(isGbbSRB4) h_yields_trf->Fill(reg, "GbbSRB4", TRF_wgt);
+			// 	if(isGbbSRA2) h_yields_trf->Fill(reg, "GbbSRA2", 1.0/*TRF_wgt*/);
+			// 	if(isGbbSRB2) h_yields_trf->Fill(reg, "GbbSRB2", 1.0/*TRF_wgt*/);
+			// 	if(isGbbSRC2) h_yields_trf->Fill(reg, "GbbSRC2", 1.0/*TRF_wgt*/);
+			// 	if(isGbbSRA4) h_yields_trf->Fill(reg, "GbbSRA4", 1.0/*TRF_wgt*/);
+			// 	if(isGbbSRB4) h_yields_trf->Fill(reg, "GbbSRB4", 1.0/*TRF_wgt*/);
 
-			// 	if(isGtt1LSRA2) h_yields_trf->Fill(reg, "Gtt1LSRA2", TRF_wgt);
-			// 	if(isGtt1LSRB2) h_yields_trf->Fill(reg, "Gtt1LSRB2", TRF_wgt);
-			// 	if(isGtt1LSRC2) h_yields_trf->Fill(reg, "Gtt1LSRC2", TRF_wgt);
-			// 	if(isGtt1LSRA4) h_yields_trf->Fill(reg, "Gtt1LSRA4", TRF_wgt);
-			// 	if(isGtt1LSRB4) h_yields_trf->Fill(reg, "Gtt1LSRB4", TRF_wgt);
-			// 	if(isGtt1LSRC4) h_yields_trf->Fill(reg, "Gtt1LSRC4", TRF_wgt);
+			// 	if(isGtt1LSRA2) h_yields_trf->Fill(reg, "Gtt1LSRA2", 1.0/*TRF_wgt*/);
+			// 	if(isGtt1LSRB2) h_yields_trf->Fill(reg, "Gtt1LSRB2", 1.0/*TRF_wgt*/);
+			// 	if(isGtt1LSRC2) h_yields_trf->Fill(reg, "Gtt1LSRC2", 1.0/*TRF_wgt*/);
+			// 	if(isGtt1LSRA4) h_yields_trf->Fill(reg, "Gtt1LSRA4", 1.0/*TRF_wgt*/);
+			// 	if(isGtt1LSRB4) h_yields_trf->Fill(reg, "Gtt1LSRB4", 1.0/*TRF_wgt*/);
+			// 	if(isGtt1LSRC4) h_yields_trf->Fill(reg, "Gtt1LSRC4", 1.0/*TRF_wgt*/);
 
-			// 	if(isGtt0LSRA) h_yields_trf->Fill(reg, "Gtt0LSRA", TRF_wgt);
-			// 	if(isGtt0LSRB) h_yields_trf->Fill(reg, "Gtt0LSRB", TRF_wgt);
-			// 	if(isGtt0LSRC) h_yields_trf->Fill(reg, "Gtt0LSRC", TRF_wgt);
-			// 	if(isGtt0LSRD) h_yields_trf->Fill(reg, "Gtt0LSRD", TRF_wgt);
+			// 	if(isGtt0LSRA) h_yields_trf->Fill(reg, "Gtt0LSRA", 1.0/*TRF_wgt*/);
+			// 	if(isGtt0LSRB) h_yields_trf->Fill(reg, "Gtt0LSRB", 1.0/*TRF_wgt*/);
+			// 	if(isGtt0LSRC) h_yields_trf->Fill(reg, "Gtt0LSRC", 1.0/*TRF_wgt*/);
+			// 	if(isGtt0LSRD) h_yields_trf->Fill(reg, "Gtt0LSRD", 1.0/*TRF_wgt*/);
 
-			// 	if(isGbbCRA2) h_yields_trf->Fill(reg, "GbbCRA2", TRF_wgt);
-			// 	if(isGbbCRB2) h_yields_trf->Fill(reg, "GbbCRB2", TRF_wgt);
-			// 	if(isGbbCRC2) h_yields_trf->Fill(reg, "GbbCRC2", TRF_wgt);
-			// 	if(isGbbCRA4) h_yields_trf->Fill(reg, "GbbCRA4", TRF_wgt);
-			// 	if(isGbbCRB4) h_yields_trf->Fill(reg, "GbbCRB4", TRF_wgt);
+			// 	if(isGbbCRA2) h_yields_trf->Fill(reg, "GbbCRA2", 1.0/*TRF_wgt*/);
+			// 	if(isGbbCRB2) h_yields_trf->Fill(reg, "GbbCRB2", 1.0/*TRF_wgt*/);
+			// 	if(isGbbCRC2) h_yields_trf->Fill(reg, "GbbCRC2", 1.0/*TRF_wgt*/);
+			// 	if(isGbbCRA4) h_yields_trf->Fill(reg, "GbbCRA4", 1.0/*TRF_wgt*/);
+			// 	if(isGbbCRB4) h_yields_trf->Fill(reg, "GbbCRB4", 1.0/*TRF_wgt*/);
 
-			// 	if(isGtt1LCRA2) h_yields_trf->Fill(reg, "Gtt1LCRA2", TRF_wgt);
-			// 	if(isGtt1LCRB2) h_yields_trf->Fill(reg, "Gtt1LCRB2", TRF_wgt);
-			// 	if(isGtt1LCRC2) h_yields_trf->Fill(reg, "Gtt1LCRC2", TRF_wgt);
-			// 	if(isGtt1LCRA4) h_yields_trf->Fill(reg, "Gtt1LCRA4", TRF_wgt);
-			// 	if(isGtt1LCRB4) h_yields_trf->Fill(reg, "Gtt1LCRB4", TRF_wgt);
-			// 	if(isGtt1LCRC4) h_yields_trf->Fill(reg, "Gtt1LCRC4", TRF_wgt);
+			// 	if(isGtt1LCRA2) h_yields_trf->Fill(reg, "Gtt1LCRA2", 1.0/*TRF_wgt*/);
+			// 	if(isGtt1LCRB2) h_yields_trf->Fill(reg, "Gtt1LCRB2", 1.0/*TRF_wgt*/);
+			// 	if(isGtt1LCRC2) h_yields_trf->Fill(reg, "Gtt1LCRC2", 1.0/*TRF_wgt*/);
+			// 	if(isGtt1LCRA4) h_yields_trf->Fill(reg, "Gtt1LCRA4", 1.0/*TRF_wgt*/);
+			// 	if(isGtt1LCRB4) h_yields_trf->Fill(reg, "Gtt1LCRB4", 1.0/*TRF_wgt*/);
+			// 	if(isGtt1LCRC4) h_yields_trf->Fill(reg, "Gtt1LCRC4", 1.0/*TRF_wgt*/);
 
-			// 	if(isGtt0LCRA) h_yields_trf->Fill(reg, "Gtt0LCRA", TRF_wgt);
-			// 	if(isGtt0LCRB) h_yields_trf->Fill(reg, "Gtt0LCRB", TRF_wgt);
-			// 	if(isGtt0LCRC) h_yields_trf->Fill(reg, "Gtt0LCRC", TRF_wgt);
-			// 	if(isGtt0LCRD) h_yields_trf->Fill(reg, "Gtt0LCRD", TRF_wgt);
+			// 	if(isGtt0LCRA) h_yields_trf->Fill(reg, "Gtt0LCRA", 1.0/*TRF_wgt*/);
+			// 	if(isGtt0LCRB) h_yields_trf->Fill(reg, "Gtt0LCRB", 1.0/*TRF_wgt*/);
+			// 	if(isGtt0LCRC) h_yields_trf->Fill(reg, "Gtt0LCRC", 1.0/*TRF_wgt*/);
+			// 	if(isGtt0LCRD) h_yields_trf->Fill(reg, "Gtt0LCRD", 1.0/*TRF_wgt*/);
 
-			// 	if(isGbbVRI2) h_yields_trf->Fill(reg, "GbbVRI2", TRF_wgt);
-			// 	if(isGbbVRII2) h_yields_trf->Fill(reg, "GbbVRII2", TRF_wgt);
-			// 	if(isGbbVRIII2) h_yields_trf->Fill(reg, "GbbVRIII2", TRF_wgt);
-			// 	if(isGbbVRI4) h_yields_trf->Fill(reg, "GbbVRI4", TRF_wgt);
-			// 	if(isGbbVRII4) h_yields_trf->Fill(reg, "GbbVRII4", TRF_wgt);
-			// 	if(isVR1LGtt0LI) h_yields_trf->Fill(reg, "VR1LGtt0LI", TRF_wgt);
-			// 	if(isVR1LGtt0LII) h_yields_trf->Fill(reg, "VR1LGtt0LII", TRF_wgt);
-			// 	if(isVR1LGtt0LIII) h_yields_trf->Fill(reg, "VR1LGtt0LIII", TRF_wgt);
-			// 	if(isVR1LGtt0LIV) h_yields_trf->Fill(reg, "VR1LGtt0LIV", TRF_wgt);
-			// 	if(isVR0LGtt0LI) h_yields_trf->Fill(reg, "VR0LGtt0LI", TRF_wgt);
-			// 	if(isVR0LGtt0LII) h_yields_trf->Fill(reg, "VR0LGtt0LII", TRF_wgt);
-			// 	if(isVR0LGtt0LIII) h_yields_trf->Fill(reg, "VR0LGtt0LIII", TRF_wgt);
-			// 	if(isVR0LGtt0LIV) h_yields_trf->Fill(reg, "VR0LGtt0LIV", TRF_wgt);
-			// 	if(isVRGtt1LI2mT2b) h_yields_trf->Fill(reg, "VRGtt1LI2mT2b", TRF_wgt);
-			// 	if(isVRGtt1LII2mT2b) h_yields_trf->Fill(reg, "VRGtt1LII2mT2b", TRF_wgt);
-			// 	if(isVRGtt1LI4mT2b) h_yields_trf->Fill(reg, "VRGtt1LI4mT2b", TRF_wgt);
-			// 	if(isVRGtt1LII4mT2b) h_yields_trf->Fill(reg, "VRGtt1LII4mT2b", TRF_wgt);
-			// 	if(isVRGtt1LI2mT3b) h_yields_trf->Fill(reg, "VRGtt1LI2mT3b", TRF_wgt);
-			// 	if(isVRGtt1LII2mT3b) h_yields_trf->Fill(reg, "VRGtt1LII2mT3b", TRF_wgt);
-			// 	if(isVRGtt1LI4mT3b) h_yields_trf->Fill(reg, "VRGtt1LI4mT3b", TRF_wgt); 
-			// 	if(isVRGtt1LII4mT3b) h_yields_trf->Fill(reg, "VRGtt1LII4mT3b", TRF_wgt);
-			// 	if(isVRGtt1LI2mTb2b) h_yields_trf->Fill(reg, "VRGtt1LI2mTb2b", TRF_wgt);
-			// 	if(isVRGtt1LII2mTb2b) h_yields_trf->Fill(reg, "VRGtt1LII2mTb2b", TRF_wgt);
-			// 	if(isVRGtt1LI4mTb2b) h_yields_trf->Fill(reg, "VRGtt1LI4mTb2b", TRF_wgt);
-			// 	if(isVRGtt1LII4mTb2b) h_yields_trf->Fill(reg, "VRGtt1LII4mTb2b", TRF_wgt);
-			// 	if(isVRGtt1LI2mTb3b) h_yields_trf->Fill(reg, "VRGtt1LI2mTb3b", TRF_wgt);
-			// 	if(isVRGtt1LII2mTb3b) h_yields_trf->Fill(reg, "VRGtt1LII2mTb3b", TRF_wgt);
-			// 	if(isVRGtt1LI4mTb3b) h_yields_trf->Fill(reg, "VRGtt1LI4mTb3b", TRF_wgt);
-			// 	if(isVRGtt1LII4mTb3b) h_yields_trf->Fill(reg, "VRGtt1LII4mTb3b", TRF_wgt);
-			// 	if(isVRGtt1LI2mT4b) h_yields_trf->Fill(reg, "VRGtt1LI2mT4b", TRF_wgt);
-			// 	if(isVRGtt1LII2mT4b) h_yields_trf->Fill(reg, "VRGtt1LII2mT4b", TRF_wgt);
-			// 	if(isVRGtt1LIII22b) h_yields_trf->Fill(reg, "VRGtt1LIII22b", TRF_wgt);
-			// 	if(isVRGtt1LIII42b) h_yields_trf->Fill(reg, "VRGtt1LIII42b", TRF_wgt);
-			// 	if(isVRGtt1LIII23b) h_yields_trf->Fill(reg, "VRGtt1LIII23b", TRF_wgt);
-			// 	if(isVRGtt1LIII43b) h_yields_trf->Fill(reg, "VRGtt1LIII43b", TRF_wgt);
-			// 	if(isVRGtt1LIII24b) h_yields_trf->Fill(reg, "VRGtt1LIII24b", TRF_wgt);
-			// 	if(isVRGtt1LIII44b) h_yields_trf->Fill(reg, "VRGtt1LIII44b", TRF_wgt);
+			// 	if(isGbbVRI2) h_yields_trf->Fill(reg, "GbbVRI2", 1.0/*TRF_wgt*/);
+			// 	if(isGbbVRII2) h_yields_trf->Fill(reg, "GbbVRII2", 1.0/*TRF_wgt*/);
+			// 	if(isGbbVRIII2) h_yields_trf->Fill(reg, "GbbVRIII2", 1.0/*TRF_wgt*/);
+			// 	if(isGbbVRI4) h_yields_trf->Fill(reg, "GbbVRI4", 1.0/*TRF_wgt*/);
+			// 	if(isGbbVRII4) h_yields_trf->Fill(reg, "GbbVRII4", 1.0/*TRF_wgt*/);
+			// 	if(isVR1LGtt0LI) h_yields_trf->Fill(reg, "VR1LGtt0LI", 1.0/*TRF_wgt*/);
+			// 	if(isVR1LGtt0LII) h_yields_trf->Fill(reg, "VR1LGtt0LII", 1.0/*TRF_wgt*/);
+			// 	if(isVR1LGtt0LIII) h_yields_trf->Fill(reg, "VR1LGtt0LIII", 1.0/*TRF_wgt*/);
+			// 	if(isVR1LGtt0LIV) h_yields_trf->Fill(reg, "VR1LGtt0LIV", 1.0/*TRF_wgt*/);
+			// 	if(isVR0LGtt0LI) h_yields_trf->Fill(reg, "VR0LGtt0LI", 1.0/*TRF_wgt*/);
+			// 	if(isVR0LGtt0LII) h_yields_trf->Fill(reg, "VR0LGtt0LII", 1.0/*TRF_wgt*/);
+			// 	if(isVR0LGtt0LIII) h_yields_trf->Fill(reg, "VR0LGtt0LIII", 1.0/*TRF_wgt*/);
+			// 	if(isVR0LGtt0LIV) h_yields_trf->Fill(reg, "VR0LGtt0LIV", 1.0/*TRF_wgt*/);
+			// 	if(isVRGtt1LI2mT2b) h_yields_trf->Fill(reg, "VRGtt1LI2mT2b", 1.0/*TRF_wgt*/);
+			// 	if(isVRGtt1LII2mT2b) h_yields_trf->Fill(reg, "VRGtt1LII2mT2b", 1.0/*TRF_wgt*/);
+			// 	if(isVRGtt1LI4mT2b) h_yields_trf->Fill(reg, "VRGtt1LI4mT2b", 1.0/*TRF_wgt*/);
+			// 	if(isVRGtt1LII4mT2b) h_yields_trf->Fill(reg, "VRGtt1LII4mT2b", 1.0/*TRF_wgt*/);
+			// 	if(isVRGtt1LI2mT3b) h_yields_trf->Fill(reg, "VRGtt1LI2mT3b", 1.0/*TRF_wgt*/);
+			// 	if(isVRGtt1LII2mT3b) h_yields_trf->Fill(reg, "VRGtt1LII2mT3b", 1.0/*TRF_wgt*/);
+			// 	if(isVRGtt1LI4mT3b) h_yields_trf->Fill(reg, "VRGtt1LI4mT3b", 1.0/*TRF_wgt*/); 
+			// 	if(isVRGtt1LII4mT3b) h_yields_trf->Fill(reg, "VRGtt1LII4mT3b", 1.0/*TRF_wgt*/);
+			// 	if(isVRGtt1LI2mTb2b) h_yields_trf->Fill(reg, "VRGtt1LI2mTb2b", 1.0/*TRF_wgt*/);
+			// 	if(isVRGtt1LII2mTb2b) h_yields_trf->Fill(reg, "VRGtt1LII2mTb2b", 1.0/*TRF_wgt*/);
+			// 	if(isVRGtt1LI4mTb2b) h_yields_trf->Fill(reg, "VRGtt1LI4mTb2b", 1.0/*TRF_wgt*/);
+			// 	if(isVRGtt1LII4mTb2b) h_yields_trf->Fill(reg, "VRGtt1LII4mTb2b", 1.0/*TRF_wgt*/);
+			// 	if(isVRGtt1LI2mTb3b) h_yields_trf->Fill(reg, "VRGtt1LI2mTb3b", 1.0/*TRF_wgt*/);
+			// 	if(isVRGtt1LII2mTb3b) h_yields_trf->Fill(reg, "VRGtt1LII2mTb3b", 1.0/*TRF_wgt*/);
+			// 	if(isVRGtt1LI4mTb3b) h_yields_trf->Fill(reg, "VRGtt1LI4mTb3b", 1.0/*TRF_wgt*/);
+			// 	if(isVRGtt1LII4mTb3b) h_yields_trf->Fill(reg, "VRGtt1LII4mTb3b", 1.0/*TRF_wgt*/);
+			// 	if(isVRGtt1LI2mT4b) h_yields_trf->Fill(reg, "VRGtt1LI2mT4b", 1.0/*TRF_wgt*/);
+			// 	if(isVRGtt1LII2mT4b) h_yields_trf->Fill(reg, "VRGtt1LII2mT4b", 1.0/*TRF_wgt*/);
+			// 	if(isVRGtt1LIII22b) h_yields_trf->Fill(reg, "VRGtt1LIII22b", 1.0/*TRF_wgt*/);
+			// 	if(isVRGtt1LIII42b) h_yields_trf->Fill(reg, "VRGtt1LIII42b", 1.0/*TRF_wgt*/);
+			// 	if(isVRGtt1LIII23b) h_yields_trf->Fill(reg, "VRGtt1LIII23b", 1.0/*TRF_wgt*/);
+			// 	if(isVRGtt1LIII43b) h_yields_trf->Fill(reg, "VRGtt1LIII43b", 1.0/*TRF_wgt*/);
+			// 	if(isVRGtt1LIII24b) h_yields_trf->Fill(reg, "VRGtt1LIII24b", 1.0/*TRF_wgt*/);
+			// 	if(isVRGtt1LIII44b) h_yields_trf->Fill(reg, "VRGtt1LIII44b", 1.0/*TRF_wgt*/);
 			// }		
 
 		}

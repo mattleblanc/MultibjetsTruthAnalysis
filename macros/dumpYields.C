@@ -25,7 +25,7 @@ void dumpYields(void)
 	TFile* f; f = new TFile("truthYields.root");
 	TH2D* h_yields; h_yields = (TH2D*)f->Get("yields");
 
-	std::cout << "Yields obtained. Dumping systematics ..." << std::endl;
+	std::cout << "Yields ..." << std::endl;
 
 	for(int iDSID=0; iDSID<h_yields->GetXaxis()->GetNbins()+1; iDSID++)
 	{
@@ -40,6 +40,26 @@ void dumpYields(void)
 		{
 			//std::cout << std::setw(12) << setprecision(3) << h_yields->GetBinError(iDSID,iVar)/h_yields->GetBinContent(iDSID,iVar) << " ";
 			std::cout << std::setw(12) << setprecision(3) << h_yields->GetBinContent(iDSID,iVar) << " ";
+		}
+
+		std::cout << std::endl;
+	}
+
+	std::cout << "Statistical uncertainty ..." << std::endl;
+
+	for(int iDSID=0; iDSID<h_yields->GetXaxis()->GetNbins()+1; iDSID++)
+	{
+		std::cout << std::setw(12) << h_yields->GetXaxis()->GetBinLabel(iDSID) << " ";
+	}
+	std::cout << std::endl;
+
+	for(int iVar=0; iVar<h_yields->GetYaxis()->GetNbins(); iVar++)
+	{
+		std::cout << std::setw(12) << h_yields->GetYaxis()->GetBinLabel(iVar);
+		for(int iDSID=1; iDSID<h_yields->GetXaxis()->GetNbins()+1; iDSID++)
+		{
+			//std::cout << std::setw(12) << setprecision(3) << h_yields->GetBinError(iDSID,iVar)/h_yields->GetBinContent(iDSID,iVar) << " ";
+			std::cout << std::setw(12) << setprecision(3) << std::sqrt(h_yields->GetBinContent(iDSID,iVar)) << " ";
 		}
 
 		std::cout << std::endl;
@@ -60,6 +80,7 @@ void dumpYields(void)
 	systs.push_back("Had. / PS");
 	//systs.push_back("Tune");
 
+/*
 	// Print out variation names ...
 	for(unsigned long iSyst=0; iSyst<systs.size(); iSyst++)
 	{
@@ -102,6 +123,7 @@ void dumpYields(void)
 		std::cout << std::endl;
 	}
 	std::cout << std::endl;
+*/
 
 	std::cout << "\nTransfer factor uncertainty ...\n" << std::endl;
 	for(unsigned long iSyst=0; iSyst<systs.size(); iSyst++)
