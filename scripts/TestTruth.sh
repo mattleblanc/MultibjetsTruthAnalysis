@@ -22,13 +22,13 @@
 #  --process=PROCESS     name of the process added to the output grid jobs
 
 #rm -rf /afs/cern.ch/work/f/farooque/xMatt/myWorkDir/MultibjetsTruthAnalysis/subDir
-rm -rf /home/mleblanc/out/closure2/*
+rm -rf /home/mleblanc/out/Test/*
 
 python MultibjetsTruthAnalysis/scripts/Run.py \
-    --submitDir=/home/mleblanc/out/closure2/407012/ \
+    --submitDir=/home/mleblanc/out/Test/407012/ \
     --inputDS="mc15_13TeV:mc15_13TeV.407012.PowhegPythiaEvtGen_P2012CT10_ttbarMET200_hdamp172p5_nonAH.merge.DAOD_TRUTH1.e4023_p2436/" \
     --driver=direct \
-    --nevents=10000 \
+    --nevents=1000 \
     --doRcJets=1 \
     --doAK10Jets=0 \
     --debug=1 \

@@ -29,6 +29,7 @@
 #include "TRandom3.h"
 #include "TFile.h"
 #include "TSystem.h"
+#include "TLorentzVector.h"
 
 // chiara: including the TRF package
 #include <BtaggingTRFandRW/TRFinterface.h>
@@ -531,9 +532,17 @@ EL::StatusCode TruthAnalysis :: initialize ()
 
 
 
-void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContainer> * SelectedBJets, ConstDataVector<xAOD::JetContainer> * SelectedJets
-						 , xAOD::MissingET* TruthMET_NonInt, bool isTRF, bool isTRF_incl, int nbjets_TRF){
-
+void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContainer> * SelectedBJets, 
+                                                 ConstDataVector<xAOD::JetContainer> * SelectedJets,
+						 ConstDataVector<xAOD::JetContainer> * SelectedRCJets,
+						 ConstDataVector<xAOD::JetContainer> * SelectedTopJets,
+                                                 ConstDataVector<xAOD::TruthParticleContainer> * SignalMuons,
+                                                 ConstDataVector<xAOD::TruthParticleContainer> * SignalElectrons,
+                                                 xAOD::MissingET* TruthMET_NonInt,
+                                                 bool isTRF,
+                                                 bool isTRF_incl,
+                                                 int nbjets_TRF)
+{
   Bool_t debug = false;
 
   m_isTRF = isTRF;
@@ -545,7 +554,6 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
   m_out_jets_isb_85_TRF_3excl.clear();
   m_out_jets_isb_85_TRF_3incl.clear();
   m_out_jets_isb_85_TRF_4incl.clear();
-
 
   m_out_sel_jets_pt.clear();
   m_out_sel_jets_eta.clear();
@@ -564,8 +572,6 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
     m_out_sel_jets_phi = m_sel_jets_phi;
   }
 
-
-
   m_TRF_wgt = 1.;
   if( isTRF && (nbjets_TRF == 2) && isTRF_incl ){ m_TRF_wgt = m_TRFweight_2incl;}
   else if( isTRF && (nbjets_TRF == 2) && !isTRF_incl ){ m_TRF_wgt = m_TRFweight_2excl;}
@@ -574,7 +580,6 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
   else if( isTRF && (nbjets_TRF == 3) && !isTRF_incl ){ m_TRF_wgt = m_TRFweight_3excl;}
 
   else if( isTRF && (nbjets_TRF == 4) && isTRF_incl ){ m_TRF_wgt = m_TRFweight_4incl;}
-
 
   NBJets = SelectedBJets->size();
   NBJets_TRF = nbjets_TRF;
@@ -598,6 +603,203 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
   if(SelectedBJets->size()>3) var_bjet_e_4 = SelectedBJets->at(3)->e() / MEV;
 
   var_mTb = Variables::mT_min_bjets(TruthMET_NonInt, SelectedBJets->asDataVector(), false );
+
+  // Overlap Removal
+
+  ConstDataVector<xAOD::TruthParticleContainer> * elPassingEJ = new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
+  ConstDataVector<xAOD::JetContainer> * jetPassingEJ = new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
+  ConstDataVector<xAOD::TruthParticleContainer> * jetPassingJE = new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
+  ConstDataVector<xAOD::TruthParticleContainer> * muPassingMJ = new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
+  ConstDataVector<xAOD::TruthParticleContainer> * elPassingEM = new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
+  ConstDataVector<xAOD::TruthParticleContainer> * muPassingEM = new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
+
+  ConstDataVector<xAOD::JetContainer> * FinalJets   =  new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
+  ConstDataVector<xAOD::TruthParticleContainer> * FinalElectrons    =  new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
+  ConstDataVector<xAOD::TruthParticleContainer> * FinalMuons    =  new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
+
+  // El-Jet
+  for(const auto electron : *SignalElectrons){
+    bool isGoodEl=true;
+    TLorentzVector elVec;
+    elVec.SetPtEtaPhiE(electron->pt(),electron->eta(),electron->phi(),electron->e());
+    for(const auto jet : *SelectedBJets) // this should loop over b-jets
+      {
+  TLorentzVector jetVec;
+  jetVec.SetPtEtaPhiE(jet->pt(),jet->eta(),jet->phi(),jet->e());
+        if(fabs(elVec.DeltaR(jetVec)<0.2))
+          {
+	    if(debug) std::cout << "El-Jet Overlap Triggered (remove e)" << std::endl;
+            isGoodEl=false;
+          }
+      }
+    if(isGoodEl) elPassingEJ->push_back(electron);
+  }
+  
+  // Jet-El
+  for(const auto jet : *SelectedJets)
+    {
+      TLorentzVector jetVec;
+      jetVec.SetPtEtaPhiE(jet->pt(),jet->eta(),jet->phi(),jet->e());
+      bool isGoodJet=true;;
+      for(const auto electron : *elPassingEJ)
+  {
+    TLorentzVector elVec;
+    elVec.SetPtEtaPhiE(electron->pt(),electron->eta(),electron->phi(),electron->e());
+    if(fabs(elVec.DeltaR(jetVec)<0.2))
+      {
+        if(debug) std::cout << "El-Jet Overlap Triggered (remove j)" << std::endl;
+        isGoodJet=false;
+      }
+  }
+      if(isGoodJet) jetPassingEJ->push_back(jet);
+    }
+  
+  // Mu-Jet
+  for(const auto muon : *SignalMuons)
+    {
+      TLorentzVector muVec;
+      muVec.SetPtEtaPhiE(muon->pt(),muon->eta(),muon->phi(),muon->e());
+      bool isGoodMuon=true;
+      for(const auto jet : *jetPassingEJ)
+        {
+          TLorentzVector jetVec;
+	  jetVec.SetPtEtaPhiE(jet->pt(),jet->eta(),jet->phi(),jet->e());
+          if(fabs(jetVec.DeltaR(muVec)<(0.04+10*MEV/muVec.Pt())))
+            {
+	      if(debug) std::cout << "Mu-Jet Overlap Triggered (remove m)" << std::endl;
+              isGoodMuon=false;
+            }
+  }
+      if(isGoodMuon) muPassingMJ->push_back(muon);
+    }
+  
+  // El-Mu
+  for(const auto electron : *elPassingEJ)
+    {
+      bool goodLeptons=true;
+      TLorentzVector elVec;
+      elVec.SetPtEtaPhiE(electron->pt(),electron->eta(),electron->phi(),electron->e());
+      for(const auto muon : *muPassingMJ)
+	{
+	  TLorentzVector muVec;
+	  muVec.SetPtEtaPhiE(muon->pt(),muon->eta(),muon->phi(),muon->e());
+	  if(fabs(elVec.DeltaR(muVec)<0.01))
+	    {
+	      if(debug) std::cout << "El-Mu Overlap Triggered (remove e and mu)" << std::endl;
+	      goodLeptons=false;
+	    }
+	}
+      if(goodLeptons) elPassingEM->push_back(electron);  
+    }
+  
+  for(const auto muon : *muPassingMJ)
+    {
+      bool goodLeptons=true;
+      TLorentzVector muVec;
+      muVec.SetPtEtaPhiE(muon->pt(),muon->eta(),muon->phi(),muon->e());
+      for(const auto electron : *elPassingEJ)
+        {
+          TLorentzVector elVec;
+	  elVec.SetPtEtaPhiE(electron->pt(),electron->eta(),electron->phi(),electron->e());
+	  if(fabs(elVec.DeltaR(muVec)<0.01))
+            {
+	      if(debug) std::cout << "El-Mu Overlap Triggered (remove e and mu)" << std::endl;
+              goodLeptons=false;
+            }
+        }
+      if(goodLeptons) muPassingEM->push_back(muon);
+    }
+
+  // Push back the final objects. Phew ...
+  for(const auto electron : *elPassingEM)
+    {
+      FinalElectrons->push_back(electron);
+    }
+  for(const auto muon : *muPassingEM)
+    {
+      FinalMuons->push_back(muon);
+    }
+  for(const auto jet : *jetPassingEJ)
+    {
+      FinalJets->push_back(jet);
+    }
+
+  if(debug)
+    {
+      std::cout << "Overlap removal: " << SignalElectrons->size()-FinalElectrons->size() << " electrons, "
+		<< SignalMuons->size()-FinalMuons->size() << " muons and " << SelectedJets->size()-FinalJets->size()
+		<< " jets removed." << std::endl;
+    }
+
+  // Define Variables
+  var_dPhiMin = Variables::delta_phi_nj(TruthMET_NonInt, FinalJets->asDataVector(), FinalJets->size()); // Should it be this MET?
+  var_Meff = Variables::Meff_incl(TruthMET_NonInt, FinalJets->asDataVector(), FinalMuons->asDataVector(), FinalElectrons->asDataVector());
+  var_Meff_4j = Variables::Meff_4j(TruthMET_NonInt, FinalJets->asDataVector(), 4 /* How many jets to use? */);
+  var_mT = Variables::mT(TruthMET_NonInt, FinalMuons->asDataVector(), FinalElectrons->asDataVector());
+  var_HT = Variables::Ht(FinalJets->asDataVector(), FinalMuons->asDataVector(), FinalElectrons->asDataVector());
+  var_Met = TruthMET_NonInt->met()/1000.0;
+  //var_Met = TruthMET_Int->met()/1000.0;
+  var_MetSig = Variables::Met_significance(TruthMET_NonInt, FinalJets->asDataVector(), 4 /* How many jets to use in HT? */);
+
+  var_dPhiMin = 1.0; // REMOVED TO TEST, MLB ON 11-11-15
+
+  NSignalElectrons = FinalElectrons->size();
+  NSignalMuons     = FinalMuons->size();
+  NBaseElectrons   = FinalElectrons->size();
+  NBaseMuons       = FinalMuons->size();
+  NJets        = FinalJets->size();
+  //NBJets         = SelectedBJets->size();
+  NTopJets     = SelectedTopJets->size();
+  
+  NSignalLeptons   = NSignalElectrons + NSignalMuons;
+  NBaseLeptons     = NBaseElectrons + NBaseMuons;
+
+  if(FinalMuons->size()>0) var_mu_pt = FinalMuons->at(0)->pt() / MEV;
+  if(FinalMuons->size()>0) var_mu_eta = FinalMuons->at(0)->eta();
+  if(FinalMuons->size()>0) var_mu_phi = FinalMuons->at(0)->phi();
+  if(FinalMuons->size()>0) var_mu_e = FinalMuons->at(0)->e() / MEV;
+
+  if(FinalElectrons->size()>0) var_el_pt = FinalElectrons->at(0)->pt() / MEV;
+  if(FinalElectrons->size()>0) var_el_eta = FinalElectrons->at(0)->eta();
+  if(FinalElectrons->size()>0) var_el_phi = FinalElectrons->at(0)->phi();
+  if(FinalElectrons->size()>0) var_el_e = FinalElectrons->at(0)->e() / MEV;
+
+  if(FinalJets->size()>0) var_jet_pt_1 = FinalJets->at(0)->pt() / MEV;
+  if(FinalJets->size()>1) var_jet_pt_2 = FinalJets->at(1)->pt() / MEV;
+  if(FinalJets->size()>2) var_jet_pt_3 = FinalJets->at(2)->pt() / MEV;
+  if(FinalJets->size()>3) var_jet_pt_4 = FinalJets->at(3)->pt() / MEV;
+  if(FinalJets->size()>0) var_jet_eta_1 = FinalJets->at(0)->eta();
+  if(FinalJets->size()>1) var_jet_eta_2 = FinalJets->at(1)->eta();
+  if(FinalJets->size()>2) var_jet_eta_3 = FinalJets->at(2)->eta();
+  if(FinalJets->size()>3) var_jet_eta_4 = FinalJets->at(3)->eta();
+  if(FinalJets->size()>0) var_jet_phi_1 = FinalJets->at(0)->phi();
+  if(FinalJets->size()>1) var_jet_phi_2 = FinalJets->at(1)->phi();
+  if(FinalJets->size()>2) var_jet_phi_3 = FinalJets->at(2)->phi();
+  if(FinalJets->size()>3) var_jet_phi_4 = FinalJets->at(3)->phi();
+  if(FinalJets->size()>0) var_jet_e_1 = FinalJets->at(0)->e() / MEV;
+  if(FinalJets->size()>1) var_jet_e_2 = FinalJets->at(1)->e() / MEV;
+  if(FinalJets->size()>2) var_jet_e_3 = FinalJets->at(2)->e() / MEV;
+  if(FinalJets->size()>3) var_jet_e_4 = FinalJets->at(3)->e() / MEV;
+
+  if(SelectedRCJets->size()>0) var_rcjet_pt_1 = SelectedRCJets->at(0)->pt() / MEV;
+  if(SelectedRCJets->size()>1) var_rcjet_pt_2 = SelectedRCJets->at(1)->pt() / MEV;
+  if(SelectedRCJets->size()>2) var_rcjet_pt_3 = SelectedRCJets->at(2)->pt() / MEV;
+  if(SelectedRCJets->size()>3) var_rcjet_pt_4 = SelectedRCJets->at(3)->pt() / MEV;
+  if(SelectedRCJets->size()>0) var_rcjet_eta_1 = SelectedRCJets->at(0)->eta();
+  if(SelectedRCJets->size()>1) var_rcjet_eta_2 = SelectedRCJets->at(1)->eta();
+  if(SelectedRCJets->size()>2) var_rcjet_eta_3 = SelectedRCJets->at(2)->eta();
+  if(SelectedRCJets->size()>3) var_rcjet_eta_4 = SelectedRCJets->at(3)->eta();
+  if(SelectedRCJets->size()>0) var_rcjet_phi_1 = SelectedRCJets->at(0)->phi();
+  if(SelectedRCJets->size()>1) var_rcjet_phi_2 = SelectedRCJets->at(1)->phi();
+  if(SelectedRCJets->size()>2) var_rcjet_phi_3 = SelectedRCJets->at(2)->phi();
+  if(SelectedRCJets->size()>3) var_rcjet_phi_4 = SelectedRCJets->at(3)->phi();
+  if(SelectedRCJets->size()>0) var_rcjet_mass_1 = SelectedRCJets->at(0)->m() / MEV;
+  if(SelectedRCJets->size()>1) var_rcjet_mass_2 = SelectedRCJets->at(1)->m() / MEV;
+  if(SelectedRCJets->size()>2) var_rcjet_mass_3 = SelectedRCJets->at(2)->m() / MEV;
+  if(SelectedRCJets->size()>3) var_rcjet_mass_4 = SelectedRCJets->at(3)->m() / MEV;
+  
+  Bool_t isOneLepton=false; isOneLepton = (NSignalLeptons == 1);
+  Bool_t isZeroLepton=false; isZeroLepton = (NBaseLeptons == 0);
 
   // debug variables
   if(debug)
@@ -2976,7 +3178,7 @@ EL::StatusCode TruthAnalysis :: execute ()
 
   static SG::AuxElement::ConstAccessor< float > Tau2("Tau2_wta");
   static SG::AuxElement::ConstAccessor< float > Tau3("Tau3_wta");
-
+  
   ConstDataVector<xAOD::JetContainer> * SelectedJets   =  new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
   ConstDataVector<xAOD::JetContainer> * SelectedBJets  =  new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
 
@@ -3120,6 +3322,149 @@ EL::StatusCode TruthAnalysis :: execute ()
     }
   }
 
+  // Overlap Removal
+
+  /*
+    Hi Matt,
+    
+    I think we should do it as done at the reco level, except for muons (in the following order):
+    
+    El-Jet: if dR < 0.2, remove jet; unless the jet is a truth b, then remove el
+    El-Jet: if dR < 0.4, remove el and keep jet
+    Mu-Jet: if dR < 0.04+10 GeV/ pT (mu) , remove mu and keep the jet (at the reco level it is done only for jets with >= 3 tracks with pT > 500 MeV)
+    El-Mu: if dR < 0.01, remove both el and mu
+    
+    
+    Cheers,
+    Antoine
+*/
+
+ //  ConstDataVector<xAOD::TruthParticleContainer> * elPassingEJ = new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
+ //  ConstDataVector<xAOD::JetContainer> * jetPassingEJ = new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
+ //  ConstDataVector<xAOD::TruthParticleContainer> * jetPassingJE = new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
+ //  ConstDataVector<xAOD::TruthParticleContainer> * muPassingMJ = new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
+ //  ConstDataVector<xAOD::TruthParticleContainer> * elPassingEM = new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
+ //  ConstDataVector<xAOD::TruthParticleContainer> * muPassingEM = new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
+
+ //  ConstDataVector<xAOD::JetContainer> * FinalJets   =  new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
+ //  ConstDataVector<xAOD::TruthParticleContainer> * FinalElectrons    =  new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
+ //  ConstDataVector<xAOD::TruthParticleContainer> * FinalMuons    =  new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
+
+ //  // El-Jet
+ //  for(const auto electron : *SignalElectrons){
+ //    bool isGoodEl=true;
+ //    TLorentzVector elVec;
+ //    elVec.SetPtEtaPhiE(electron->pt(),electron->eta(),electron->phi(),electron->e());
+ //    for(const auto jet : *SelectedBJets) // this should loop over b-jets
+ //      {
+	// TLorentzVector jetVec;
+	// jetVec.SetPtEtaPhiE(jet->pt(),jet->eta(),jet->phi(),jet->e());
+ //        if(fabs(elVec.DeltaR(jetVec)<0.2))
+ //          {
+	//     //std::cout << "El-Jet Overlap Triggered (remove e)" << std::endl;
+ //            isGoodEl=false;
+ //          }
+ //      }
+ //    if(isGoodEl) elPassingEJ->push_back(electron);
+ //  }
+  
+ //  // Jet-El
+ //  for(const auto jet : *SelectedJets)
+ //    {
+ //      TLorentzVector jetVec;
+ //      jetVec.SetPtEtaPhiE(jet->pt(),jet->eta(),jet->phi(),jet->e());
+ //      bool isGoodJet=true;;
+ //      for(const auto electron : *elPassingEJ)
+	// {
+	//   TLorentzVector elVec;
+	//   elVec.SetPtEtaPhiE(electron->pt(),electron->eta(),electron->phi(),electron->e());
+	//   if(fabs(elVec.DeltaR(jetVec)<0.2))
+	//     {
+	//       //std::cout << "El-Jet Overlap Triggered (remove j)" << std::endl;
+	//       isGoodJet=false;
+	//     }
+	// }
+ //      if(isGoodJet) jetPassingEJ->push_back(jet);
+ //    }
+  
+ //  // Mu-Jet
+ //  for(const auto muon : *SignalMuons)
+ //    {
+ //      TLorentzVector muVec;
+ //      muVec.SetPtEtaPhiE(muon->pt(),muon->eta(),muon->phi(),muon->e());
+ //      bool isGoodMuon=true;
+ //      for(const auto jet : *jetPassingEJ)
+ //        {
+ //          TLorentzVector jetVec;
+	//   jetVec.SetPtEtaPhiE(jet->pt(),jet->eta(),jet->phi(),jet->e());
+ //          if(fabs(jetVec.DeltaR(muVec)<(0.04+10*MEV/muVec.Pt())))
+ //            {
+	//       //std::cout << "Mu-Jet Overlap Triggered (remove m)" << std::endl;
+ //              isGoodMuon=false;
+ //            }
+	// }
+ //      if(isGoodMuon) muPassingMJ->push_back(muon);
+ //    }
+  
+ //  // El-Mu
+ //  for(const auto electron : *elPassingEJ)
+ //    {
+ //      bool goodLeptons=true;
+ //      TLorentzVector elVec;
+ //      elVec.SetPtEtaPhiE(electron->pt(),electron->eta(),electron->phi(),electron->e());
+ //      for(const auto muon : *muPassingMJ)
+	// {
+	//   TLorentzVector muVec;
+	//   muVec.SetPtEtaPhiE(muon->pt(),muon->eta(),muon->phi(),muon->e());
+	//   if(fabs(elVec.DeltaR(muVec)<0.01))
+	//     {
+	//       //std::cout << "El-Mu Overlap Triggered (remove e and mu)" << std::endl;
+	//       goodLeptons=false;
+	//     }
+	// }
+ //      if(goodLeptons) elPassingEM->push_back(electron);  
+ //    }
+  
+ //  for(const auto muon : *muPassingMJ)
+ //    {
+ //      //for( ; electron_itr != electron_end; electron_itr++){
+ //      bool goodLeptons=true;
+ //      TLorentzVector muVec;
+ //      muVec.SetPtEtaPhiE(muon->pt(),muon->eta(),muon->phi(),muon->e());
+ //      for(const auto electron : *elPassingEJ)
+ //        {
+ //          //for( ; jet_itr != jet_end; jet_itr++){
+ //          TLorentzVector elVec;
+	//   elVec.SetPtEtaPhiE(electron->pt(),electron->eta(),electron->phi(),electron->e());
+	//   if(fabs(elVec.DeltaR(muVec)<0.01))
+ //            {
+	//       //std::cout << "El-Mu Overlap Triggered (remove e and mu)" << std::endl;
+ //              goodLeptons=false;
+ //            }
+ //        }
+ //      if(goodLeptons) muPassingEM->push_back(muon);
+ //    }
+
+ //  // Push back the final objects. Phew ...
+ //  for(const auto electron : *elPassingEM)
+ //    {
+ //      FinalElectrons->push_back(electron);
+ //    }
+ //  for(const auto muon : *muPassingEM)
+ //    {
+ //      FinalMuons->push_back(muon);
+ //    }
+ //  for(const auto jet : *jetPassingEJ)
+ //    {
+ //      FinalJets->push_back(jet);
+ //    }
+  
+  /*
+  std::cout << "Overlap removal: " << SignalElectrons->size()-FinalElectrons->size() << "electrons, "
+	    << SignalMuons->size()-FinalMuons->size() << " muons and " << SelectedJets->size()-FinalJets->size() 
+	    << " jets removed." << std::endl;
+  */
+
   const xAOD::MissingETContainer* TruthMET = 0;
   EL_RETURN_CHECK("Get MET", m_event->retrieve( TruthMET, "MET_Truth" ) );
   
@@ -3133,74 +3478,74 @@ EL::StatusCode TruthAnalysis :: execute ()
 
   //std::cout << "MET " << TruthMET_NonInt->met()/1000.0 << "\t" << TruthMET_Int->met()/1000.0 << std::endl;
 
-  var_dPhiMin = Variables::delta_phi_nj(TruthMET_NonInt, SelectedJets->asDataVector(), SelectedJets->size()); // Should it be this MET?
-  var_Meff = Variables::Meff_incl(TruthMET_NonInt, SelectedJets->asDataVector(), SignalMuons->asDataVector(), SignalElectrons->asDataVector());
-  var_Meff_4j = Variables::Meff_4j(TruthMET_NonInt, SelectedJets->asDataVector(), 4 /* How many jets to use? */);
-  var_mT = Variables::mT(TruthMET_NonInt, SignalMuons->asDataVector(), SignalElectrons->asDataVector());
-  var_HT = Variables::Ht(SelectedJets->asDataVector(), SignalMuons->asDataVector(), SignalElectrons->asDataVector());
-  var_Met = TruthMET_NonInt->met()/1000.0;
-  //var_Met = TruthMET_Int->met()/1000.0;
-  var_MetSig = Variables::Met_significance(TruthMET_NonInt, SelectedJets->asDataVector(), 4 /* How many jets to use in HT? */);
+  // var_dPhiMin = Variables::delta_phi_nj(TruthMET_NonInt, FinalJets->asDataVector(), FinalJets->size()); // Should it be this MET?
+  // var_Meff = Variables::Meff_incl(TruthMET_NonInt, FinalJets->asDataVector(), FinalMuons->asDataVector(), FinalElectrons->asDataVector());
+  // var_Meff_4j = Variables::Meff_4j(TruthMET_NonInt, FinalJets->asDataVector(), 4 /* How many jets to use? */);
+  // var_mT = Variables::mT(TruthMET_NonInt, FinalMuons->asDataVector(), FinalElectrons->asDataVector());
+  // var_HT = Variables::Ht(TruthJets->asDataVector(), FinalMuons->asDataVector(), FinalElectrons->asDataVector());
+  // var_Met = TruthMET_NonInt->met()/1000.0;
+  // //var_Met = TruthMET_Int->met()/1000.0;
+  // var_MetSig = Variables::Met_significance(TruthMET_NonInt, FinalJets->asDataVector(), 4 /* How many jets to use in HT? */);
 
-  var_dPhiMin = 1.0; // REMOVED TO TEST, MLB ON 11-11-15
+  // var_dPhiMin = 1.0; // REMOVED TO TEST, MLB ON 11-11-15
 
-  NSignalElectrons = SignalElectrons->size();
-  NSignalMuons     = SignalMuons->size();
-  NBaseElectrons   = BaselineElectrons->size();
-  NBaseMuons       = BaselineMuons->size();
-  NJets	  	       = SelectedJets->size();
-  //NBJets           = SelectedBJets->size();
-  NTopJets	       = SelectedTopJets->size();
+  // NSignalElectrons = FinalElectrons->size();
+  // NSignalMuons     = FinalMuons->size();
+  // NBaseElectrons   = FinalElectrons->size();
+  // NBaseMuons       = FinalMuons->size();
+  // NJets	  	   = FinalJets->size();
+  // //NBJets         = SelectedBJets->size();
+  // NTopJets	   = SelectedTopJets->size();
   
-  NSignalLeptons   = NSignalElectrons + NSignalMuons;
-  NBaseLeptons     = NBaseElectrons + NBaseMuons;
+  // NSignalLeptons   = NSignalElectrons + NSignalMuons;
+  // NBaseLeptons     = NBaseElectrons + NBaseMuons;
 
-  if(SignalMuons->size()>0) var_mu_pt = SignalMuons->at(0)->pt() / MEV;
-  if(SignalMuons->size()>0) var_mu_eta = SignalMuons->at(0)->eta();
-  if(SignalMuons->size()>0) var_mu_phi = SignalMuons->at(0)->phi();
-  if(SignalMuons->size()>0) var_mu_e = SignalMuons->at(0)->e() / MEV;
+  // if(FinalMuons->size()>0) var_mu_pt = FinalMuons->at(0)->pt() / MEV;
+  // if(FinalMuons->size()>0) var_mu_eta = FinalMuons->at(0)->eta();
+  // if(FinalMuons->size()>0) var_mu_phi = FinalMuons->at(0)->phi();
+  // if(FinalMuons->size()>0) var_mu_e = FinalMuons->at(0)->e() / MEV;
 
-  if(SignalElectrons->size()>0) var_el_pt = SignalElectrons->at(0)->pt() / MEV;
-  if(SignalElectrons->size()>0) var_el_eta = SignalElectrons->at(0)->eta();
-  if(SignalElectrons->size()>0) var_el_phi = SignalElectrons->at(0)->phi();
-  if(SignalElectrons->size()>0) var_el_e = SignalElectrons->at(0)->e() / MEV;
+  // if(FinalElectrons->size()>0) var_el_pt = FinalElectrons->at(0)->pt() / MEV;
+  // if(FinalElectrons->size()>0) var_el_eta = FinalElectrons->at(0)->eta();
+  // if(FinalElectrons->size()>0) var_el_phi = FinalElectrons->at(0)->phi();
+  // if(FinalElectrons->size()>0) var_el_e = FinalElectrons->at(0)->e() / MEV;
 
-  if(SelectedJets->size()>0) var_jet_pt_1 = SelectedJets->at(0)->pt() / MEV;
-  if(SelectedJets->size()>1) var_jet_pt_2 = SelectedJets->at(1)->pt() / MEV;
-  if(SelectedJets->size()>2) var_jet_pt_3 = SelectedJets->at(2)->pt() / MEV;
-  if(SelectedJets->size()>3) var_jet_pt_4 = SelectedJets->at(3)->pt() / MEV;
-  if(SelectedJets->size()>0) var_jet_eta_1 = SelectedJets->at(0)->eta();
-  if(SelectedJets->size()>1) var_jet_eta_2 = SelectedJets->at(1)->eta();
-  if(SelectedJets->size()>2) var_jet_eta_3 = SelectedJets->at(2)->eta();
-  if(SelectedJets->size()>3) var_jet_eta_4 = SelectedJets->at(3)->eta();
-  if(SelectedJets->size()>0) var_jet_phi_1 = SelectedJets->at(0)->phi();
-  if(SelectedJets->size()>1) var_jet_phi_2 = SelectedJets->at(1)->phi();
-  if(SelectedJets->size()>2) var_jet_phi_3 = SelectedJets->at(2)->phi();
-  if(SelectedJets->size()>3) var_jet_phi_4 = SelectedJets->at(3)->phi();
-  if(SelectedJets->size()>0) var_jet_e_1 = SelectedJets->at(0)->e() / MEV;
-  if(SelectedJets->size()>1) var_jet_e_2 = SelectedJets->at(1)->e() / MEV;
-  if(SelectedJets->size()>2) var_jet_e_3 = SelectedJets->at(2)->e() / MEV;
-  if(SelectedJets->size()>3) var_jet_e_4 = SelectedJets->at(3)->e() / MEV;
+  // if(FinalJets->size()>0) var_jet_pt_1 = FinalJets->at(0)->pt() / MEV;
+  // if(FinalJets->size()>1) var_jet_pt_2 = FinalJets->at(1)->pt() / MEV;
+  // if(FinalJets->size()>2) var_jet_pt_3 = FinalJets->at(2)->pt() / MEV;
+  // if(FinalJets->size()>3) var_jet_pt_4 = FinalJets->at(3)->pt() / MEV;
+  // if(FinalJets->size()>0) var_jet_eta_1 = FinalJets->at(0)->eta();
+  // if(FinalJets->size()>1) var_jet_eta_2 = FinalJets->at(1)->eta();
+  // if(FinalJets->size()>2) var_jet_eta_3 = FinalJets->at(2)->eta();
+  // if(FinalJets->size()>3) var_jet_eta_4 = FinalJets->at(3)->eta();
+  // if(FinalJets->size()>0) var_jet_phi_1 = FinalJets->at(0)->phi();
+  // if(FinalJets->size()>1) var_jet_phi_2 = FinalJets->at(1)->phi();
+  // if(FinalJets->size()>2) var_jet_phi_3 = FinalJets->at(2)->phi();
+  // if(FinalJets->size()>3) var_jet_phi_4 = FinalJets->at(3)->phi();
+  // if(FinalJets->size()>0) var_jet_e_1 = FinalJets->at(0)->e() / MEV;
+  // if(FinalJets->size()>1) var_jet_e_2 = FinalJets->at(1)->e() / MEV;
+  // if(FinalJets->size()>2) var_jet_e_3 = FinalJets->at(2)->e() / MEV;
+  // if(FinalJets->size()>3) var_jet_e_4 = FinalJets->at(3)->e() / MEV;
 
-  if(SelectedRCJets->size()>0) var_rcjet_pt_1 = SelectedRCJets->at(0)->pt() / MEV;
-  if(SelectedRCJets->size()>1) var_rcjet_pt_2 = SelectedRCJets->at(1)->pt() / MEV;
-  if(SelectedRCJets->size()>2) var_rcjet_pt_3 = SelectedRCJets->at(2)->pt() / MEV;
-  if(SelectedRCJets->size()>3) var_rcjet_pt_4 = SelectedRCJets->at(3)->pt() / MEV;
-  if(SelectedRCJets->size()>0) var_rcjet_eta_1 = SelectedRCJets->at(0)->eta();
-  if(SelectedRCJets->size()>1) var_rcjet_eta_2 = SelectedRCJets->at(1)->eta();
-  if(SelectedRCJets->size()>2) var_rcjet_eta_3 = SelectedRCJets->at(2)->eta();
-  if(SelectedRCJets->size()>3) var_rcjet_eta_4 = SelectedRCJets->at(3)->eta();
-  if(SelectedRCJets->size()>0) var_rcjet_phi_1 = SelectedRCJets->at(0)->phi();
-  if(SelectedRCJets->size()>1) var_rcjet_phi_2 = SelectedRCJets->at(1)->phi();
-  if(SelectedRCJets->size()>2) var_rcjet_phi_3 = SelectedRCJets->at(2)->phi();
-  if(SelectedRCJets->size()>3) var_rcjet_phi_4 = SelectedRCJets->at(3)->phi();
-  if(SelectedRCJets->size()>0) var_rcjet_mass_1 = SelectedRCJets->at(0)->m() / MEV;
-  if(SelectedRCJets->size()>1) var_rcjet_mass_2 = SelectedRCJets->at(1)->m() / MEV;
-  if(SelectedRCJets->size()>2) var_rcjet_mass_3 = SelectedRCJets->at(2)->m() / MEV;
-  if(SelectedRCJets->size()>3) var_rcjet_mass_4 = SelectedRCJets->at(3)->m() / MEV;
+  // if(SelectedRCJets->size()>0) var_rcjet_pt_1 = SelectedRCJets->at(0)->pt() / MEV;
+  // if(SelectedRCJets->size()>1) var_rcjet_pt_2 = SelectedRCJets->at(1)->pt() / MEV;
+  // if(SelectedRCJets->size()>2) var_rcjet_pt_3 = SelectedRCJets->at(2)->pt() / MEV;
+  // if(SelectedRCJets->size()>3) var_rcjet_pt_4 = SelectedRCJets->at(3)->pt() / MEV;
+  // if(SelectedRCJets->size()>0) var_rcjet_eta_1 = SelectedRCJets->at(0)->eta();
+  // if(SelectedRCJets->size()>1) var_rcjet_eta_2 = SelectedRCJets->at(1)->eta();
+  // if(SelectedRCJets->size()>2) var_rcjet_eta_3 = SelectedRCJets->at(2)->eta();
+  // if(SelectedRCJets->size()>3) var_rcjet_eta_4 = SelectedRCJets->at(3)->eta();
+  // if(SelectedRCJets->size()>0) var_rcjet_phi_1 = SelectedRCJets->at(0)->phi();
+  // if(SelectedRCJets->size()>1) var_rcjet_phi_2 = SelectedRCJets->at(1)->phi();
+  // if(SelectedRCJets->size()>2) var_rcjet_phi_3 = SelectedRCJets->at(2)->phi();
+  // if(SelectedRCJets->size()>3) var_rcjet_phi_4 = SelectedRCJets->at(3)->phi();
+  // if(SelectedRCJets->size()>0) var_rcjet_mass_1 = SelectedRCJets->at(0)->m() / MEV;
+  // if(SelectedRCJets->size()>1) var_rcjet_mass_2 = SelectedRCJets->at(1)->m() / MEV;
+  // if(SelectedRCJets->size()>2) var_rcjet_mass_3 = SelectedRCJets->at(2)->m() / MEV;
+  // if(SelectedRCJets->size()>3) var_rcjet_mass_4 = SelectedRCJets->at(3)->m() / MEV;
   
-  Bool_t isOneLepton=false; isOneLepton = (NSignalLeptons == 1);
-  Bool_t isZeroLepton=false; isZeroLepton = (NBaseLeptons == 0);
+  // Bool_t isOneLepton=false; isOneLepton = (NSignalLeptons == 1);
+  // Bool_t isZeroLepton=false; isZeroLepton = (NBaseLeptons == 0);
 
   const xAOD::EventInfo* EventInfo = 0;
   m_event->retrieve(EventInfo, "EventInfo");
@@ -3246,8 +3591,8 @@ EL::StatusCode TruthAnalysis :: execute ()
       }//jet loop
       //std::cout<<"i = "<<i<<" SelectedBJets_TRF_in.size() = "<<SelectedBJets_TRF_in->size()
       //<<" SelectedBJets_TRF_ex.size() = "<<SelectedBJets_TRF_ex->size()<<" InputJets_TRF.size() = "<<InputJets_TRF->size()<<std::endl;
-      processEventPerBMultiplicity(SelectedBJets_TRF_in, SelectedJets, TruthMET_NonInt, true, true, i);
-      if(i < 4){ processEventPerBMultiplicity(SelectedBJets_TRF_ex, SelectedJets, TruthMET_NonInt, true, false, i); }
+      processEventPerBMultiplicity(SelectedBJets_TRF_in, SelectedJets, SelectedRCJets, SelectedTopJets, SignalMuons, SignalElectrons, TruthMET_NonInt, true, true, i);
+      if(i < 4){ processEventPerBMultiplicity(SelectedBJets_TRF_ex, SelectedJets, SelectedRCJets, SelectedTopJets, SignalMuons, SignalElectrons, TruthMET_NonInt, true, false, i); }
       
       delete SelectedBJets_TRF_in;
       delete SelectedBJets_TRF_ex;
@@ -3256,7 +3601,7 @@ EL::StatusCode TruthAnalysis :: execute ()
     
   } //if TRF-tagging
 
-  processEventPerBMultiplicity(SelectedBJets, SelectedJets, TruthMET_NonInt); 
+  processEventPerBMultiplicity(SelectedBJets, SelectedJets, SelectedRCJets, SelectedTopJets, SignalMuons, SignalElectrons, TruthMET_NonInt); 
 
   /*
   delete InputJets_TRF;
