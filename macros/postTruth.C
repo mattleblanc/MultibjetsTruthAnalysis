@@ -61,8 +61,8 @@ void postTruth(void)
 	//// v_trees.push_back(std::make_pair(t_410000,410000));
 	//// v_trees.push_back(std::make_pair(t_410001,410001));
 	//// v_trees.push_back(std::make_pair(t_410002,410002));
-	v_trees.push_back(std::make_pair(t_410003,410003));
 	v_trees.push_back(std::make_pair(t_410004,410004));
+	v_trees.push_back(std::make_pair(t_410003,410003));
 	//// v_trees.push_back(std::make_pair(t_410006,410006));
 	v_trees.push_back(std::make_pair(t_407012,407012));
 	v_trees.push_back(std::make_pair(t_407032,407032));
@@ -406,351 +406,351 @@ void postTruth(void)
 				h_yields_trf->Fill(reg, "VRGtt1LIII44b", 0.0);
 			}
 
-			if(!isTRF)
-			{
-				//std::cout << "not TRF" << std::endl;
-
-				if(all) h_yields->Fill(reg, "All", weight_temp);
-				if(isPreselect) h_yields->Fill(reg, "Presel", weight_temp);
-				if(isPreselect_Gbb) h_yields->Fill(reg, "PreGbb", weight_temp);
-				if(isPreselect_Gtt_0l) h_yields->Fill(reg, "PreGtt0l", weight_temp);
-				if(isPreselect_Gtt_1l) h_yields->Fill(reg, "PreGtt1l", weight_temp);
-
-				if(isGbbSRA2) h_yields->Fill(reg, "GbbSRA2", weight_temp);
-				if(isGbbSRB2) h_yields->Fill(reg, "GbbSRB2", weight_temp);
-				if(isGbbSRC2) h_yields->Fill(reg, "GbbSRC2", weight_temp);
-				if(isGbbSRA4) h_yields->Fill(reg, "GbbSRA4", weight_temp);
-				if(isGbbSRB4) h_yields->Fill(reg, "GbbSRB4", weight_temp);
-
-				if(isGtt1LSRA2) h_yields->Fill(reg, "Gtt1LSRA2", weight_temp);
-				if(isGtt1LSRB2) h_yields->Fill(reg, "Gtt1LSRB2", weight_temp);
-				if(isGtt1LSRC2) h_yields->Fill(reg, "Gtt1LSRC2", weight_temp);
-				if(isGtt1LSRA4) h_yields->Fill(reg, "Gtt1LSRA4", weight_temp);
-				if(isGtt1LSRB4) h_yields->Fill(reg, "Gtt1LSRB4", weight_temp);
-				if(isGtt1LSRC4) h_yields->Fill(reg, "Gtt1LSRC4", weight_temp);
-
-				if(isGtt0LSRA) h_yields->Fill(reg, "Gtt0LSRA", weight_temp);
-				if(isGtt0LSRB) h_yields->Fill(reg, "Gtt0LSRB", weight_temp);
-				if(isGtt0LSRC) h_yields->Fill(reg, "Gtt0LSRC", weight_temp);
-				if(isGtt0LSRD) h_yields->Fill(reg, "Gtt0LSRD", weight_temp);
-
-				if(isGbbCRA2) h_yields->Fill(reg, "GbbCRA2", weight_temp);
-				if(isGbbCRB2) h_yields->Fill(reg, "GbbCRB2", weight_temp);
-				if(isGbbCRC2) h_yields->Fill(reg, "GbbCRC2", weight_temp);
-				if(isGbbCRA4) h_yields->Fill(reg, "GbbCRA4", weight_temp);
-				if(isGbbCRB4) h_yields->Fill(reg, "GbbCRB4", weight_temp);
-
-				if(isGtt1LCRA2) h_yields->Fill(reg, "Gtt1LCRA2", weight_temp);
-				if(isGtt1LCRB2) h_yields->Fill(reg, "Gtt1LCRB2", weight_temp);
-				if(isGtt1LCRC2) h_yields->Fill(reg, "Gtt1LCRC2", weight_temp);
-				if(isGtt1LCRA4) h_yields->Fill(reg, "Gtt1LCRA4", weight_temp);
-				if(isGtt1LCRB4) h_yields->Fill(reg, "Gtt1LCRB4", weight_temp);
-				if(isGtt1LCRC4) h_yields->Fill(reg, "Gtt1LCRC4", weight_temp);
-
-				if(isGtt0LCRA) h_yields->Fill(reg, "Gtt0LCRA", weight_temp);
-				if(isGtt0LCRB) h_yields->Fill(reg, "Gtt0LCRB", weight_temp);
-				if(isGtt0LCRC) h_yields->Fill(reg, "Gtt0LCRC", weight_temp);
-				if(isGtt0LCRD) h_yields->Fill(reg, "Gtt0LCRD", weight_temp);
-
-				if(isGbbVRI2) h_yields->Fill(reg, "GbbVRI2", weight_temp);
-				if(isGbbVRII2) h_yields->Fill(reg, "GbbVRII2", weight_temp);
-				if(isGbbVRIII2) h_yields->Fill(reg, "GbbVRIII2", weight_temp);
-				if(isGbbVRI4) h_yields->Fill(reg, "GbbVRI4", weight_temp);
-				if(isGbbVRII4) h_yields->Fill(reg, "GbbVRII4", weight_temp);
-				if(isVR1LGtt0LI) h_yields->Fill(reg, "VR1LGtt0LI", weight_temp);
-				if(isVR1LGtt0LII) h_yields->Fill(reg, "VR1LGtt0LII", weight_temp);
-				if(isVR1LGtt0LIII) h_yields->Fill(reg, "VR1LGtt0LIII", weight_temp);
-				if(isVR1LGtt0LIV) h_yields->Fill(reg, "VR1LGtt0LIV", weight_temp);
-				if(isVR0LGtt0LI) h_yields->Fill(reg, "VR0LGtt0LI", weight_temp);
-				if(isVR0LGtt0LII) h_yields->Fill(reg, "VR0LGtt0LII", weight_temp);
-				if(isVR0LGtt0LIII) h_yields->Fill(reg, "VR0LGtt0LIII", weight_temp);
-				if(isVR0LGtt0LIV) h_yields->Fill(reg, "VR0LGtt0LIV", weight_temp);
-				if(isVRGtt1LI2mT2b) h_yields->Fill(reg, "VRGtt1LI2mT2b", weight_temp);
-				if(isVRGtt1LII2mT2b) h_yields->Fill(reg, "VRGtt1LII2mT2b", weight_temp);
-				if(isVRGtt1LI4mT2b) h_yields->Fill(reg, "VRGtt1LI4mT2b", weight_temp);
-				if(isVRGtt1LII4mT2b) h_yields->Fill(reg, "VRGtt1LII4mT2b", weight_temp);
-				if(isVRGtt1LI2mT3b) h_yields->Fill(reg, "VRGtt1LI2mT3b", weight_temp);
-				if(isVRGtt1LII2mT3b) h_yields->Fill(reg, "VRGtt1LII2mT3b", weight_temp);
-				if(isVRGtt1LI4mT3b) h_yields->Fill(reg, "VRGtt1LI4mT3b", weight_temp); 
-				if(isVRGtt1LII4mT3b) h_yields->Fill(reg, "VRGtt1LII4mT3b", weight_temp);
-				if(isVRGtt1LI2mTb2b) h_yields->Fill(reg, "VRGtt1LI2mTb2b", weight_temp);
-				if(isVRGtt1LII2mTb2b) h_yields->Fill(reg, "VRGtt1LII2mTb2b", weight_temp);
-				if(isVRGtt1LI4mTb2b) h_yields->Fill(reg, "VRGtt1LI4mTb2b", weight_temp);
-				if(isVRGtt1LII4mTb2b) h_yields->Fill(reg, "VRGtt1LII4mTb2b", weight_temp);
-				if(isVRGtt1LI2mTb3b) h_yields->Fill(reg, "VRGtt1LI2mTb3b", weight_temp);
-				if(isVRGtt1LII2mTb3b) h_yields->Fill(reg, "VRGtt1LII2mTb3b", weight_temp);
-				if(isVRGtt1LI4mTb3b) h_yields->Fill(reg, "VRGtt1LI4mTb3b", weight_temp);
-				if(isVRGtt1LII4mTb3b) h_yields->Fill(reg, "VRGtt1LII4mTb3b", weight_temp);
-				if(isVRGtt1LI2mT4b) h_yields->Fill(reg, "VRGtt1LI2mT4b", weight_temp);
-				if(isVRGtt1LII2mT4b) h_yields->Fill(reg, "VRGtt1LII2mT4b", weight_temp);
-				if(isVRGtt1LIII22b) h_yields->Fill(reg, "VRGtt1LIII22b", weight_temp);
-				if(isVRGtt1LIII42b) h_yields->Fill(reg, "VRGtt1LIII42b", weight_temp);
-				if(isVRGtt1LIII23b) h_yields->Fill(reg, "VRGtt1LIII23b", weight_temp);
-				if(isVRGtt1LIII43b) h_yields->Fill(reg, "VRGtt1LIII43b", weight_temp);
-				if(isVRGtt1LIII24b) h_yields->Fill(reg, "VRGtt1LIII24b", weight_temp);
-				if(isVRGtt1LIII44b) h_yields->Fill(reg, "VRGtt1LIII44b", weight_temp);
-			}
-			else if(isTRF)
-			{
-				//std::cout << "is TRF\tTRF_wgt is " << TRF_wgt << std::endl;
-				weight_temp*=TRF_wgt;
-
-				if(all) h_yields_trf->Fill(reg, "All", weight_temp);
-				if(isPreselect) h_yields_trf->Fill(reg, "Presel", weight_temp);
-				if(isPreselect_Gbb) h_yields_trf->Fill(reg, "PreGbb", weight_temp);
-				if(isPreselect_Gtt_0l) h_yields_trf->Fill(reg, "PreGtt0l", weight_temp);
-				if(isPreselect_Gtt_1l) h_yields_trf->Fill(reg, "PreGtt1l", weight_temp);
-
-				if(isGbbSRA2) h_yields_trf->Fill(reg, "GbbSRA2", weight_temp);
-				if(isGbbSRB2) h_yields_trf->Fill(reg, "GbbSRB2", weight_temp);
-				if(isGbbSRC2) h_yields_trf->Fill(reg, "GbbSRC2", weight_temp);
-				if(isGbbSRA4) h_yields_trf->Fill(reg, "GbbSRA4", weight_temp);
-				if(isGbbSRB4) h_yields_trf->Fill(reg, "GbbSRB4", weight_temp);
-
-				if(isGtt1LSRA2) h_yields_trf->Fill(reg, "Gtt1LSRA2", weight_temp);
-				if(isGtt1LSRB2) h_yields_trf->Fill(reg, "Gtt1LSRB2", weight_temp);
-				if(isGtt1LSRC2) h_yields_trf->Fill(reg, "Gtt1LSRC2", weight_temp);
-				if(isGtt1LSRA4) h_yields_trf->Fill(reg, "Gtt1LSRA4", weight_temp);
-				if(isGtt1LSRB4) h_yields_trf->Fill(reg, "Gtt1LSRB4", weight_temp);
-				if(isGtt1LSRC4) h_yields_trf->Fill(reg, "Gtt1LSRC4", weight_temp);
-				if(isGtt0LSRA) h_yields_trf->Fill(reg, "Gtt0LSRA", weight_temp);
-				if(isGtt0LSRB) h_yields_trf->Fill(reg, "Gtt0LSRB", weight_temp);
-				if(isGtt0LSRC) h_yields_trf->Fill(reg, "Gtt0LSRC", weight_temp);
-				if(isGtt0LSRD) h_yields_trf->Fill(reg, "Gtt0LSRD", weight_temp);
-
-				if(isGbbCRA2) h_yields_trf->Fill(reg, "GbbCRA2", weight_temp);
-				if(isGbbCRB2) h_yields_trf->Fill(reg, "GbbCRB2", weight_temp);
-				if(isGbbCRC2) h_yields_trf->Fill(reg, "GbbCRC2", weight_temp);
-				if(isGbbCRA4) h_yields_trf->Fill(reg, "GbbCRA4", weight_temp);
-				if(isGbbCRB4) h_yields_trf->Fill(reg, "GbbCRB4", weight_temp);
-
-				if(isGtt1LCRA2) h_yields_trf->Fill(reg, "Gtt1LCRA2", weight_temp);
-				if(isGtt1LCRB2) h_yields_trf->Fill(reg, "Gtt1LCRB2", weight_temp);
-				if(isGtt1LCRC2) h_yields_trf->Fill(reg, "Gtt1LCRC2", weight_temp);
-				if(isGtt1LCRA4) h_yields_trf->Fill(reg, "Gtt1LCRA4", weight_temp);
-				if(isGtt1LCRB4) h_yields_trf->Fill(reg, "Gtt1LCRB4", weight_temp);
-				if(isGtt1LCRC4) h_yields_trf->Fill(reg, "Gtt1LCRC4", weight_temp);
-
-				if(isGtt0LCRA) h_yields_trf->Fill(reg, "Gtt0LCRA", weight_temp);
-				if(isGtt0LCRB) h_yields_trf->Fill(reg, "Gtt0LCRB", weight_temp);
-				if(isGtt0LCRC) h_yields_trf->Fill(reg, "Gtt0LCRC", weight_temp);
-				if(isGtt0LCRD) h_yields_trf->Fill(reg, "Gtt0LCRD", weight_temp);
-
-				if(isGbbVRI2) h_yields_trf->Fill(reg, "GbbVRI2", weight_temp);
-				if(isGbbVRII2) h_yields_trf->Fill(reg, "GbbVRII2", weight_temp);
-				if(isGbbVRIII2) h_yields_trf->Fill(reg, "GbbVRIII2", weight_temp);
-				if(isGbbVRI4) h_yields_trf->Fill(reg, "GbbVRI4", weight_temp);
-				if(isGbbVRII4) h_yields_trf->Fill(reg, "GbbVRII4", weight_temp);
-				if(isVR1LGtt0LI) h_yields_trf->Fill(reg, "VR1LGtt0LI", weight_temp);
-				if(isVR1LGtt0LII) h_yields_trf->Fill(reg, "VR1LGtt0LII", weight_temp);
-				if(isVR1LGtt0LIII) h_yields_trf->Fill(reg, "VR1LGtt0LIII", weight_temp);
-				if(isVR1LGtt0LIV) h_yields_trf->Fill(reg, "VR1LGtt0LIV", weight_temp);
-				if(isVR0LGtt0LI) h_yields_trf->Fill(reg, "VR0LGtt0LI", weight_temp);
-				if(isVR0LGtt0LII) h_yields_trf->Fill(reg, "VR0LGtt0LII", weight_temp);
-				if(isVR0LGtt0LIII) h_yields_trf->Fill(reg, "VR0LGtt0LIII", weight_temp);
-				if(isVR0LGtt0LIV) h_yields_trf->Fill(reg, "VR0LGtt0LIV", weight_temp);
-				if(isVRGtt1LI2mT2b) h_yields_trf->Fill(reg, "VRGtt1LI2mT2b", weight_temp);
-				if(isVRGtt1LII2mT2b) h_yields_trf->Fill(reg, "VRGtt1LII2mT2b", weight_temp);
-				if(isVRGtt1LI4mT2b) h_yields_trf->Fill(reg, "VRGtt1LI4mT2b", weight_temp);
-				if(isVRGtt1LII4mT2b) h_yields_trf->Fill(reg, "VRGtt1LII4mT2b", weight_temp);
-				if(isVRGtt1LI2mT3b) h_yields_trf->Fill(reg, "VRGtt1LI2mT3b", weight_temp);
-				if(isVRGtt1LII2mT3b) h_yields_trf->Fill(reg, "VRGtt1LII2mT3b", weight_temp);
-				if(isVRGtt1LI4mT3b) h_yields_trf->Fill(reg, "VRGtt1LI4mT3b", weight_temp); 
-				if(isVRGtt1LII4mT3b) h_yields_trf->Fill(reg, "VRGtt1LII4mT3b", weight_temp);
-				if(isVRGtt1LI2mTb2b) h_yields_trf->Fill(reg, "VRGtt1LI2mTb2b", weight_temp);
-				if(isVRGtt1LII2mTb2b) h_yields_trf->Fill(reg, "VRGtt1LII2mTb2b", weight_temp);
-				if(isVRGtt1LI4mTb2b) h_yields_trf->Fill(reg, "VRGtt1LI4mTb2b", weight_temp);
-				if(isVRGtt1LII4mTb2b) h_yields_trf->Fill(reg, "VRGtt1LII4mTb2b", weight_temp);
-				if(isVRGtt1LI2mTb3b) h_yields_trf->Fill(reg, "VRGtt1LI2mTb3b", weight_temp);
-				if(isVRGtt1LII2mTb3b) h_yields_trf->Fill(reg, "VRGtt1LII2mTb3b", weight_temp);
-				if(isVRGtt1LI4mTb3b) h_yields_trf->Fill(reg, "VRGtt1LI4mTb3b", weight_temp);
-				if(isVRGtt1LII4mTb3b) h_yields_trf->Fill(reg, "VRGtt1LII4mTb3b", weight_temp);
-				if(isVRGtt1LI2mT4b) h_yields_trf->Fill(reg, "VRGtt1LI2mT4b", weight_temp);
-				if(isVRGtt1LII2mT4b) h_yields_trf->Fill(reg, "VRGtt1LII2mT4b", weight_temp);
-				if(isVRGtt1LIII22b) h_yields_trf->Fill(reg, "VRGtt1LIII22b", weight_temp);
-				if(isVRGtt1LIII42b) h_yields_trf->Fill(reg, "VRGtt1LIII42b", weight_temp);
-				if(isVRGtt1LIII23b) h_yields_trf->Fill(reg, "VRGtt1LIII23b", weight_temp);
-				if(isVRGtt1LIII43b) h_yields_trf->Fill(reg, "VRGtt1LIII43b", weight_temp);
-				if(isVRGtt1LIII24b) h_yields_trf->Fill(reg, "VRGtt1LIII24b", weight_temp);
-				if(isVRGtt1LIII44b) h_yields_trf->Fill(reg, "VRGtt1LIII44b", weight_temp);
-			}
-
 			// if(!isTRF)
 			// {
 			// 	//std::cout << "not TRF" << std::endl;
 
-			// 	if(all) h_yields->Fill(reg, "All", 1.0);
-			// 	if(isPreselect) h_yields->Fill(reg, "Presel", 1.0);
-			// 	if(isPreselect_Gbb) h_yields->Fill(reg, "PreGbb", 1.0);
-			// 	if(isPreselect_Gtt_0l) h_yields->Fill(reg, "PreGtt0l", 1.0);
-			// 	if(isPreselect_Gtt_1l) h_yields->Fill(reg, "PreGtt1l", 1.0);
+			// 	if(all) h_yields->Fill(reg, "All", weight_temp);
+			// 	if(isPreselect) h_yields->Fill(reg, "Presel", weight_temp);
+			// 	if(isPreselect_Gbb) h_yields->Fill(reg, "PreGbb", weight_temp);
+			// 	if(isPreselect_Gtt_0l) h_yields->Fill(reg, "PreGtt0l", weight_temp);
+			// 	if(isPreselect_Gtt_1l) h_yields->Fill(reg, "PreGtt1l", weight_temp);
 
-			// 	if(isGbbSRA2) h_yields->Fill(reg, "GbbSRA2", 1.0);
-			// 	if(isGbbSRB2) h_yields->Fill(reg, "GbbSRB2", 1.0);
-			// 	if(isGbbSRC2) h_yields->Fill(reg, "GbbSRC2", 1.0);
-			// 	if(isGbbSRA4) h_yields->Fill(reg, "GbbSRA4", 1.0);
-			// 	if(isGbbSRB4) h_yields->Fill(reg, "GbbSRB4", 1.0);
+			// 	if(isGbbSRA2) h_yields->Fill(reg, "GbbSRA2", weight_temp);
+			// 	if(isGbbSRB2) h_yields->Fill(reg, "GbbSRB2", weight_temp);
+			// 	if(isGbbSRC2) h_yields->Fill(reg, "GbbSRC2", weight_temp);
+			// 	if(isGbbSRA4) h_yields->Fill(reg, "GbbSRA4", weight_temp);
+			// 	if(isGbbSRB4) h_yields->Fill(reg, "GbbSRB4", weight_temp);
 
-			// 	if(isGtt1LSRA2) h_yields->Fill(reg, "Gtt1LSRA2", 1.0);
-			// 	if(isGtt1LSRB2) h_yields->Fill(reg, "Gtt1LSRB2", 1.0);
-			// 	if(isGtt1LSRC2) h_yields->Fill(reg, "Gtt1LSRC2", 1.0);
-			// 	if(isGtt1LSRA4) h_yields->Fill(reg, "Gtt1LSRA4", 1.0);
-			// 	if(isGtt1LSRB4) h_yields->Fill(reg, "Gtt1LSRB4", 1.0);
-			// 	if(isGtt1LSRC4) h_yields->Fill(reg, "Gtt1LSRC4", 1.0);
+			// 	if(isGtt1LSRA2) h_yields->Fill(reg, "Gtt1LSRA2", weight_temp);
+			// 	if(isGtt1LSRB2) h_yields->Fill(reg, "Gtt1LSRB2", weight_temp);
+			// 	if(isGtt1LSRC2) h_yields->Fill(reg, "Gtt1LSRC2", weight_temp);
+			// 	if(isGtt1LSRA4) h_yields->Fill(reg, "Gtt1LSRA4", weight_temp);
+			// 	if(isGtt1LSRB4) h_yields->Fill(reg, "Gtt1LSRB4", weight_temp);
+			// 	if(isGtt1LSRC4) h_yields->Fill(reg, "Gtt1LSRC4", weight_temp);
 
-			// 	if(isGtt0LSRA) h_yields->Fill(reg, "Gtt0LSRA", 1.0);
-			// 	if(isGtt0LSRB) h_yields->Fill(reg, "Gtt0LSRB", 1.0);
-			// 	if(isGtt0LSRC) h_yields->Fill(reg, "Gtt0LSRC", 1.0);
-			// 	if(isGtt0LSRD) h_yields->Fill(reg, "Gtt0LSRD", 1.0);
+			// 	if(isGtt0LSRA) h_yields->Fill(reg, "Gtt0LSRA", weight_temp);
+			// 	if(isGtt0LSRB) h_yields->Fill(reg, "Gtt0LSRB", weight_temp);
+			// 	if(isGtt0LSRC) h_yields->Fill(reg, "Gtt0LSRC", weight_temp);
+			// 	if(isGtt0LSRD) h_yields->Fill(reg, "Gtt0LSRD", weight_temp);
 
-			// 	if(isGbbCRA2) h_yields->Fill(reg, "GbbCRA2", 1.0);
-			// 	if(isGbbCRB2) h_yields->Fill(reg, "GbbCRB2", 1.0);
-			// 	if(isGbbCRC2) h_yields->Fill(reg, "GbbCRC2", 1.0);
-			// 	if(isGbbCRA4) h_yields->Fill(reg, "GbbCRA4", 1.0);
-			// 	if(isGbbCRB4) h_yields->Fill(reg, "GbbCRB4", 1.0);
+			// 	if(isGbbCRA2) h_yields->Fill(reg, "GbbCRA2", weight_temp);
+			// 	if(isGbbCRB2) h_yields->Fill(reg, "GbbCRB2", weight_temp);
+			// 	if(isGbbCRC2) h_yields->Fill(reg, "GbbCRC2", weight_temp);
+			// 	if(isGbbCRA4) h_yields->Fill(reg, "GbbCRA4", weight_temp);
+			// 	if(isGbbCRB4) h_yields->Fill(reg, "GbbCRB4", weight_temp);
 
-			// 	if(isGtt1LCRA2) h_yields->Fill(reg, "Gtt1LCRA2", 1.0);
-			// 	if(isGtt1LCRB2) h_yields->Fill(reg, "Gtt1LCRB2", 1.0);
-			// 	if(isGtt1LCRC2) h_yields->Fill(reg, "Gtt1LCRC2", 1.0);
-			// 	if(isGtt1LCRA4) h_yields->Fill(reg, "Gtt1LCRA4", 1.0);
-			// 	if(isGtt1LCRB4) h_yields->Fill(reg, "Gtt1LCRB4", 1.0);
-			// 	if(isGtt1LCRC4) h_yields->Fill(reg, "Gtt1LCRC4", 1.0);
+			// 	if(isGtt1LCRA2) h_yields->Fill(reg, "Gtt1LCRA2", weight_temp);
+			// 	if(isGtt1LCRB2) h_yields->Fill(reg, "Gtt1LCRB2", weight_temp);
+			// 	if(isGtt1LCRC2) h_yields->Fill(reg, "Gtt1LCRC2", weight_temp);
+			// 	if(isGtt1LCRA4) h_yields->Fill(reg, "Gtt1LCRA4", weight_temp);
+			// 	if(isGtt1LCRB4) h_yields->Fill(reg, "Gtt1LCRB4", weight_temp);
+			// 	if(isGtt1LCRC4) h_yields->Fill(reg, "Gtt1LCRC4", weight_temp);
 
-			// 	if(isGtt0LCRA) h_yields->Fill(reg, "Gtt0LCRA", 1.0);
-			// 	if(isGtt0LCRB) h_yields->Fill(reg, "Gtt0LCRB", 1.0);
-			// 	if(isGtt0LCRC) h_yields->Fill(reg, "Gtt0LCRC", 1.0);
-			// 	if(isGtt0LCRD) h_yields->Fill(reg, "Gtt0LCRD", 1.0);
+			// 	if(isGtt0LCRA) h_yields->Fill(reg, "Gtt0LCRA", weight_temp);
+			// 	if(isGtt0LCRB) h_yields->Fill(reg, "Gtt0LCRB", weight_temp);
+			// 	if(isGtt0LCRC) h_yields->Fill(reg, "Gtt0LCRC", weight_temp);
+			// 	if(isGtt0LCRD) h_yields->Fill(reg, "Gtt0LCRD", weight_temp);
 
-			// 	if(isGbbVRI2) h_yields->Fill(reg, "GbbVRI2", 1.0);
-			// 	if(isGbbVRII2) h_yields->Fill(reg, "GbbVRII2", 1.0);
-			// 	if(isGbbVRIII2) h_yields->Fill(reg, "GbbVRIII2", 1.0);
-			// 	if(isGbbVRI4) h_yields->Fill(reg, "GbbVRI4", 1.0);
-			// 	if(isGbbVRII4) h_yields->Fill(reg, "GbbVRII4", 1.0);
-			// 	if(isVR1LGtt0LI) h_yields->Fill(reg, "VR1LGtt0LI", 1.0);
-			// 	if(isVR1LGtt0LII) h_yields->Fill(reg, "VR1LGtt0LII", 1.0);
-			// 	if(isVR1LGtt0LIII) h_yields->Fill(reg, "VR1LGtt0LIII", 1.0);
-			// 	if(isVR1LGtt0LIV) h_yields->Fill(reg, "VR1LGtt0LIV", 1.0);
-			// 	if(isVR0LGtt0LI) h_yields->Fill(reg, "VR0LGtt0LI", 1.0);
-			// 	if(isVR0LGtt0LII) h_yields->Fill(reg, "VR0LGtt0LII", 1.0);
-			// 	if(isVR0LGtt0LIII) h_yields->Fill(reg, "VR0LGtt0LIII", 1.0);
-			// 	if(isVR0LGtt0LIV) h_yields->Fill(reg, "VR0LGtt0LIV", 1.0);
-			// 	if(isVRGtt1LI2mT2b) h_yields->Fill(reg, "VRGtt1LI2mT2b", 1.0);
-			// 	if(isVRGtt1LII2mT2b) h_yields->Fill(reg, "VRGtt1LII2mT2b", 1.0);
-			// 	if(isVRGtt1LI4mT2b) h_yields->Fill(reg, "VRGtt1LI4mT2b", 1.0);
-			// 	if(isVRGtt1LII4mT2b) h_yields->Fill(reg, "VRGtt1LII4mT2b", 1.0);
-			// 	if(isVRGtt1LI2mT3b) h_yields->Fill(reg, "VRGtt1LI2mT3b", 1.0);
-			// 	if(isVRGtt1LII2mT3b) h_yields->Fill(reg, "VRGtt1LII2mT3b", 1.0);
-			// 	if(isVRGtt1LI4mT3b) h_yields->Fill(reg, "VRGtt1LI4mT3b", 1.0); 
-			// 	if(isVRGtt1LII4mT3b) h_yields->Fill(reg, "VRGtt1LII4mT3b", 1.0);
-			// 	if(isVRGtt1LI2mTb2b) h_yields->Fill(reg, "VRGtt1LI2mTb2b", 1.0);
-			// 	if(isVRGtt1LII2mTb2b) h_yields->Fill(reg, "VRGtt1LII2mTb2b", 1.0);
-			// 	if(isVRGtt1LI4mTb2b) h_yields->Fill(reg, "VRGtt1LI4mTb2b", 1.0);
-			// 	if(isVRGtt1LII4mTb2b) h_yields->Fill(reg, "VRGtt1LII4mTb2b", 1.0);
-			// 	if(isVRGtt1LI2mTb3b) h_yields->Fill(reg, "VRGtt1LI2mTb3b", 1.0);
-			// 	if(isVRGtt1LII2mTb3b) h_yields->Fill(reg, "VRGtt1LII2mTb3b", 1.0);
-			// 	if(isVRGtt1LI4mTb3b) h_yields->Fill(reg, "VRGtt1LI4mTb3b", 1.0);
-			// 	if(isVRGtt1LII4mTb3b) h_yields->Fill(reg, "VRGtt1LII4mTb3b", 1.0);
-			// 	if(isVRGtt1LI2mT4b) h_yields->Fill(reg, "VRGtt1LI2mT4b", 1.0);
-			// 	if(isVRGtt1LII2mT4b) h_yields->Fill(reg, "VRGtt1LII2mT4b", 1.0);
-			// 	if(isVRGtt1LIII22b) h_yields->Fill(reg, "VRGtt1LIII22b", 1.0);
-			// 	if(isVRGtt1LIII42b) h_yields->Fill(reg, "VRGtt1LIII42b", 1.0);
-			// 	if(isVRGtt1LIII23b) h_yields->Fill(reg, "VRGtt1LIII23b", 1.0);
-			// 	if(isVRGtt1LIII43b) h_yields->Fill(reg, "VRGtt1LIII43b", 1.0);
-			// 	if(isVRGtt1LIII24b) h_yields->Fill(reg, "VRGtt1LIII24b", 1.0);
-			// 	if(isVRGtt1LIII44b) h_yields->Fill(reg, "VRGtt1LIII44b", 1.0);
+			// 	if(isGbbVRI2) h_yields->Fill(reg, "GbbVRI2", weight_temp);
+			// 	if(isGbbVRII2) h_yields->Fill(reg, "GbbVRII2", weight_temp);
+			// 	if(isGbbVRIII2) h_yields->Fill(reg, "GbbVRIII2", weight_temp);
+			// 	if(isGbbVRI4) h_yields->Fill(reg, "GbbVRI4", weight_temp);
+			// 	if(isGbbVRII4) h_yields->Fill(reg, "GbbVRII4", weight_temp);
+			// 	if(isVR1LGtt0LI) h_yields->Fill(reg, "VR1LGtt0LI", weight_temp);
+			// 	if(isVR1LGtt0LII) h_yields->Fill(reg, "VR1LGtt0LII", weight_temp);
+			// 	if(isVR1LGtt0LIII) h_yields->Fill(reg, "VR1LGtt0LIII", weight_temp);
+			// 	if(isVR1LGtt0LIV) h_yields->Fill(reg, "VR1LGtt0LIV", weight_temp);
+			// 	if(isVR0LGtt0LI) h_yields->Fill(reg, "VR0LGtt0LI", weight_temp);
+			// 	if(isVR0LGtt0LII) h_yields->Fill(reg, "VR0LGtt0LII", weight_temp);
+			// 	if(isVR0LGtt0LIII) h_yields->Fill(reg, "VR0LGtt0LIII", weight_temp);
+			// 	if(isVR0LGtt0LIV) h_yields->Fill(reg, "VR0LGtt0LIV", weight_temp);
+			// 	if(isVRGtt1LI2mT2b) h_yields->Fill(reg, "VRGtt1LI2mT2b", weight_temp);
+			// 	if(isVRGtt1LII2mT2b) h_yields->Fill(reg, "VRGtt1LII2mT2b", weight_temp);
+			// 	if(isVRGtt1LI4mT2b) h_yields->Fill(reg, "VRGtt1LI4mT2b", weight_temp);
+			// 	if(isVRGtt1LII4mT2b) h_yields->Fill(reg, "VRGtt1LII4mT2b", weight_temp);
+			// 	if(isVRGtt1LI2mT3b) h_yields->Fill(reg, "VRGtt1LI2mT3b", weight_temp);
+			// 	if(isVRGtt1LII2mT3b) h_yields->Fill(reg, "VRGtt1LII2mT3b", weight_temp);
+			// 	if(isVRGtt1LI4mT3b) h_yields->Fill(reg, "VRGtt1LI4mT3b", weight_temp); 
+			// 	if(isVRGtt1LII4mT3b) h_yields->Fill(reg, "VRGtt1LII4mT3b", weight_temp);
+			// 	if(isVRGtt1LI2mTb2b) h_yields->Fill(reg, "VRGtt1LI2mTb2b", weight_temp);
+			// 	if(isVRGtt1LII2mTb2b) h_yields->Fill(reg, "VRGtt1LII2mTb2b", weight_temp);
+			// 	if(isVRGtt1LI4mTb2b) h_yields->Fill(reg, "VRGtt1LI4mTb2b", weight_temp);
+			// 	if(isVRGtt1LII4mTb2b) h_yields->Fill(reg, "VRGtt1LII4mTb2b", weight_temp);
+			// 	if(isVRGtt1LI2mTb3b) h_yields->Fill(reg, "VRGtt1LI2mTb3b", weight_temp);
+			// 	if(isVRGtt1LII2mTb3b) h_yields->Fill(reg, "VRGtt1LII2mTb3b", weight_temp);
+			// 	if(isVRGtt1LI4mTb3b) h_yields->Fill(reg, "VRGtt1LI4mTb3b", weight_temp);
+			// 	if(isVRGtt1LII4mTb3b) h_yields->Fill(reg, "VRGtt1LII4mTb3b", weight_temp);
+			// 	if(isVRGtt1LI2mT4b) h_yields->Fill(reg, "VRGtt1LI2mT4b", weight_temp);
+			// 	if(isVRGtt1LII2mT4b) h_yields->Fill(reg, "VRGtt1LII2mT4b", weight_temp);
+			// 	if(isVRGtt1LIII22b) h_yields->Fill(reg, "VRGtt1LIII22b", weight_temp);
+			// 	if(isVRGtt1LIII42b) h_yields->Fill(reg, "VRGtt1LIII42b", weight_temp);
+			// 	if(isVRGtt1LIII23b) h_yields->Fill(reg, "VRGtt1LIII23b", weight_temp);
+			// 	if(isVRGtt1LIII43b) h_yields->Fill(reg, "VRGtt1LIII43b", weight_temp);
+			// 	if(isVRGtt1LIII24b) h_yields->Fill(reg, "VRGtt1LIII24b", weight_temp);
+			// 	if(isVRGtt1LIII44b) h_yields->Fill(reg, "VRGtt1LIII44b", weight_temp);
 			// }
 			// else if(isTRF)
 			// {
 			// 	//std::cout << "is TRF\tTRF_wgt is " << TRF_wgt << std::endl;
 			// 	weight_temp*=TRF_wgt;
 
-			// 	if(all) h_yields_trf->Fill(reg, "All", 1.0/*TRF_wgt*/);
-			// 	if(isPreselect) h_yields_trf->Fill(reg, "Presel", 1.0/*TRF_wgt*/);
-			// 	if(isPreselect_Gbb) h_yields_trf->Fill(reg, "PreGbb", 1.0/*TRF_wgt*/);
-			// 	if(isPreselect_Gtt_0l) h_yields_trf->Fill(reg, "PreGtt0l", 1.0/*TRF_wgt*/);
-			// 	if(isPreselect_Gtt_1l) h_yields_trf->Fill(reg, "PreGtt1l", 1.0/*TRF_wgt*/);
+			// 	if(all) h_yields_trf->Fill(reg, "All", weight_temp);
+			// 	if(isPreselect) h_yields_trf->Fill(reg, "Presel", weight_temp);
+			// 	if(isPreselect_Gbb) h_yields_trf->Fill(reg, "PreGbb", weight_temp);
+			// 	if(isPreselect_Gtt_0l) h_yields_trf->Fill(reg, "PreGtt0l", weight_temp);
+			// 	if(isPreselect_Gtt_1l) h_yields_trf->Fill(reg, "PreGtt1l", weight_temp);
 
-			// 	if(isGbbSRA2) h_yields_trf->Fill(reg, "GbbSRA2", 1.0/*TRF_wgt*/);
-			// 	if(isGbbSRB2) h_yields_trf->Fill(reg, "GbbSRB2", 1.0/*TRF_wgt*/);
-			// 	if(isGbbSRC2) h_yields_trf->Fill(reg, "GbbSRC2", 1.0/*TRF_wgt*/);
-			// 	if(isGbbSRA4) h_yields_trf->Fill(reg, "GbbSRA4", 1.0/*TRF_wgt*/);
-			// 	if(isGbbSRB4) h_yields_trf->Fill(reg, "GbbSRB4", 1.0/*TRF_wgt*/);
+			// 	if(isGbbSRA2) h_yields_trf->Fill(reg, "GbbSRA2", weight_temp);
+			// 	if(isGbbSRB2) h_yields_trf->Fill(reg, "GbbSRB2", weight_temp);
+			// 	if(isGbbSRC2) h_yields_trf->Fill(reg, "GbbSRC2", weight_temp);
+			// 	if(isGbbSRA4) h_yields_trf->Fill(reg, "GbbSRA4", weight_temp);
+			// 	if(isGbbSRB4) h_yields_trf->Fill(reg, "GbbSRB4", weight_temp);
 
-			// 	if(isGtt1LSRA2) h_yields_trf->Fill(reg, "Gtt1LSRA2", 1.0/*TRF_wgt*/);
-			// 	if(isGtt1LSRB2) h_yields_trf->Fill(reg, "Gtt1LSRB2", 1.0/*TRF_wgt*/);
-			// 	if(isGtt1LSRC2) h_yields_trf->Fill(reg, "Gtt1LSRC2", 1.0/*TRF_wgt*/);
-			// 	if(isGtt1LSRA4) h_yields_trf->Fill(reg, "Gtt1LSRA4", 1.0/*TRF_wgt*/);
-			// 	if(isGtt1LSRB4) h_yields_trf->Fill(reg, "Gtt1LSRB4", 1.0/*TRF_wgt*/);
-			// 	if(isGtt1LSRC4) h_yields_trf->Fill(reg, "Gtt1LSRC4", 1.0/*TRF_wgt*/);
+			// 	if(isGtt1LSRA2) h_yields_trf->Fill(reg, "Gtt1LSRA2", weight_temp);
+			// 	if(isGtt1LSRB2) h_yields_trf->Fill(reg, "Gtt1LSRB2", weight_temp);
+			// 	if(isGtt1LSRC2) h_yields_trf->Fill(reg, "Gtt1LSRC2", weight_temp);
+			// 	if(isGtt1LSRA4) h_yields_trf->Fill(reg, "Gtt1LSRA4", weight_temp);
+			// 	if(isGtt1LSRB4) h_yields_trf->Fill(reg, "Gtt1LSRB4", weight_temp);
+			// 	if(isGtt1LSRC4) h_yields_trf->Fill(reg, "Gtt1LSRC4", weight_temp);
+			// 	if(isGtt0LSRA) h_yields_trf->Fill(reg, "Gtt0LSRA", weight_temp);
+			// 	if(isGtt0LSRB) h_yields_trf->Fill(reg, "Gtt0LSRB", weight_temp);
+			// 	if(isGtt0LSRC) h_yields_trf->Fill(reg, "Gtt0LSRC", weight_temp);
+			// 	if(isGtt0LSRD) h_yields_trf->Fill(reg, "Gtt0LSRD", weight_temp);
 
-			// 	if(isGtt0LSRA) h_yields_trf->Fill(reg, "Gtt0LSRA", 1.0/*TRF_wgt*/);
-			// 	if(isGtt0LSRB) h_yields_trf->Fill(reg, "Gtt0LSRB", 1.0/*TRF_wgt*/);
-			// 	if(isGtt0LSRC) h_yields_trf->Fill(reg, "Gtt0LSRC", 1.0/*TRF_wgt*/);
-			// 	if(isGtt0LSRD) h_yields_trf->Fill(reg, "Gtt0LSRD", 1.0/*TRF_wgt*/);
+			// 	if(isGbbCRA2) h_yields_trf->Fill(reg, "GbbCRA2", weight_temp);
+			// 	if(isGbbCRB2) h_yields_trf->Fill(reg, "GbbCRB2", weight_temp);
+			// 	if(isGbbCRC2) h_yields_trf->Fill(reg, "GbbCRC2", weight_temp);
+			// 	if(isGbbCRA4) h_yields_trf->Fill(reg, "GbbCRA4", weight_temp);
+			// 	if(isGbbCRB4) h_yields_trf->Fill(reg, "GbbCRB4", weight_temp);
 
-			// 	if(isGbbCRA2) h_yields_trf->Fill(reg, "GbbCRA2", 1.0/*TRF_wgt*/);
-			// 	if(isGbbCRB2) h_yields_trf->Fill(reg, "GbbCRB2", 1.0/*TRF_wgt*/);
-			// 	if(isGbbCRC2) h_yields_trf->Fill(reg, "GbbCRC2", 1.0/*TRF_wgt*/);
-			// 	if(isGbbCRA4) h_yields_trf->Fill(reg, "GbbCRA4", 1.0/*TRF_wgt*/);
-			// 	if(isGbbCRB4) h_yields_trf->Fill(reg, "GbbCRB4", 1.0/*TRF_wgt*/);
+			// 	if(isGtt1LCRA2) h_yields_trf->Fill(reg, "Gtt1LCRA2", weight_temp);
+			// 	if(isGtt1LCRB2) h_yields_trf->Fill(reg, "Gtt1LCRB2", weight_temp);
+			// 	if(isGtt1LCRC2) h_yields_trf->Fill(reg, "Gtt1LCRC2", weight_temp);
+			// 	if(isGtt1LCRA4) h_yields_trf->Fill(reg, "Gtt1LCRA4", weight_temp);
+			// 	if(isGtt1LCRB4) h_yields_trf->Fill(reg, "Gtt1LCRB4", weight_temp);
+			// 	if(isGtt1LCRC4) h_yields_trf->Fill(reg, "Gtt1LCRC4", weight_temp);
 
-			// 	if(isGtt1LCRA2) h_yields_trf->Fill(reg, "Gtt1LCRA2", 1.0/*TRF_wgt*/);
-			// 	if(isGtt1LCRB2) h_yields_trf->Fill(reg, "Gtt1LCRB2", 1.0/*TRF_wgt*/);
-			// 	if(isGtt1LCRC2) h_yields_trf->Fill(reg, "Gtt1LCRC2", 1.0/*TRF_wgt*/);
-			// 	if(isGtt1LCRA4) h_yields_trf->Fill(reg, "Gtt1LCRA4", 1.0/*TRF_wgt*/);
-			// 	if(isGtt1LCRB4) h_yields_trf->Fill(reg, "Gtt1LCRB4", 1.0/*TRF_wgt*/);
-			// 	if(isGtt1LCRC4) h_yields_trf->Fill(reg, "Gtt1LCRC4", 1.0/*TRF_wgt*/);
+			// 	if(isGtt0LCRA) h_yields_trf->Fill(reg, "Gtt0LCRA", weight_temp);
+			// 	if(isGtt0LCRB) h_yields_trf->Fill(reg, "Gtt0LCRB", weight_temp);
+			// 	if(isGtt0LCRC) h_yields_trf->Fill(reg, "Gtt0LCRC", weight_temp);
+			// 	if(isGtt0LCRD) h_yields_trf->Fill(reg, "Gtt0LCRD", weight_temp);
 
-			// 	if(isGtt0LCRA) h_yields_trf->Fill(reg, "Gtt0LCRA", 1.0/*TRF_wgt*/);
-			// 	if(isGtt0LCRB) h_yields_trf->Fill(reg, "Gtt0LCRB", 1.0/*TRF_wgt*/);
-			// 	if(isGtt0LCRC) h_yields_trf->Fill(reg, "Gtt0LCRC", 1.0/*TRF_wgt*/);
-			// 	if(isGtt0LCRD) h_yields_trf->Fill(reg, "Gtt0LCRD", 1.0/*TRF_wgt*/);
+			// 	if(isGbbVRI2) h_yields_trf->Fill(reg, "GbbVRI2", weight_temp);
+			// 	if(isGbbVRII2) h_yields_trf->Fill(reg, "GbbVRII2", weight_temp);
+			// 	if(isGbbVRIII2) h_yields_trf->Fill(reg, "GbbVRIII2", weight_temp);
+			// 	if(isGbbVRI4) h_yields_trf->Fill(reg, "GbbVRI4", weight_temp);
+			// 	if(isGbbVRII4) h_yields_trf->Fill(reg, "GbbVRII4", weight_temp);
+			// 	if(isVR1LGtt0LI) h_yields_trf->Fill(reg, "VR1LGtt0LI", weight_temp);
+			// 	if(isVR1LGtt0LII) h_yields_trf->Fill(reg, "VR1LGtt0LII", weight_temp);
+			// 	if(isVR1LGtt0LIII) h_yields_trf->Fill(reg, "VR1LGtt0LIII", weight_temp);
+			// 	if(isVR1LGtt0LIV) h_yields_trf->Fill(reg, "VR1LGtt0LIV", weight_temp);
+			// 	if(isVR0LGtt0LI) h_yields_trf->Fill(reg, "VR0LGtt0LI", weight_temp);
+			// 	if(isVR0LGtt0LII) h_yields_trf->Fill(reg, "VR0LGtt0LII", weight_temp);
+			// 	if(isVR0LGtt0LIII) h_yields_trf->Fill(reg, "VR0LGtt0LIII", weight_temp);
+			// 	if(isVR0LGtt0LIV) h_yields_trf->Fill(reg, "VR0LGtt0LIV", weight_temp);
+			// 	if(isVRGtt1LI2mT2b) h_yields_trf->Fill(reg, "VRGtt1LI2mT2b", weight_temp);
+			// 	if(isVRGtt1LII2mT2b) h_yields_trf->Fill(reg, "VRGtt1LII2mT2b", weight_temp);
+			// 	if(isVRGtt1LI4mT2b) h_yields_trf->Fill(reg, "VRGtt1LI4mT2b", weight_temp);
+			// 	if(isVRGtt1LII4mT2b) h_yields_trf->Fill(reg, "VRGtt1LII4mT2b", weight_temp);
+			// 	if(isVRGtt1LI2mT3b) h_yields_trf->Fill(reg, "VRGtt1LI2mT3b", weight_temp);
+			// 	if(isVRGtt1LII2mT3b) h_yields_trf->Fill(reg, "VRGtt1LII2mT3b", weight_temp);
+			// 	if(isVRGtt1LI4mT3b) h_yields_trf->Fill(reg, "VRGtt1LI4mT3b", weight_temp); 
+			// 	if(isVRGtt1LII4mT3b) h_yields_trf->Fill(reg, "VRGtt1LII4mT3b", weight_temp);
+			// 	if(isVRGtt1LI2mTb2b) h_yields_trf->Fill(reg, "VRGtt1LI2mTb2b", weight_temp);
+			// 	if(isVRGtt1LII2mTb2b) h_yields_trf->Fill(reg, "VRGtt1LII2mTb2b", weight_temp);
+			// 	if(isVRGtt1LI4mTb2b) h_yields_trf->Fill(reg, "VRGtt1LI4mTb2b", weight_temp);
+			// 	if(isVRGtt1LII4mTb2b) h_yields_trf->Fill(reg, "VRGtt1LII4mTb2b", weight_temp);
+			// 	if(isVRGtt1LI2mTb3b) h_yields_trf->Fill(reg, "VRGtt1LI2mTb3b", weight_temp);
+			// 	if(isVRGtt1LII2mTb3b) h_yields_trf->Fill(reg, "VRGtt1LII2mTb3b", weight_temp);
+			// 	if(isVRGtt1LI4mTb3b) h_yields_trf->Fill(reg, "VRGtt1LI4mTb3b", weight_temp);
+			// 	if(isVRGtt1LII4mTb3b) h_yields_trf->Fill(reg, "VRGtt1LII4mTb3b", weight_temp);
+			// 	if(isVRGtt1LI2mT4b) h_yields_trf->Fill(reg, "VRGtt1LI2mT4b", weight_temp);
+			// 	if(isVRGtt1LII2mT4b) h_yields_trf->Fill(reg, "VRGtt1LII2mT4b", weight_temp);
+			// 	if(isVRGtt1LIII22b) h_yields_trf->Fill(reg, "VRGtt1LIII22b", weight_temp);
+			// 	if(isVRGtt1LIII42b) h_yields_trf->Fill(reg, "VRGtt1LIII42b", weight_temp);
+			// 	if(isVRGtt1LIII23b) h_yields_trf->Fill(reg, "VRGtt1LIII23b", weight_temp);
+			// 	if(isVRGtt1LIII43b) h_yields_trf->Fill(reg, "VRGtt1LIII43b", weight_temp);
+			// 	if(isVRGtt1LIII24b) h_yields_trf->Fill(reg, "VRGtt1LIII24b", weight_temp);
+			// 	if(isVRGtt1LIII44b) h_yields_trf->Fill(reg, "VRGtt1LIII44b", weight_temp);
+			// }
 
-			// 	if(isGbbVRI2) h_yields_trf->Fill(reg, "GbbVRI2", 1.0/*TRF_wgt*/);
-			// 	if(isGbbVRII2) h_yields_trf->Fill(reg, "GbbVRII2", 1.0/*TRF_wgt*/);
-			// 	if(isGbbVRIII2) h_yields_trf->Fill(reg, "GbbVRIII2", 1.0/*TRF_wgt*/);
-			// 	if(isGbbVRI4) h_yields_trf->Fill(reg, "GbbVRI4", 1.0/*TRF_wgt*/);
-			// 	if(isGbbVRII4) h_yields_trf->Fill(reg, "GbbVRII4", 1.0/*TRF_wgt*/);
-			// 	if(isVR1LGtt0LI) h_yields_trf->Fill(reg, "VR1LGtt0LI", 1.0/*TRF_wgt*/);
-			// 	if(isVR1LGtt0LII) h_yields_trf->Fill(reg, "VR1LGtt0LII", 1.0/*TRF_wgt*/);
-			// 	if(isVR1LGtt0LIII) h_yields_trf->Fill(reg, "VR1LGtt0LIII", 1.0/*TRF_wgt*/);
-			// 	if(isVR1LGtt0LIV) h_yields_trf->Fill(reg, "VR1LGtt0LIV", 1.0/*TRF_wgt*/);
-			// 	if(isVR0LGtt0LI) h_yields_trf->Fill(reg, "VR0LGtt0LI", 1.0/*TRF_wgt*/);
-			// 	if(isVR0LGtt0LII) h_yields_trf->Fill(reg, "VR0LGtt0LII", 1.0/*TRF_wgt*/);
-			// 	if(isVR0LGtt0LIII) h_yields_trf->Fill(reg, "VR0LGtt0LIII", 1.0/*TRF_wgt*/);
-			// 	if(isVR0LGtt0LIV) h_yields_trf->Fill(reg, "VR0LGtt0LIV", 1.0/*TRF_wgt*/);
-			// 	if(isVRGtt1LI2mT2b) h_yields_trf->Fill(reg, "VRGtt1LI2mT2b", 1.0/*TRF_wgt*/);
-			// 	if(isVRGtt1LII2mT2b) h_yields_trf->Fill(reg, "VRGtt1LII2mT2b", 1.0/*TRF_wgt*/);
-			// 	if(isVRGtt1LI4mT2b) h_yields_trf->Fill(reg, "VRGtt1LI4mT2b", 1.0/*TRF_wgt*/);
-			// 	if(isVRGtt1LII4mT2b) h_yields_trf->Fill(reg, "VRGtt1LII4mT2b", 1.0/*TRF_wgt*/);
-			// 	if(isVRGtt1LI2mT3b) h_yields_trf->Fill(reg, "VRGtt1LI2mT3b", 1.0/*TRF_wgt*/);
-			// 	if(isVRGtt1LII2mT3b) h_yields_trf->Fill(reg, "VRGtt1LII2mT3b", 1.0/*TRF_wgt*/);
-			// 	if(isVRGtt1LI4mT3b) h_yields_trf->Fill(reg, "VRGtt1LI4mT3b", 1.0/*TRF_wgt*/); 
-			// 	if(isVRGtt1LII4mT3b) h_yields_trf->Fill(reg, "VRGtt1LII4mT3b", 1.0/*TRF_wgt*/);
-			// 	if(isVRGtt1LI2mTb2b) h_yields_trf->Fill(reg, "VRGtt1LI2mTb2b", 1.0/*TRF_wgt*/);
-			// 	if(isVRGtt1LII2mTb2b) h_yields_trf->Fill(reg, "VRGtt1LII2mTb2b", 1.0/*TRF_wgt*/);
-			// 	if(isVRGtt1LI4mTb2b) h_yields_trf->Fill(reg, "VRGtt1LI4mTb2b", 1.0/*TRF_wgt*/);
-			// 	if(isVRGtt1LII4mTb2b) h_yields_trf->Fill(reg, "VRGtt1LII4mTb2b", 1.0/*TRF_wgt*/);
-			// 	if(isVRGtt1LI2mTb3b) h_yields_trf->Fill(reg, "VRGtt1LI2mTb3b", 1.0/*TRF_wgt*/);
-			// 	if(isVRGtt1LII2mTb3b) h_yields_trf->Fill(reg, "VRGtt1LII2mTb3b", 1.0/*TRF_wgt*/);
-			// 	if(isVRGtt1LI4mTb3b) h_yields_trf->Fill(reg, "VRGtt1LI4mTb3b", 1.0/*TRF_wgt*/);
-			// 	if(isVRGtt1LII4mTb3b) h_yields_trf->Fill(reg, "VRGtt1LII4mTb3b", 1.0/*TRF_wgt*/);
-			// 	if(isVRGtt1LI2mT4b) h_yields_trf->Fill(reg, "VRGtt1LI2mT4b", 1.0/*TRF_wgt*/);
-			// 	if(isVRGtt1LII2mT4b) h_yields_trf->Fill(reg, "VRGtt1LII2mT4b", 1.0/*TRF_wgt*/);
-			// 	if(isVRGtt1LIII22b) h_yields_trf->Fill(reg, "VRGtt1LIII22b", 1.0/*TRF_wgt*/);
-			// 	if(isVRGtt1LIII42b) h_yields_trf->Fill(reg, "VRGtt1LIII42b", 1.0/*TRF_wgt*/);
-			// 	if(isVRGtt1LIII23b) h_yields_trf->Fill(reg, "VRGtt1LIII23b", 1.0/*TRF_wgt*/);
-			// 	if(isVRGtt1LIII43b) h_yields_trf->Fill(reg, "VRGtt1LIII43b", 1.0/*TRF_wgt*/);
-			// 	if(isVRGtt1LIII24b) h_yields_trf->Fill(reg, "VRGtt1LIII24b", 1.0/*TRF_wgt*/);
-			// 	if(isVRGtt1LIII44b) h_yields_trf->Fill(reg, "VRGtt1LIII44b", 1.0/*TRF_wgt*/);
-			// }		
+			if(!isTRF)
+			{
+				//std::cout << "not TRF" << std::endl;
+
+				if(all) h_yields->Fill(reg, "All", 1.0);
+				if(isPreselect) h_yields->Fill(reg, "Presel", 1.0);
+				if(isPreselect_Gbb) h_yields->Fill(reg, "PreGbb", 1.0);
+				if(isPreselect_Gtt_0l) h_yields->Fill(reg, "PreGtt0l", 1.0);
+				if(isPreselect_Gtt_1l) h_yields->Fill(reg, "PreGtt1l", 1.0);
+
+				if(isGbbSRA2) h_yields->Fill(reg, "GbbSRA2", 1.0);
+				if(isGbbSRB2) h_yields->Fill(reg, "GbbSRB2", 1.0);
+				if(isGbbSRC2) h_yields->Fill(reg, "GbbSRC2", 1.0);
+				if(isGbbSRA4) h_yields->Fill(reg, "GbbSRA4", 1.0);
+				if(isGbbSRB4) h_yields->Fill(reg, "GbbSRB4", 1.0);
+
+				if(isGtt1LSRA2) h_yields->Fill(reg, "Gtt1LSRA2", 1.0);
+				if(isGtt1LSRB2) h_yields->Fill(reg, "Gtt1LSRB2", 1.0);
+				if(isGtt1LSRC2) h_yields->Fill(reg, "Gtt1LSRC2", 1.0);
+				if(isGtt1LSRA4) h_yields->Fill(reg, "Gtt1LSRA4", 1.0);
+				if(isGtt1LSRB4) h_yields->Fill(reg, "Gtt1LSRB4", 1.0);
+				if(isGtt1LSRC4) h_yields->Fill(reg, "Gtt1LSRC4", 1.0);
+
+				if(isGtt0LSRA) h_yields->Fill(reg, "Gtt0LSRA", 1.0);
+				if(isGtt0LSRB) h_yields->Fill(reg, "Gtt0LSRB", 1.0);
+				if(isGtt0LSRC) h_yields->Fill(reg, "Gtt0LSRC", 1.0);
+				if(isGtt0LSRD) h_yields->Fill(reg, "Gtt0LSRD", 1.0);
+
+				if(isGbbCRA2) h_yields->Fill(reg, "GbbCRA2", 1.0);
+				if(isGbbCRB2) h_yields->Fill(reg, "GbbCRB2", 1.0);
+				if(isGbbCRC2) h_yields->Fill(reg, "GbbCRC2", 1.0);
+				if(isGbbCRA4) h_yields->Fill(reg, "GbbCRA4", 1.0);
+				if(isGbbCRB4) h_yields->Fill(reg, "GbbCRB4", 1.0);
+
+				if(isGtt1LCRA2) h_yields->Fill(reg, "Gtt1LCRA2", 1.0);
+				if(isGtt1LCRB2) h_yields->Fill(reg, "Gtt1LCRB2", 1.0);
+				if(isGtt1LCRC2) h_yields->Fill(reg, "Gtt1LCRC2", 1.0);
+				if(isGtt1LCRA4) h_yields->Fill(reg, "Gtt1LCRA4", 1.0);
+				if(isGtt1LCRB4) h_yields->Fill(reg, "Gtt1LCRB4", 1.0);
+				if(isGtt1LCRC4) h_yields->Fill(reg, "Gtt1LCRC4", 1.0);
+
+				if(isGtt0LCRA) h_yields->Fill(reg, "Gtt0LCRA", 1.0);
+				if(isGtt0LCRB) h_yields->Fill(reg, "Gtt0LCRB", 1.0);
+				if(isGtt0LCRC) h_yields->Fill(reg, "Gtt0LCRC", 1.0);
+				if(isGtt0LCRD) h_yields->Fill(reg, "Gtt0LCRD", 1.0);
+
+				if(isGbbVRI2) h_yields->Fill(reg, "GbbVRI2", 1.0);
+				if(isGbbVRII2) h_yields->Fill(reg, "GbbVRII2", 1.0);
+				if(isGbbVRIII2) h_yields->Fill(reg, "GbbVRIII2", 1.0);
+				if(isGbbVRI4) h_yields->Fill(reg, "GbbVRI4", 1.0);
+				if(isGbbVRII4) h_yields->Fill(reg, "GbbVRII4", 1.0);
+				if(isVR1LGtt0LI) h_yields->Fill(reg, "VR1LGtt0LI", 1.0);
+				if(isVR1LGtt0LII) h_yields->Fill(reg, "VR1LGtt0LII", 1.0);
+				if(isVR1LGtt0LIII) h_yields->Fill(reg, "VR1LGtt0LIII", 1.0);
+				if(isVR1LGtt0LIV) h_yields->Fill(reg, "VR1LGtt0LIV", 1.0);
+				if(isVR0LGtt0LI) h_yields->Fill(reg, "VR0LGtt0LI", 1.0);
+				if(isVR0LGtt0LII) h_yields->Fill(reg, "VR0LGtt0LII", 1.0);
+				if(isVR0LGtt0LIII) h_yields->Fill(reg, "VR0LGtt0LIII", 1.0);
+				if(isVR0LGtt0LIV) h_yields->Fill(reg, "VR0LGtt0LIV", 1.0);
+				if(isVRGtt1LI2mT2b) h_yields->Fill(reg, "VRGtt1LI2mT2b", 1.0);
+				if(isVRGtt1LII2mT2b) h_yields->Fill(reg, "VRGtt1LII2mT2b", 1.0);
+				if(isVRGtt1LI4mT2b) h_yields->Fill(reg, "VRGtt1LI4mT2b", 1.0);
+				if(isVRGtt1LII4mT2b) h_yields->Fill(reg, "VRGtt1LII4mT2b", 1.0);
+				if(isVRGtt1LI2mT3b) h_yields->Fill(reg, "VRGtt1LI2mT3b", 1.0);
+				if(isVRGtt1LII2mT3b) h_yields->Fill(reg, "VRGtt1LII2mT3b", 1.0);
+				if(isVRGtt1LI4mT3b) h_yields->Fill(reg, "VRGtt1LI4mT3b", 1.0); 
+				if(isVRGtt1LII4mT3b) h_yields->Fill(reg, "VRGtt1LII4mT3b", 1.0);
+				if(isVRGtt1LI2mTb2b) h_yields->Fill(reg, "VRGtt1LI2mTb2b", 1.0);
+				if(isVRGtt1LII2mTb2b) h_yields->Fill(reg, "VRGtt1LII2mTb2b", 1.0);
+				if(isVRGtt1LI4mTb2b) h_yields->Fill(reg, "VRGtt1LI4mTb2b", 1.0);
+				if(isVRGtt1LII4mTb2b) h_yields->Fill(reg, "VRGtt1LII4mTb2b", 1.0);
+				if(isVRGtt1LI2mTb3b) h_yields->Fill(reg, "VRGtt1LI2mTb3b", 1.0);
+				if(isVRGtt1LII2mTb3b) h_yields->Fill(reg, "VRGtt1LII2mTb3b", 1.0);
+				if(isVRGtt1LI4mTb3b) h_yields->Fill(reg, "VRGtt1LI4mTb3b", 1.0);
+				if(isVRGtt1LII4mTb3b) h_yields->Fill(reg, "VRGtt1LII4mTb3b", 1.0);
+				if(isVRGtt1LI2mT4b) h_yields->Fill(reg, "VRGtt1LI2mT4b", 1.0);
+				if(isVRGtt1LII2mT4b) h_yields->Fill(reg, "VRGtt1LII2mT4b", 1.0);
+				if(isVRGtt1LIII22b) h_yields->Fill(reg, "VRGtt1LIII22b", 1.0);
+				if(isVRGtt1LIII42b) h_yields->Fill(reg, "VRGtt1LIII42b", 1.0);
+				if(isVRGtt1LIII23b) h_yields->Fill(reg, "VRGtt1LIII23b", 1.0);
+				if(isVRGtt1LIII43b) h_yields->Fill(reg, "VRGtt1LIII43b", 1.0);
+				if(isVRGtt1LIII24b) h_yields->Fill(reg, "VRGtt1LIII24b", 1.0);
+				if(isVRGtt1LIII44b) h_yields->Fill(reg, "VRGtt1LIII44b", 1.0);
+			}
+			else if(isTRF)
+			{
+				//std::cout << "is TRF\tTRF_wgt is " << TRF_wgt << std::endl;
+				weight_temp*=TRF_wgt;
+
+				if(all) h_yields_trf->Fill(reg, "All", 1.0/*TRF_wgt*/);
+				if(isPreselect) h_yields_trf->Fill(reg, "Presel", 1.0/*TRF_wgt*/);
+				if(isPreselect_Gbb) h_yields_trf->Fill(reg, "PreGbb", 1.0/*TRF_wgt*/);
+				if(isPreselect_Gtt_0l) h_yields_trf->Fill(reg, "PreGtt0l", 1.0/*TRF_wgt*/);
+				if(isPreselect_Gtt_1l) h_yields_trf->Fill(reg, "PreGtt1l", 1.0/*TRF_wgt*/);
+
+				if(isGbbSRA2) h_yields_trf->Fill(reg, "GbbSRA2", 1.0/*TRF_wgt*/);
+				if(isGbbSRB2) h_yields_trf->Fill(reg, "GbbSRB2", 1.0/*TRF_wgt*/);
+				if(isGbbSRC2) h_yields_trf->Fill(reg, "GbbSRC2", 1.0/*TRF_wgt*/);
+				if(isGbbSRA4) h_yields_trf->Fill(reg, "GbbSRA4", 1.0/*TRF_wgt*/);
+				if(isGbbSRB4) h_yields_trf->Fill(reg, "GbbSRB4", 1.0/*TRF_wgt*/);
+
+				if(isGtt1LSRA2) h_yields_trf->Fill(reg, "Gtt1LSRA2", 1.0/*TRF_wgt*/);
+				if(isGtt1LSRB2) h_yields_trf->Fill(reg, "Gtt1LSRB2", 1.0/*TRF_wgt*/);
+				if(isGtt1LSRC2) h_yields_trf->Fill(reg, "Gtt1LSRC2", 1.0/*TRF_wgt*/);
+				if(isGtt1LSRA4) h_yields_trf->Fill(reg, "Gtt1LSRA4", 1.0/*TRF_wgt*/);
+				if(isGtt1LSRB4) h_yields_trf->Fill(reg, "Gtt1LSRB4", 1.0/*TRF_wgt*/);
+				if(isGtt1LSRC4) h_yields_trf->Fill(reg, "Gtt1LSRC4", 1.0/*TRF_wgt*/);
+
+				if(isGtt0LSRA) h_yields_trf->Fill(reg, "Gtt0LSRA", 1.0/*TRF_wgt*/);
+				if(isGtt0LSRB) h_yields_trf->Fill(reg, "Gtt0LSRB", 1.0/*TRF_wgt*/);
+				if(isGtt0LSRC) h_yields_trf->Fill(reg, "Gtt0LSRC", 1.0/*TRF_wgt*/);
+				if(isGtt0LSRD) h_yields_trf->Fill(reg, "Gtt0LSRD", 1.0/*TRF_wgt*/);
+
+				if(isGbbCRA2) h_yields_trf->Fill(reg, "GbbCRA2", 1.0/*TRF_wgt*/);
+				if(isGbbCRB2) h_yields_trf->Fill(reg, "GbbCRB2", 1.0/*TRF_wgt*/);
+				if(isGbbCRC2) h_yields_trf->Fill(reg, "GbbCRC2", 1.0/*TRF_wgt*/);
+				if(isGbbCRA4) h_yields_trf->Fill(reg, "GbbCRA4", 1.0/*TRF_wgt*/);
+				if(isGbbCRB4) h_yields_trf->Fill(reg, "GbbCRB4", 1.0/*TRF_wgt*/);
+
+				if(isGtt1LCRA2) h_yields_trf->Fill(reg, "Gtt1LCRA2", 1.0/*TRF_wgt*/);
+				if(isGtt1LCRB2) h_yields_trf->Fill(reg, "Gtt1LCRB2", 1.0/*TRF_wgt*/);
+				if(isGtt1LCRC2) h_yields_trf->Fill(reg, "Gtt1LCRC2", 1.0/*TRF_wgt*/);
+				if(isGtt1LCRA4) h_yields_trf->Fill(reg, "Gtt1LCRA4", 1.0/*TRF_wgt*/);
+				if(isGtt1LCRB4) h_yields_trf->Fill(reg, "Gtt1LCRB4", 1.0/*TRF_wgt*/);
+				if(isGtt1LCRC4) h_yields_trf->Fill(reg, "Gtt1LCRC4", 1.0/*TRF_wgt*/);
+
+				if(isGtt0LCRA) h_yields_trf->Fill(reg, "Gtt0LCRA", 1.0/*TRF_wgt*/);
+				if(isGtt0LCRB) h_yields_trf->Fill(reg, "Gtt0LCRB", 1.0/*TRF_wgt*/);
+				if(isGtt0LCRC) h_yields_trf->Fill(reg, "Gtt0LCRC", 1.0/*TRF_wgt*/);
+				if(isGtt0LCRD) h_yields_trf->Fill(reg, "Gtt0LCRD", 1.0/*TRF_wgt*/);
+
+				if(isGbbVRI2) h_yields_trf->Fill(reg, "GbbVRI2", 1.0/*TRF_wgt*/);
+				if(isGbbVRII2) h_yields_trf->Fill(reg, "GbbVRII2", 1.0/*TRF_wgt*/);
+				if(isGbbVRIII2) h_yields_trf->Fill(reg, "GbbVRIII2", 1.0/*TRF_wgt*/);
+				if(isGbbVRI4) h_yields_trf->Fill(reg, "GbbVRI4", 1.0/*TRF_wgt*/);
+				if(isGbbVRII4) h_yields_trf->Fill(reg, "GbbVRII4", 1.0/*TRF_wgt*/);
+				if(isVR1LGtt0LI) h_yields_trf->Fill(reg, "VR1LGtt0LI", 1.0/*TRF_wgt*/);
+				if(isVR1LGtt0LII) h_yields_trf->Fill(reg, "VR1LGtt0LII", 1.0/*TRF_wgt*/);
+				if(isVR1LGtt0LIII) h_yields_trf->Fill(reg, "VR1LGtt0LIII", 1.0/*TRF_wgt*/);
+				if(isVR1LGtt0LIV) h_yields_trf->Fill(reg, "VR1LGtt0LIV", 1.0/*TRF_wgt*/);
+				if(isVR0LGtt0LI) h_yields_trf->Fill(reg, "VR0LGtt0LI", 1.0/*TRF_wgt*/);
+				if(isVR0LGtt0LII) h_yields_trf->Fill(reg, "VR0LGtt0LII", 1.0/*TRF_wgt*/);
+				if(isVR0LGtt0LIII) h_yields_trf->Fill(reg, "VR0LGtt0LIII", 1.0/*TRF_wgt*/);
+				if(isVR0LGtt0LIV) h_yields_trf->Fill(reg, "VR0LGtt0LIV", 1.0/*TRF_wgt*/);
+				if(isVRGtt1LI2mT2b) h_yields_trf->Fill(reg, "VRGtt1LI2mT2b", 1.0/*TRF_wgt*/);
+				if(isVRGtt1LII2mT2b) h_yields_trf->Fill(reg, "VRGtt1LII2mT2b", 1.0/*TRF_wgt*/);
+				if(isVRGtt1LI4mT2b) h_yields_trf->Fill(reg, "VRGtt1LI4mT2b", 1.0/*TRF_wgt*/);
+				if(isVRGtt1LII4mT2b) h_yields_trf->Fill(reg, "VRGtt1LII4mT2b", 1.0/*TRF_wgt*/);
+				if(isVRGtt1LI2mT3b) h_yields_trf->Fill(reg, "VRGtt1LI2mT3b", 1.0/*TRF_wgt*/);
+				if(isVRGtt1LII2mT3b) h_yields_trf->Fill(reg, "VRGtt1LII2mT3b", 1.0/*TRF_wgt*/);
+				if(isVRGtt1LI4mT3b) h_yields_trf->Fill(reg, "VRGtt1LI4mT3b", 1.0/*TRF_wgt*/); 
+				if(isVRGtt1LII4mT3b) h_yields_trf->Fill(reg, "VRGtt1LII4mT3b", 1.0/*TRF_wgt*/);
+				if(isVRGtt1LI2mTb2b) h_yields_trf->Fill(reg, "VRGtt1LI2mTb2b", 1.0/*TRF_wgt*/);
+				if(isVRGtt1LII2mTb2b) h_yields_trf->Fill(reg, "VRGtt1LII2mTb2b", 1.0/*TRF_wgt*/);
+				if(isVRGtt1LI4mTb2b) h_yields_trf->Fill(reg, "VRGtt1LI4mTb2b", 1.0/*TRF_wgt*/);
+				if(isVRGtt1LII4mTb2b) h_yields_trf->Fill(reg, "VRGtt1LII4mTb2b", 1.0/*TRF_wgt*/);
+				if(isVRGtt1LI2mTb3b) h_yields_trf->Fill(reg, "VRGtt1LI2mTb3b", 1.0/*TRF_wgt*/);
+				if(isVRGtt1LII2mTb3b) h_yields_trf->Fill(reg, "VRGtt1LII2mTb3b", 1.0/*TRF_wgt*/);
+				if(isVRGtt1LI4mTb3b) h_yields_trf->Fill(reg, "VRGtt1LI4mTb3b", 1.0/*TRF_wgt*/);
+				if(isVRGtt1LII4mTb3b) h_yields_trf->Fill(reg, "VRGtt1LII4mTb3b", 1.0/*TRF_wgt*/);
+				if(isVRGtt1LI2mT4b) h_yields_trf->Fill(reg, "VRGtt1LI2mT4b", 1.0/*TRF_wgt*/);
+				if(isVRGtt1LII2mT4b) h_yields_trf->Fill(reg, "VRGtt1LII2mT4b", 1.0/*TRF_wgt*/);
+				if(isVRGtt1LIII22b) h_yields_trf->Fill(reg, "VRGtt1LIII22b", 1.0/*TRF_wgt*/);
+				if(isVRGtt1LIII42b) h_yields_trf->Fill(reg, "VRGtt1LIII42b", 1.0/*TRF_wgt*/);
+				if(isVRGtt1LIII23b) h_yields_trf->Fill(reg, "VRGtt1LIII23b", 1.0/*TRF_wgt*/);
+				if(isVRGtt1LIII43b) h_yields_trf->Fill(reg, "VRGtt1LIII43b", 1.0/*TRF_wgt*/);
+				if(isVRGtt1LIII24b) h_yields_trf->Fill(reg, "VRGtt1LIII24b", 1.0/*TRF_wgt*/);
+				if(isVRGtt1LIII44b) h_yields_trf->Fill(reg, "VRGtt1LIII44b", 1.0/*TRF_wgt*/);
+			}		
 
 		}
 	}
 
 	std::cout << "Done processing events." << std::endl;
 
-	TFile* out; out = new TFile("truthYields.root", "RECREATE");
+	TFile* out; out = new TFile("flipYields.root", "RECREATE");
 	h_yields->Write();
 	h_yields_trf->Write();
 	out->Close();

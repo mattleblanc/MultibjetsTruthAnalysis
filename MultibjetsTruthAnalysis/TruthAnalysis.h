@@ -85,6 +85,10 @@ public:
   //Trisha:
   void processEventPerBMultiplicity(ConstDataVector<xAOD::JetContainer> * SelectedBJets
 				    , ConstDataVector<xAOD::JetContainer> * SelectedJets
+				    , ConstDataVector<xAOD::JetContainer> * SelectedRCJets
+				    , ConstDataVector<xAOD::JetContainer> * SelectedTopJets
+				    , ConstDataVector<xAOD::TruthParticleContainer> * SignalMuons
+				    , ConstDataVector<xAOD::TruthParticleContainer> * SignalElectrons
 				    , xAOD::MissingET* TruthMET_NonInt
 				    , bool isTRF=false, bool isTRF_incl=false, int nbjets_TRF=0);
   bool m_probTag;
