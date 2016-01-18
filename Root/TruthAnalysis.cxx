@@ -606,6 +606,7 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
 
   // Overlap Removal
 
+  ConstDataVector<xAOD::TruthParticleContainer> * elPassingEB = new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
   ConstDataVector<xAOD::TruthParticleContainer> * elPassingEJ = new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
   ConstDataVector<xAOD::JetContainer> * jetPassingEJ = new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
   ConstDataVector<xAOD::TruthParticleContainer> * jetPassingJE = new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
@@ -628,11 +629,11 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
   jetVec.SetPtEtaPhiE(jet->pt(),jet->eta(),jet->phi(),jet->e());
         if(fabs(elVec.DeltaR(jetVec)<0.2))
           {
-	    if(debug) std::cout << "El-Jet Overlap Triggered (remove e)" << std::endl;
+	    if(debug) std::cout << "El-bJet Overlap Triggered (remove e)" << std::endl;
             isGoodEl=false;
           }
       }
-    if(isGoodEl) elPassingEJ->push_back(electron);
+    if(isGoodEl) elPassingEB->push_back(electron);
   }
   
   // Jet-El
@@ -641,8 +642,8 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
       TLorentzVector jetVec;
       jetVec.SetPtEtaPhiE(jet->pt(),jet->eta(),jet->phi(),jet->e());
       bool isGoodJet=true;;
-      for(const auto electron : *elPassingEJ)
-  {
+      for(const auto electron : *elPassingEB)
+    {
     TLorentzVector elVec;
     elVec.SetPtEtaPhiE(electron->pt(),electron->eta(),electron->phi(),electron->e());
     if(fabs(elVec.DeltaR(jetVec)<0.2))
@@ -650,10 +651,28 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
         if(debug) std::cout << "El-Jet Overlap Triggered (remove j)" << std::endl;
         isGoodJet=false;
       }
-  }
+    }
       if(isGoodJet) jetPassingEJ->push_back(jet);
     }
   
+  for(const auto electron : *elPassingEB)
+    {
+      TLorentzVector elVec;
+      elVec.SetPtEtaPhiE(electron->pt(),electron->eta(),electron->phi(),electron->e());
+      bool isGoodElectron=true;;
+      for(const auto jet : *jetPassingEJ)
+	{
+	  TLorentzVector jetVec;
+	  jetVec.SetPtEtaPhiE(jet->pt(),jet->eta(),jet->phi(),jet->e());
+	  if(fabs(elVec.DeltaR(jetVec)<0.4))
+	    {
+	      if(debug) std::cout << "El-Jet Overlap Triggered (remove el)" << std::endl;
+	      isGoodElectron=false;
+	    }
+	}
+      if(isGoodElectron) elPassingEJ->push_back(electron);
+    }
+
   // Mu-Jet
   for(const auto muon : *SignalMuons)
     {
@@ -951,8 +970,8 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
   if(NBaseLeptons == 0
      && pass3bincl
      &&var_dPhiMin > 0.4
-     && SelectedJets->size() >= 4
-     && SelectedJets->at(3)->pt()/MEV > 50.0
+     && FinalJets->size() >= 4
+     && FinalJets->at(3)->pt()/MEV > 50.0
      && SelectedBJets->at(2)->pt()/MEV > 50.0
      && var_Met > 300.0
      && var_Meff_4j > 1600.0)
@@ -966,8 +985,8 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
   if(NBaseLeptons == 0
      && pass3bincl
      && var_dPhiMin > 0.4
-     && SelectedJets->size() >= 4
-     && SelectedJets->at(3)->pt()/MEV > 70.0
+     && FinalJets->size() >= 4
+     && FinalJets->at(3)->pt()/MEV > 70.0
      && SelectedBJets->at(2)->pt()/MEV > 70.0
      && var_Met > 400.0
      && var_Meff_4j > 800.0)
@@ -981,8 +1000,8 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
   if(NBaseLeptons == 0
      && pass3bincl
      && var_dPhiMin > 0.4
-     && SelectedJets->size() >= 4
-     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && FinalJets->size() >= 4
+     && FinalJets->at(3)->pt()/MEV > 90.0
      && SelectedBJets->at(2)->pt()/MEV > 90.0
      && var_Met > 350.0
      && var_Meff_4j > 1400.0)
@@ -996,8 +1015,8 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
   if(NBaseLeptons == 0
      && pass3bincl
      && var_dPhiMin > 0.4
-     && SelectedJets->size() >= 4
-     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && FinalJets->size() >= 4
+     && FinalJets->at(3)->pt()/MEV > 90.0
      && SelectedBJets->at(2)->pt()/MEV > 90.0
      && var_Met > 400.0
      && var_Meff_4j > 1200.0)
@@ -1011,8 +1030,8 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
   if(NBaseLeptons == 0
      && pass3bincl
      && var_dPhiMin > 0.4
-     && SelectedJets->size() >= 4
-     && SelectedJets->at(3)->pt()/MEV > 30.0
+     && FinalJets->size() >= 4
+     && FinalJets->at(3)->pt()/MEV > 30.0
      && SelectedBJets->at(2)->pt()/MEV > 30.0
      && var_Met > 500.0
      && var_Meff_4j > 1400.0)
@@ -1026,8 +1045,8 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
   if(NBaseLeptons == 0
      && pass3bincl
      && var_dPhiMin > 0.4
-     && SelectedJets->size() >= 4
-     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && FinalJets->size() >= 4
+     && FinalJets->at(3)->pt()/MEV > 90.0
      && SelectedBJets->at(2)->pt()/MEV > 90.0
      && var_Met > 350.0
      && var_Meff_4j > 1600.0)
@@ -1041,8 +1060,8 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
   if(NBaseLeptons == 0
      && pass3bincl
      && var_dPhiMin > 0.4
-     && SelectedJets->size() >= 4
-     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && FinalJets->size() >= 4
+     && FinalJets->at(3)->pt()/MEV > 90.0
      && SelectedBJets->at(2)->pt()/MEV > 90.0
      && var_Met > 450.0
      && var_Meff_4j > 1400.0)
@@ -1219,7 +1238,7 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
   // Gbb CRs
   if( NSignalLeptons == 1
      && NJets >= 4
-     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && FinalJets->at(3)->pt()/MEV > 90.0
      && pass3bincl
      //&& NBJets >= 3
      && var_mT < 150
@@ -1232,7 +1251,7 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
 
   if(NSignalLeptons==1
      &&    NJets >= 4
-     &&    SelectedJets->at(3)->pt()/MEV > 90.0
+     &&    FinalJets->at(3)->pt()/MEV > 90.0
      && pass3bincl
      //&&    NBJets >= 3
      &&    var_mT < 150
@@ -1245,7 +1264,7 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
 
   if(NSignalLeptons==1
      &&    NJets >= 4     
-     &&    SelectedJets->at(3)->pt()/MEV > 30.0
+     &&    FinalJets->at(3)->pt()/MEV > 30.0
      && pass3bincl
      //&&    NBJets >= 3
      &&    var_mT < 150
@@ -1260,7 +1279,7 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
   
   if( NSignalLeptons==1
      &&    NJets >= 4
-     &&    SelectedJets->at(3)->pt()/MEV > 90.0
+     &&    FinalJets->at(3)->pt()/MEV > 90.0
      && pass3bincl
      //&&    NBJets >= 3
      &&    var_mT < 150 
@@ -1273,7 +1292,7 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
   
   if(NSignalLeptons==1
      &&    NJets >= 4
-     &&    SelectedJets->at(3)->pt()/MEV > 90.0
+     &&    FinalJets->at(3)->pt()/MEV > 90.0
      && pass3bincl
      //&&    NBJets >= 3
      &&    var_mT < 150
@@ -1424,7 +1443,7 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
      && pass3bincl
      //&& NBJets >= 3
      && var_mTb < 160.0
-     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && FinalJets->at(3)->pt()/MEV > 90.0
      && var_Met > 200.0
      && var_Meff_4j < 1200.0)
     {
@@ -1438,7 +1457,7 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
      && pass3bincl
      //&& NBJets >= 3
      && var_mTb < 160.0
-     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && FinalJets->at(3)->pt()/MEV > 90.0
      && var_Met > 250.0
      && var_Meff_4j < 1200.0)
     {
@@ -1452,7 +1471,7 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
      && pass3bincl
      //&& NBJets >= 3
      && var_mTb < 160.0
-     && SelectedJets->at(3)->pt()/MEV > 30.0
+     && FinalJets->at(3)->pt()/MEV > 30.0
      && var_Met > 400.0
      && var_Meff_4j < 1400.0)
     {
@@ -1466,7 +1485,7 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
      && pass3bincl
      //&& NBJets >= 3
      && var_mTb < 160.0
-     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && FinalJets->at(3)->pt()/MEV > 90.0
      && var_Met > 250.0
      && var_Meff_4j < 1400.0)
     {
@@ -1480,7 +1499,7 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
      && pass3bincl
      //&& NBJets >= 3
      && var_mTb < 160.0
-     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && FinalJets->at(3)->pt()/MEV > 90.0
      && var_Met > 300.0
      && var_Meff_4j < 1400.0)
     {
@@ -1986,8 +2005,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   if(NSignalLeptons == 0
      && pass3bincl
      &&var_dPhiMin > 0.4
-     && SelectedJets->size() >= 4
-     && SelectedJets->at(3)->pt()/MEV > 50.0
+     && FinalJets->size() >= 4
+     && FinalJets->at(3)->pt()/MEV > 50.0
      && SelectedBJets->at(2)->pt()/MEV > 50.0
      && var_Met > 0.0
      && var_Meff_4j > 1300.0)
@@ -2001,8 +2020,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   if(NSignalLeptons == 0
      && pass3bincl
      && var_dPhiMin > 0.4
-     && SelectedJets->size() >= 4
-     && SelectedJets->at(3)->pt()/MEV > 70.0
+     && FinalJets->size() >= 4
+     && FinalJets->at(3)->pt()/MEV > 70.0
      && SelectedBJets->at(2)->pt()/MEV > 70.0
      && var_Met > 0.0
      && var_Meff_4j > 400.0)
@@ -2016,8 +2035,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   if(NSignalLeptons == 0
      && pass3bincl
      && var_dPhiMin > 0.4
-     && SelectedJets->size() >= 4
-     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && FinalJets->size() >= 4
+     && FinalJets->at(3)->pt()/MEV > 90.0
      && SelectedBJets->at(2)->pt()/MEV > 90.0
      && var_Met > 0.0
      && var_Meff_4j > 1050.0)
@@ -2031,8 +2050,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   if(NSignalLeptons == 0
      && pass3bincl
      &&var_dPhiMin > 0.4
-     && SelectedJets->size() >= 4
-     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && FinalJets->size() >= 4
+     && FinalJets->at(3)->pt()/MEV > 90.0
      && SelectedBJets->at(2)->pt()/MEV > 90.0
      && var_Met > 0.0
      && var_Meff_4j > 800.0)
@@ -2046,8 +2065,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   if(NSignalLeptons == 0
      && pass3bincl
      &&var_dPhiMin > 0.4
-     && SelectedJets->size() >= 4
-     && SelectedJets->at(3)->pt()/MEV > 30.0
+     && FinalJets->size() >= 4
+     && FinalJets->at(3)->pt()/MEV > 30.0
      && SelectedBJets->at(2)->pt()/MEV > 30.0
      && var_Met > 0.0
      && var_Meff_4j > 900.0)
@@ -2061,8 +2080,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   if(NSignalLeptons == 0
      && pass3bincl
      && var_dPhiMin > 0.4
-     && SelectedJets->size() >= 4
-     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && FinalJets->size() >= 4
+     && FinalJets->at(3)->pt()/MEV > 90.0
      && SelectedBJets->at(2)->pt()/MEV > 90.0
      && var_Met > 0.0
      && var_Meff_4j > 1250.0)
@@ -2076,8 +2095,8 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   if(NSignalLeptons == 0
      && pass3bincl
      && var_dPhiMin > 0.4
-     && SelectedJets->size() >= 4
-     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && FinalJets->size() >= 4
+     && FinalJets->at(3)->pt()/MEV > 90.0
      && SelectedBJets->at(2)->pt()/MEV > 90.0
      && var_Met > 0.0
      && var_Meff_4j > 950.0)
@@ -2255,7 +2274,7 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   // Gbb CRs
   if( NSignalLeptons == 1
      && NJets >= 4
-     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && FinalJets->at(3)->pt()/MEV > 90.0
      && pass3bincl
      //&& NBJets >= 3
      && var_mT < 150
@@ -2268,7 +2287,7 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
 
   if( NSignalLeptons == 1
      &&    NJets >= 4
-     &&    SelectedJets->at(3)->pt()/MEV > 90.0
+     &&    FinalJets->at(3)->pt()/MEV > 90.0
      && pass3bincl
      //&&    NBJets >= 3
      &&    var_mT < 150
@@ -2281,7 +2300,7 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
 
   if( NSignalLeptons == 1
      &&    NJets >= 4     
-     &&    SelectedJets->at(3)->pt()/MEV > 30.0
+     &&    FinalJets->at(3)->pt()/MEV > 30.0
      && pass3bincl
      //&&    NBJets >= 3
      &&    var_mT < 150
@@ -2295,7 +2314,7 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   
   if( NSignalLeptons == 1
      &&    NJets >= 4
-     &&    SelectedJets->at(3)->pt()/MEV > 90.0
+     &&    FinalJets->at(3)->pt()/MEV > 90.0
      && pass3bincl
      //&&    NBJets >= 3
      &&    var_mT < 150 
@@ -2308,7 +2327,7 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   
   if( NSignalLeptons == 1
      &&    NJets >= 4
-     &&    SelectedJets->at(3)->pt()/MEV > 90.0
+     &&    FinalJets->at(3)->pt()/MEV > 90.0
      && pass3bincl
      //&&    NBJets >= 3
      &&    var_mT < 150
@@ -2459,7 +2478,7 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
      && pass3bincl
      //&& NBJets >= 3
      && var_mTb < 160.0
-     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && FinalJets->at(3)->pt()/MEV > 90.0
      && var_Met > 0.0
      && var_Meff_4j < 1000.0)
     {
@@ -2473,7 +2492,7 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
      && pass3bincl
      //&& NBJets >= 3
      && var_mTb < 160.0
-     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && FinalJets->at(3)->pt()/MEV > 90.0
      && var_Met > 0.0
      && var_Meff_4j < 950.0)
     {
@@ -2487,7 +2506,7 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
      && pass3bincl
      //&& NBJets >= 3
      && var_mTb < 160.0
-     && SelectedJets->at(3)->pt()/MEV > 30.0
+     && FinalJets->at(3)->pt()/MEV > 30.0
      && var_Met > 0.0
      && var_Meff_4j < 1000.0)
     {
@@ -2501,7 +2520,7 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
      && pass3bincl
      //&& NBJets >= 3
      && var_mTb < 160.0
-     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && FinalJets->at(3)->pt()/MEV > 90.0
      && var_Met > 0.0
      && var_Meff_4j < 1150.0)
     {
@@ -2515,7 +2534,7 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
      && pass3bincl
      //&& NBJets >= 3
      && var_mTb < 160.0
-     && SelectedJets->at(3)->pt()/MEV > 90.0
+     && FinalJets->at(3)->pt()/MEV > 90.0
      && var_Met > 0.0
      && var_Meff_4j < 1100.0)
     {
@@ -3321,149 +3340,6 @@ EL::StatusCode TruthAnalysis :: execute ()
       BaselineMuons->push_back(muon);
     }
   }
-
-  // Overlap Removal
-
-  /*
-    Hi Matt,
-    
-    I think we should do it as done at the reco level, except for muons (in the following order):
-    
-    El-Jet: if dR < 0.2, remove jet; unless the jet is a truth b, then remove el
-    El-Jet: if dR < 0.4, remove el and keep jet
-    Mu-Jet: if dR < 0.04+10 GeV/ pT (mu) , remove mu and keep the jet (at the reco level it is done only for jets with >= 3 tracks with pT > 500 MeV)
-    El-Mu: if dR < 0.01, remove both el and mu
-    
-    
-    Cheers,
-    Antoine
-*/
-
- //  ConstDataVector<xAOD::TruthParticleContainer> * elPassingEJ = new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
- //  ConstDataVector<xAOD::JetContainer> * jetPassingEJ = new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
- //  ConstDataVector<xAOD::TruthParticleContainer> * jetPassingJE = new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
- //  ConstDataVector<xAOD::TruthParticleContainer> * muPassingMJ = new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
- //  ConstDataVector<xAOD::TruthParticleContainer> * elPassingEM = new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
- //  ConstDataVector<xAOD::TruthParticleContainer> * muPassingEM = new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
-
- //  ConstDataVector<xAOD::JetContainer> * FinalJets   =  new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
- //  ConstDataVector<xAOD::TruthParticleContainer> * FinalElectrons    =  new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
- //  ConstDataVector<xAOD::TruthParticleContainer> * FinalMuons    =  new ConstDataVector<xAOD::TruthParticleContainer>(SG::VIEW_ELEMENTS);
-
- //  // El-Jet
- //  for(const auto electron : *SignalElectrons){
- //    bool isGoodEl=true;
- //    TLorentzVector elVec;
- //    elVec.SetPtEtaPhiE(electron->pt(),electron->eta(),electron->phi(),electron->e());
- //    for(const auto jet : *SelectedBJets) // this should loop over b-jets
- //      {
-	// TLorentzVector jetVec;
-	// jetVec.SetPtEtaPhiE(jet->pt(),jet->eta(),jet->phi(),jet->e());
- //        if(fabs(elVec.DeltaR(jetVec)<0.2))
- //          {
-	//     //std::cout << "El-Jet Overlap Triggered (remove e)" << std::endl;
- //            isGoodEl=false;
- //          }
- //      }
- //    if(isGoodEl) elPassingEJ->push_back(electron);
- //  }
-  
- //  // Jet-El
- //  for(const auto jet : *SelectedJets)
- //    {
- //      TLorentzVector jetVec;
- //      jetVec.SetPtEtaPhiE(jet->pt(),jet->eta(),jet->phi(),jet->e());
- //      bool isGoodJet=true;;
- //      for(const auto electron : *elPassingEJ)
-	// {
-	//   TLorentzVector elVec;
-	//   elVec.SetPtEtaPhiE(electron->pt(),electron->eta(),electron->phi(),electron->e());
-	//   if(fabs(elVec.DeltaR(jetVec)<0.2))
-	//     {
-	//       //std::cout << "El-Jet Overlap Triggered (remove j)" << std::endl;
-	//       isGoodJet=false;
-	//     }
-	// }
- //      if(isGoodJet) jetPassingEJ->push_back(jet);
- //    }
-  
- //  // Mu-Jet
- //  for(const auto muon : *SignalMuons)
- //    {
- //      TLorentzVector muVec;
- //      muVec.SetPtEtaPhiE(muon->pt(),muon->eta(),muon->phi(),muon->e());
- //      bool isGoodMuon=true;
- //      for(const auto jet : *jetPassingEJ)
- //        {
- //          TLorentzVector jetVec;
-	//   jetVec.SetPtEtaPhiE(jet->pt(),jet->eta(),jet->phi(),jet->e());
- //          if(fabs(jetVec.DeltaR(muVec)<(0.04+10*MEV/muVec.Pt())))
- //            {
-	//       //std::cout << "Mu-Jet Overlap Triggered (remove m)" << std::endl;
- //              isGoodMuon=false;
- //            }
-	// }
- //      if(isGoodMuon) muPassingMJ->push_back(muon);
- //    }
-  
- //  // El-Mu
- //  for(const auto electron : *elPassingEJ)
- //    {
- //      bool goodLeptons=true;
- //      TLorentzVector elVec;
- //      elVec.SetPtEtaPhiE(electron->pt(),electron->eta(),electron->phi(),electron->e());
- //      for(const auto muon : *muPassingMJ)
-	// {
-	//   TLorentzVector muVec;
-	//   muVec.SetPtEtaPhiE(muon->pt(),muon->eta(),muon->phi(),muon->e());
-	//   if(fabs(elVec.DeltaR(muVec)<0.01))
-	//     {
-	//       //std::cout << "El-Mu Overlap Triggered (remove e and mu)" << std::endl;
-	//       goodLeptons=false;
-	//     }
-	// }
- //      if(goodLeptons) elPassingEM->push_back(electron);  
- //    }
-  
- //  for(const auto muon : *muPassingMJ)
- //    {
- //      //for( ; electron_itr != electron_end; electron_itr++){
- //      bool goodLeptons=true;
- //      TLorentzVector muVec;
- //      muVec.SetPtEtaPhiE(muon->pt(),muon->eta(),muon->phi(),muon->e());
- //      for(const auto electron : *elPassingEJ)
- //        {
- //          //for( ; jet_itr != jet_end; jet_itr++){
- //          TLorentzVector elVec;
-	//   elVec.SetPtEtaPhiE(electron->pt(),electron->eta(),electron->phi(),electron->e());
-	//   if(fabs(elVec.DeltaR(muVec)<0.01))
- //            {
-	//       //std::cout << "El-Mu Overlap Triggered (remove e and mu)" << std::endl;
- //              goodLeptons=false;
- //            }
- //        }
- //      if(goodLeptons) muPassingEM->push_back(muon);
- //    }
-
- //  // Push back the final objects. Phew ...
- //  for(const auto electron : *elPassingEM)
- //    {
- //      FinalElectrons->push_back(electron);
- //    }
- //  for(const auto muon : *muPassingEM)
- //    {
- //      FinalMuons->push_back(muon);
- //    }
- //  for(const auto jet : *jetPassingEJ)
- //    {
- //      FinalJets->push_back(jet);
- //    }
-  
-  /*
-  std::cout << "Overlap removal: " << SignalElectrons->size()-FinalElectrons->size() << "electrons, "
-	    << SignalMuons->size()-FinalMuons->size() << " muons and " << SelectedJets->size()-FinalJets->size() 
-	    << " jets removed." << std::endl;
-  */
 
   const xAOD::MissingETContainer* TruthMET = 0;
   EL_RETURN_CHECK("Get MET", m_event->retrieve( TruthMET, "MET_Truth" ) );
