@@ -2,17 +2,12 @@ import os
 import glob
 from sys import argv
 
+#import rootpy
 import ROOT
+#from ROOT import TTree, TFile, TH1, AddressOf, gROOT
 
 ROOT.gROOT.Macro('$ROOTCOREDIR/scripts/load_packages.C')
 ROOT.xAOD.Init().ignore()
-
-#files = [
-#    'root://fax.mwt2.org:1094//atlas/rucio/mc15_13TeV:DAOD_SUSY10.07108541._000001.pool.root.1',
-#    'root://fax.mwt2.org:1094//atlas/rucio/mc15_13TeV:DAOD_SUSY10.07108541._000002.pool.root.1']
-
-#inlist = argv
-#files = inlist.split(',')
 
 files = argv[1].split(',')
 
@@ -24,26 +19,42 @@ for f in files:
 tree = ROOT.xAOD.MakeTransientTree(chain, ROOT.xAOD.TEvent.kBranchAccess)
 print tree
 
-nevents = 0
-for event in tree:
+# output
+f = ROOT.TFile("gttgbb2k15_acc_out.root","recreate")
 
-    electrons = tree.Electrons
-    muons = tree.Muons
+#with root_open('acc_out.root') as output:
+
+h_acceptance = ROOT.TH1F("acceptance","",1, 0, 1)
+h_dsid=ROOT.TH1F("dsid","",1,0,1);
+
+nevents = 0
+
+for ievt in xrange(tree.GetEntries()):
+    tree.GetEntry(ievt)
+
+    dsid = tree.EventInfo.mcChannelNumber()
+
+    electrons = tree.TruthElectrons
+    muons = tree.TruthMuons
     
-    selected_electrons = filter(lambda el: el.pt() > 10000.0 and abs(el.eta()) < 4.0, electrons)
-    selected_muons = filter(lambda mu: mu.pt() > 10000.0 and abs(mu.eta()) < 4.0, muons)
+    selected_electrons = filter(lambda el: el.pt() > 20000.0, electrons)
+    selected_muons = filter(lambda mu: mu.pt() > 20000.0, muons)
     
-    #if len(selected_muons)+len(selected_electrons) < 1:
     if len(selected_muons) + len(selected_electrons) < 1:
         continue
     nevents += 1
-
+    
     if nevents % 1000 == 0:
         print nevents
-
+        
 print "Total number of events passing: "
 print nevents
-
+    
 print "Acceptance is: "
-print nevents/float(tree.GetEntries())
+acceptance = nevents/float(tree.GetEntries())
+print acceptance
 
+h_acceptance.SetBinContent(1,acceptance)
+h_dsid.SetBinContent(1,dsid)
+
+f.Write()

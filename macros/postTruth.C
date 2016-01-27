@@ -750,7 +750,7 @@ void postTruth(void)
 
 	std::cout << "Done processing events." << std::endl;
 
-	TFile* out; out = new TFile("flipYields.root", "RECREATE");
+	TFile* out; out = new TFile("comboRawYields.root", "RECREATE");
 	h_yields->Write();
 	h_yields_trf->Write();
 	out->Close();

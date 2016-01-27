@@ -1305,7 +1305,7 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
   
   // Gtt 1L control regions
   if(NSignalLeptons>=1
-     && NJets >= 6
+     && NJets == 6
      && pass3bincl
      //&& NBJets >= 3
      && NTopJets >= 1
@@ -1318,7 +1318,7 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
   else isGtt1LCRA2=false;
 
   if( NSignalLeptons >=1
-     && NJets >= 6
+     && NJets == 6
      && pass3bincl
      //&& NBJets >= 3
      && NTopJets >= 0
@@ -2340,7 +2340,7 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   
   // Gtt 1L control regions
   if( NSignalLeptons >= 1
-     && NJets >= 6
+     && NJets == 6
      && pass3bincl
      //&& NBJets >= 3
      && NTopJets >= 1
@@ -2353,7 +2353,7 @@ else // ELSE YOU'RE DOING MCNLO SO FIX THAT MET UP YO
   else isGtt1LCRA2=false;
 
   if( NSignalLeptons >= 1
-     && NJets >= 6
+     && NJets == 6
      && pass3bincl
      //&& NBJets >= 3
      && NTopJets >= 0
