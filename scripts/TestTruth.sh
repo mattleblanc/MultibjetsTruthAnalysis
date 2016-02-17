@@ -25,14 +25,9 @@
 rm -rf /home/mleblanc/out/Test/*
 
 python MultibjetsTruthAnalysis/scripts/Run.py \
-    --submitDir=/home/mleblanc/out/Test/407012/ \
-    --inputDS="mc15_13TeV:mc15_13TeV.407012.PowhegPythiaEvtGen_P2012CT10_ttbarMET200_hdamp172p5_nonAH.merge.DAOD_TRUTH1.e4023_p2436/" \
+    --submitDir=/home/mleblanc/out/Test/370179/ \
+    --inputDS="mc15_13TeV:mc15_13TeV.370179.MGPy8EG_A14N_GG_ttn1_2000_5000_200.merge.DAOD_TRUTH1.e4049_p2482" \
     --driver=direct \
-    --nevents=1000 \
-    --doRcJets=1 \
-    --doAK10Jets=0 \
-    --debug=1 \
-    --doTRF=0 \
     --process="testMLB00"
 
 exit 0

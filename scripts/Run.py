@@ -49,12 +49,13 @@ if options.inputDS != "none":
     ROOT.SH.scanDQ2 (sh_all, options.inputDS);
 else :
     search_directories = []
+    search_directories = ["/home/mleblanc/inTemp/"]
     #search_directories = ["/afs/cern.ch/user/c/crizzi/IFAE/storage/SUSY10/"]
     #search_directories = ["/share/t3data3/kratsg/xAODs/test/"]
     #    search_directories = ["/afs/cern.ch/work/l/lvalery/public/mc15_dSUSY1/test/"]
     #search_directories = ("/afs/cern.ch/atlas/project/PAT/xAODs/r5787/",)
     #search_directories = ["/u/at/swiatlow/nfs/test/rel20/ttbarSUSY1/"]
-    search_directories = ["/share/t3data2/swiatlow/truth_test/"]
+    #search_directories = ["/share/t3data2/swiatlow/truth_test/"]
     #search_directories = ["/afs/cern.ch/work/a/amarzin/susy_13TeV/samples/ttbar/"]
     #search_directories = ["/afs/cern.ch/work/a/amarzin/susy_13TeV/samples/Z/"]
     #search_directories = ["/afs/cern.ch/work/l/lvalery/public/mc15_dSUSY1/test/"]
