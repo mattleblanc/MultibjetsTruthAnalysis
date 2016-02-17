@@ -64,7 +64,7 @@ TruthAnalysis :: TruthAnalysis ()
   // chiara: initialize TRF tool
   const std::string pathToConf = gSystem->Getenv("ROOTCOREBIN");
   m_TRF = new TRFinterface(pathToConf+"/data/BtaggingTRFandRW/calibConfig_MultiBTrurh_MV2c20_v1.txt",-0.7887,"AntiKt4EMTopoJets");
-  m_probTag = true;
+  m_probTag = false;
   m_myRand = new TRandom3();
 
 
@@ -688,7 +688,7 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
 	      if(debug) std::cout << "Mu-Jet Overlap Triggered (remove m)" << std::endl;
               isGoodMuon=false;
             }
-  }
+	}
       if(isGoodMuon) muPassingMJ->push_back(muon);
     }
   
@@ -730,6 +730,7 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
     }
 
   // Push back the final objects. Phew ...
+  
   for(const auto electron : *elPassingEM)
     {
       FinalElectrons->push_back(electron);
@@ -742,7 +743,7 @@ void TruthAnalysis::processEventPerBMultiplicity(ConstDataVector<xAOD::JetContai
     {
       FinalJets->push_back(jet);
     }
-
+  
   if(debug)
     {
       std::cout << "Overlap removal: " << SignalElectrons->size()-FinalElectrons->size() << " electrons, "
@@ -2175,51 +2176,51 @@ EL::StatusCode TruthAnalysis :: execute ()
     bool HasB = (GhostBHadrons(*jet) >= 1);
     bool HasC = (GhostCHadrons(*jet) >= 1);
     bool HasTau = (GhostTaus(*jet) >= 1);
-    // Should we look at taus as well?
-    /*
-    if(HasB)
-      TruthBNum++;
-    if(HasC)
-      TruthCNum++;
+    
+    Bool_t doAcceptance;
+    doAcceptance = true;
 
-    if(HasTau)
-      TruthTauNum++;
-    */
-
-    if(HasB){
-      if(m_probTag){ m_sel_jets_truthLabel.push_back(5); }
-
-      double randB = m_myRand->Rndm();
-      if(randB <= 0.85){
-        // then it counts as a B
-        SelectedBJets->push_back(jet);
+    if(doAcceptance)
+      {
+	if(HasB) SelectedBJets->push_back(jet);
       }
-    }
-    else if(HasC){
-      if(m_probTag){ m_sel_jets_truthLabel.push_back(4); }
-      double randC = m_myRand->Rndm();
-      if(randC < 0.38){
-        // then it counts as a B still
-        SelectedBJets->push_back(jet);
-      }
-    }
-    else if(HasTau){
-      if(m_probTag){ m_sel_jets_truthLabel.push_back(15); }
-      double randTau = m_myRand->Rndm();
-      if(randTau < 0.26){
-	// it's  b, even so
-	SelectedBJets->push_back(jet);
+    else
+      {
+	if(HasB){
+	  if(m_probTag){ m_sel_jets_truthLabel.push_back(5); }
+	  
+	  double randB = m_myRand->Rndm();
+	  if(randB <= 0.85){
+	    // then it counts as a B
+	    SelectedBJets->push_back(jet);
+	  }
 	}
-    }
-    else{ // it's a light jet in truth
-      if(m_probTag){ m_sel_jets_truthLabel.push_back(0); }
-      double randL = m_myRand->Rndm();
-      if(randL < 0.036){
-        SelectedBJets->push_back(jet);
+	else if(HasC){
+	  if(m_probTag){ m_sel_jets_truthLabel.push_back(4); }
+	  double randC = m_myRand->Rndm();
+	  if(randC < 0.38){
+	    // then it counts as a B still
+	    SelectedBJets->push_back(jet);
+	  }
+	}
+	else if(HasTau){
+	  if(m_probTag){ m_sel_jets_truthLabel.push_back(15); }
+	  double randTau = m_myRand->Rndm();
+	  if(randTau < 0.26){
+	    // it's  b, even so
+	    SelectedBJets->push_back(jet);
+	  }
+	}
+	else{ // it's a light jet in truth
+	  if(m_probTag){ m_sel_jets_truthLabel.push_back(0); }
+	  double randL = m_myRand->Rndm();
+	  if(randL < 0.036){
+	    SelectedBJets->push_back(jet);
+	  }
+	  
+	}
       }
-    }
   }//jet loop
-
 
   // Jet Reclustering!
   ConstDataVector<xAOD::JetContainer> * SelectedRCJets   =  new ConstDataVector<xAOD::JetContainer>(SG::VIEW_ELEMENTS);
@@ -2366,7 +2367,6 @@ EL::StatusCode TruthAnalysis :: execute ()
 
   //--------------- All of the above do not need bjets --------------------
   //Only var_mTb has to be recalculated
-
 
   if(m_probTag){
     // chiara
